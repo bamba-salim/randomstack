@@ -1,0 +1,25 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Category {
+  FRONTEND
+  BACKEND
+  DATABASE
+  ORM
+}
+
+model Technology {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  language    String
+  logo        String?
+  usage       String
+  description String
+  category    Category
+  createdAt   DateTime @default(now())
+}

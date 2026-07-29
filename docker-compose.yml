@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  postgres_db:
+    image: postgres:16-alpine
+    container_name: randomstack_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: randomstack
+    ports:
+      - "5433:5432" # Utilise le port 5433 en externe pour éviter les conflits
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: ./apps/server
+      dockerfile: Dockerfile.dev
+    container_name: randomstack_server
+    volumes:
+      - ./apps/server:/app
+      - /app/node_modules
+    ports:
+      - "4000:4000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:devpassword@postgres_db:5432/randomstack?schema=public
+      - PORT=4000
+    depends_on:
+      postgres_db:
+        condition: service_healthy # Attend que la BDD soit active pour migrer et lancer le seeder
+    command: sh -c "npx prisma db push && npm run dev"
+
+  prisma-studio:
+    build:
+      context: ./apps/server
+      dockerfile: Dockerfile.dev
+    container_name: randomstack_prisma_studio
+    volumes:
+      - ./apps/server:/app
+      - /app/node_modules
+    ports:
+      - "5555:5555"
+    environment:
+      - DATABASE_URL=postgresql://postgres:devpassword@postgres_db:5432/randomstack?schema=public
+    depends_on:
+      - postgres_db
+    command: npx prisma studio --browser none
+
+  client:
+    build:
+      context: ./apps/client
+      dockerfile: Dockerfile.dev
+    container_name: randomstack_client
+    volumes:
+      - ./apps/client:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:4000
+    depends_on:
+      - server
+
+volumes:
+  postgres_data:
