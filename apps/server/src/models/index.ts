@@ -1,0 +1,1 @@
+export { default as TechnologyModel } from './technology.model'

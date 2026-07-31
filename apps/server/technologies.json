@@ -1,0 +1,410 @@
+[
+  {
+    "Langage": "JavaScript",
+    "Framework": "Vanilla JS",
+    "Utilisation": "Frontend Web (Natif)",
+    "Description": "Développement brut sans aucune surcouche pour une performance et un contrôle absolus du DOM."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "React",
+    "Utilisation": "Frontend Web (UI)",
+    "Description": "Librairie de Facebook basée sur les composants et le DOM virtuel, standard incontournable de l'industrie."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "Vue.js",
+    "Utilisation": "Frontend Web (Framework)",
+    "Description": "Framework progressif et très intuitif, idéal pour combiner simplicité et extensibilité."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "Angular",
+    "Utilisation": "Frontend Web (Enterprise)",
+    "Description": "Framework complet et ultra-structuré de Google par défaut pour les gros projets d'entreprise."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "Svelte",
+    "Utilisation": "Frontend Web (Compilateur)",
+    "Description": "Compile les composants directement en code machine sans utiliser de DOM virtuel au runtime."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "SolidJS",
+    "Utilisation": "Frontend Web (Performance)",
+    "Description": "Proche de React dans sa syntaxe mais utilise de la réactivité fine sans DOM virtuel pour plus de vitesse."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "Alpine.js",
+    "Utilisation": "Frontend Web (Léger)",
+    "Description": "Micro-framework idéal pour ajouter du comportement dynamique directement dans le code HTML."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "Preact",
+    "Utilisation": "Frontend Web (Léger)",
+    "Description": "Alternative ultra-légère à React (3kb) partageant presque la même API."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "Node.js",
+    "Utilisation": "Backend / Runtime",
+    "Description": "Environnement d'exécution indispensable pour faire tourner JavaScript côté serveur."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "Express.js",
+    "Utilisation": "Backend (Framework API)",
+    "Description": "Le framework minimaliste historique standard de l'écosystème Node pour bâtir des serveurs."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "Fastify",
+    "Utilisation": "Backend (Haute Performance)",
+    "Description": "Framework HTTP ultra-rapide pour Node.js, axé sur de faibles coûts de performance et une validation stricte."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "Hapi.js",
+    "Utilisation": "Backend (Enterprise API)",
+    "Description": "Framework robuste axé sur la sécurité et la configuration plutôt que le code."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "Koa.js",
+    "Utilisation": "Backend (Léger)",
+    "Description": "Créé par l'équipe d'Express, il utilise massivement les fonctionnalités asynchrones modernes."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "React Native",
+    "Utilisation": "Mobile (iOS & Android)",
+    "Description": "Framework cross-platform compilant du vrai code natif pour smartphone à partir de React."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "Electron",
+    "Utilisation": "Desktop Apps (Multiplateforme)",
+    "Description": "Permet d'embarquer du HTML/CSS/JS dans un navigateur Chromium pour faire des applications de bureau (ex: VS Code)."
+  },
+  {
+    "Langage": "JavaScript",
+    "Framework": "Cordova / PhoneGap",
+    "Utilisation": "Mobile Apps (Hybride historique)",
+    "Description": "Ancienne méthode pour encapsuler un site web dans une application mobile via une WebView."
+  },
+  {
+    "Langage": "TypeScript",
+    "Framework": "Vanilla TS",
+    "Utilisation": "Frontend & Backend (Typé)",
+    "Description": "Utilisation de TypeScript natif compilé vers JS pour assurer la sécurité logicielle."
+  },
+  {
+    "Langage": "TypeScript",
+    "Framework": "Next.js",
+    "Utilisation": "Fullstack Web / SSR",
+    "Description": "Framework React leader offrant le rendu côté serveur (SSR), le routage automatique et l'optimisation SEO."
+  },
+  {
+    "Langage": "TypeScript",
+    "Framework": "Nuxt.js",
+    "Utilisation": "Fullstack Web / SSR",
+    "Description": "L'équivalent de Next.js mais conçu spécifiquement pour l'écosystème Vue.js."
+  },
+  {
+    "Langage": "TypeScript",
+    "Framework": "NestJS",
+    "Utilisation": "Backend (Architecture)",
+    "Description": "Framework backend d'entreprise inspiré d'Angular, imposant une architecture rigoureuse et modulaire."
+  },
+  {
+    "Langage": "TypeScript",
+    "Framework": "Remix",
+    "Utilisation": "Fullstack Web / SSR",
+    "Description": "Framework complet axé sur les standards du web, la gestion fluide des formulaires et la rapidité des requêtes."
+  },
+  {
+    "Langage": "TypeScript",
+    "Framework": "Gatsby",
+    "Utilisation": "Frontend Web / SSG",
+    "Description": "Générateur de sites statiques basé sur React et GraphQL, excellent pour les blogs et sites vitrines."
+  },
+  {
+    "Langage": "TypeScript",
+    "Framework": "Astro",
+    "Utilisation": "Frontend Web (Multi-framework)",
+    "Description": "Génère du HTML ultra-léger en supprimant le JavaScript inutile (architecture d'îles de composants)."
+  },
+  {
+    "Langage": "TypeScript",
+    "Framework": "SvelteKit",
+    "Utilisation": "Fullstack Web / SSR",
+    "Description": "Le framework officiel complet construit au-dessus de Svelte pour le routage et le SSR."
+  },
+  {
+    "Langage": "TypeScript",
+    "Framework": "AdonisJS",
+    "Utilisation": "Backend (Fullstack MVC)",
+    "Description": "Framework Node.js complet reprenant la philosophie MVC très structurée de Laravel."
+  },
+  {
+    "Langage": "Dart",
+    "Framework": "Vanilla Dart",
+    "Utilisation": "Logique / Outils",
+    "Description": "Programmation orientée objet de base optimisée pour l'exécution rapide de scripts."
+  },
+  {
+    "Langage": "Dart",
+    "Framework": "Flutter",
+    "Utilisation": "Mobile / Web Multiplateforme",
+    "Description": "Moteur graphique révolutionnaire de Google dessinant chaque pixel pour une fluidité native absolue."
+  },
+  {
+    "Langage": "Python",
+    "Framework": "Vanilla Python",
+    "Utilisation": "Scripts / Data",
+    "Description": "Le langage pur utilisé pour l'analyse de données, l'IA et l'automatisation."
+  },
+  {
+    "Langage": "Python",
+    "Framework": "Django",
+    "Utilisation": "Backend (Piles incluses)",
+    "Description": "Framework complet, sécurisé et lourd, embarquant son propre ORM et interface d'administration."
+  },
+  {
+    "Langage": "Python",
+    "Framework": "FastAPI",
+    "Utilisation": "Backend (API Asynchrone)",
+    "Description": "Le standard moderne ultra-rapide pour concevoir des APIs avec documentation automatique."
+  },
+  {
+    "Langage": "Python",
+    "Framework": "Flask",
+    "Utilisation": "Backend (Micro-framework)",
+    "Description": "Framework minimaliste laissant une liberté totale d'organisation du code."
+  },
+  {
+    "Langage": "Python",
+    "Framework": "Pyramid",
+    "Utilisation": "Backend (Modulaire)",
+    "Description": "Framework flexible adapté aussi bien pour de petites applications que des projets géants."
+  },
+  {
+    "Langage": "Python",
+    "Framework": "Tornado",
+    "Utilisation": "Backend (Réseau/WebSockets)",
+    "Description": "Framework et librairie réseau asynchrone capable de gérer des milliers de connexions simultanées."
+  },
+  {
+    "Langage": "PHP",
+    "Framework": "Vanilla PHP",
+    "Utilisation": "Backend Web",
+    "Description": "Le code PHP d'origine sans bibliothèque pour l'apprentissage ou des applications simples."
+  },
+  {
+    "Langage": "PHP",
+    "Framework": "Laravel",
+    "Utilisation": "Backend (Moderne MVC)",
+    "Description": "Framework star au design épuré disposant d'un écosystème géant et d'une syntaxe élégante."
+  },
+  {
+    "Langage": "PHP",
+    "Framework": "Symfony",
+    "Utilisation": "Backend (Architecture)",
+    "Description": "Framework français modulaire, extrêmement rigoureux, très prisé par les grands groupes industriels."
+  },
+  {
+    "Langage": "PHP",
+    "Framework": "WordPress",
+    "Utilisation": "CMS / Blog / Vitrine",
+    "Description": "Le système de gestion de contenu le plus populaire de la planète pour éditer des sites sans coder."
+  },
+  {
+    "Langage": "PHP",
+    "Framework": "Drupal",
+    "Utilisation": "CMS (Enterprise CMF)",
+    "Description": "Framework de gestion de contenu hautement sécurisé et puissant pour sites institutionnels lourds."
+  },
+  {
+    "Langage": "PHP",
+    "Framework": "Joomla",
+    "Utilisation": "CMS (Intermédiaire)",
+    "Description": "CMS historique proposant une flexibilité à mi-chemin entre WordPress et Drupal."
+  },
+  {
+    "Langage": "PHP",
+    "Framework": "CakePHP",
+    "Utilisation": "Backend (Rapide MVC)",
+    "Description": "Framework inspiré des concepts de Ruby on Rails permettant un développement structuré et rapide."
+  },
+  {
+    "Langage": "PHP",
+    "Framework": "CodeIgniter",
+    "Utilisation": "Backend (Léger)",
+    "Description": "Framework très léger au format mini, idéal pour les serveurs aux performances limitées."
+  },
+  {
+    "Langage": "Kotlin",
+    "Framework": "Jetpack Compose",
+    "Utilisation": "Mobile Android (Natif)",
+    "Description": "Le framework d'interface déclaratif moderne officiel poussé par Google."
+  },
+  {
+    "Langage": "Kotlin",
+    "Framework": "Kotlin Multiplatform (KMP)",
+    "Utilisation": "Mobile Cross-Platform",
+    "Description": "Partage la logique métier (code de calcul, réseau) entre iOS et Android de manière transparente."
+  },
+  {
+    "Langage": "Kotlin",
+    "Framework": "Ktor",
+    "Utilisation": "Backend (Asynchrone)",
+    "Description": "Framework asynchrone créé par JetBrains pour concevoir des serveurs et clients légers."
+  },
+  {
+    "Langage": "Java",
+    "Framework": "Spring Boot",
+    "Utilisation": "Backend (Enterprise Heavy)",
+    "Description": "Le roi incontesté de l'industrie pour les architectures microservices et serveurs critiques sécurisés."
+  },
+  {
+    "Langage": "Java",
+    "Framework": "Quarkus",
+    "Utilisation": "Backend (Cloud Native)",
+    "Description": "Framework Java adapté pour Kubernetes avec un temps de démarrage ultra-rapide."
+  },
+  {
+    "Langage": "Java",
+    "Framework": "Micronaut",
+    "Utilisation": "Backend (Microservices)",
+    "Description": "Framework moderne conçu pour créer des architectures serveurs cloud à faible empreinte mémoire."
+  },
+  {
+    "Langage": "Swift",
+    "Framework": "SwiftUI",
+    "Utilisation": "Mobile iOS (Natif)",
+    "Description": "Framework déclaratif moderne d'Apple facilitant énormément la création d'interfaces graphiques."
+  },
+  {
+    "Langage": "Swift",
+    "Framework": "UIKit",
+    "Utilisation": "Mobile iOS (Héritage)",
+    "Description": "Framework impératif historique indispensable pour maintenir les anciennes applications Apple."
+  },
+  {
+    "Langage": "Swift",
+    "Framework": "Vapor",
+    "Utilisation": "Backend Swift",
+    "Description": "Permet d'utiliser la puissance et le typage de Swift côté serveur pour créer des APIs."
+  },
+  {
+    "Langage": "Ruby",
+    "Framework": "Ruby on Rails",
+    "Utilisation": "Backend / Fullstack MVC",
+    "Description": "Pionnier de la philosophie 'Convention plutôt que Configuration' pour coder à la vitesse de l'éclair."
+  },
+  {
+    "Langage": "Ruby",
+    "Framework": "Sinatra",
+    "Utilisation": "Backend (Micro-framework)",
+    "Description": "Alternative minimaliste à Rails permettant de créer des services web en quelques lignes."
+  },
+  {
+    "Langage": "C#",
+    "Framework": "ASP.NET Core",
+    "Utilisation": "Backend Cloud & API",
+    "Description": "Framework ultra-performant et open-source de Microsoft taillé pour le cloud d'entreprise."
+  },
+  {
+    "Langage": "C#",
+    "Framework": ".NET MAUI / Xamarin",
+    "Utilisation": "Mobile & Bureau Cross-Platform",
+    "Description": "Technologie Microsoft permettant d'exporter un code C# sur Android, iOS et Windows."
+  },
+  {
+    "Langage": "C#",
+    "Framework": "Blazor",
+    "Utilisation": "Frontend Web (C#)",
+    "Description": "Permet de concevoir des interfaces web interactives en C# sans utiliser JavaScript (via WebAssembly)."
+  },
+  {
+    "Langage": "Go (Golang)",
+    "Framework": "Gin-Gonic",
+    "Utilisation": "Backend (API Légère)",
+    "Description": "Framework de routage minimaliste offrant de superbes performances réseau."
+  },
+  {
+    "Langage": "Go (Golang)",
+    "Framework": "Fiber",
+    "Utilisation": "Backend (Type Express)",
+    "Description": "Framework ultra-rapide calqué sur le modèle et la simplicité de syntaxe d'Express.js (Node)."
+  },
+  {
+    "Langage": "Go (Golang)",
+    "Framework": "Echo",
+    "Utilisation": "Backend (API REST)",
+    "Description": "Framework web extensible, centré sur la rapidité et la gestion performante des contextes HTTP."
+  },
+  {
+    "Langage": "Rust",
+    "Framework": "Actix-web",
+    "Utilisation": "Backend (Performance pure)",
+    "Description": "Un des frameworks serveurs les plus rapides au monde toutes catégories confondues."
+  },
+  {
+    "Langage": "Rust",
+    "Framework": "Axum",
+    "Utilisation": "Backend (Écosystème Tokio)",
+    "Description": "Framework web modulaire et officiel de l'écosystème asynchrone de Rust."
+  },
+  {
+    "Langage": "Rust",
+    "Framework": "Tauri",
+    "Utilisation": "Desktop / Mobile Apps",
+    "Description": "Alternative ultra-légère à Electron remplaçant Chromium par la WebView native du système."
+  },
+  {
+    "Langage": "SQL (Relationnel)",
+    "Framework": "PostgreSQL",
+    "Utilisation": "Base de Données Globale",
+    "Description": "Le système de gestion relationnel open-source le plus complet, puissant et extensible."
+  },
+  {
+    "Langage": "SQL (Relationnel)",
+    "Framework": "MySQL / MariaDB",
+    "Utilisation": "Base de Données Web",
+    "Description": "Le standard historique du web, ultra-rapide pour les architectures classiques (LAMP)."
+  },
+  {
+    "Langage": "SQL (Relationnel)",
+    "Framework": "SQLite",
+    "Utilisation": "Base de Données Embarquée",
+    "Description": "Un moteur SQL complet tenant dans un simple fichier local, au cœur de toutes les applications mobiles."
+  },
+  {
+    "Langage": "NoSQL / BaaS",
+    "Framework": "MongoDB",
+    "Utilisation": "Stockage Documentaire",
+    "Description": "Base NoSQL stockant les données sous forme de documents JSON flexibles, très populaire avec Node.js."
+  },
+  {
+    "Langage": "NoSQL / BaaS",
+    "Framework": "Redis",
+    "Utilisation": "Cache & Clé-Valeur",
+    "Description": "Base de données en mémoire ultra-rapide utilisée pour la mise en cache et les sessions en temps réel."
+  },
+  {
+    "Langage": "NoSQL / BaaS",
+    "Framework": "Supabase",
+    "Utilisation": "Backend-as-a-Service (Open)",
+    "Description": "Plateforme cloud fournissant une base PostgreSQL, authentification, stockage et APIs temps réel générées automatiquement."
+  },
+  {
+    "Langage": "NoSQL / BaaS",
+    "Framework": "Firebase",
+    "Utilisation": "Backend-as-a-Service (Google)",
+    "Description": "L'infrastructure cloud clé en main historique de Google pour synchroniser instantanément les apps mobiles et le web."
+  }
+]

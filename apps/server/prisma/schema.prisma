@@ -10,7 +10,8 @@ enum Category {
   FRONTEND
   BACKEND
   DATABASE
-  ORM
+  MOBILE
+  DESKTOP
 }
 
 model Technology {

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres_db:
     image: postgres:16-alpine
@@ -9,7 +7,7 @@ services:
       POSTGRES_PASSWORD: devpassword
       POSTGRES_DB: randomstack
     ports:
-      - "5433:5432" # Utilise le port 5433 en externe pour éviter les conflits
+      - "5435:5432" # Utilise le port 5435 en externe pour éviter les conflits
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -34,7 +32,8 @@ services:
     depends_on:
       postgres_db:
         condition: service_healthy # Attend que la BDD soit active pour migrer et lancer le seeder
-    command: sh -c "npx prisma db push && npm run dev"
+    # Ligne modifiée ci-dessous pour inclure npx prisma generate en premier 🚀
+    command: sh -c "npx prisma generate && npx prisma db push && npm run dev"
 
   prisma-studio:
     build:
@@ -66,6 +65,7 @@ services:
       - VITE_API_URL=http://localhost:4000
     depends_on:
       - server
+    command: npm run dev -- --host # <-- Ligne ajoutée pour démarrer le compilateur Vite
 
 volumes:
   postgres_data:
