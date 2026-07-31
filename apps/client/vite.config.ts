@@ -9,5 +9,11 @@ export default defineConfig({
             '#services': fileURLToPath(new URL('./src/services/index.ts', import.meta.url)),
             '#pages': fileURLToPath(new URL('./src/pages/index.ts', import.meta.url))
         }
+    },
+    // AJOUTEZ CE BLOC SERVEUR ICI 🚀
+    server: {
+        watch: {
+            usePolling: true // Force le "watch" par scrutation pour fonctionner sous Docker sur Mac
+        }
     }
 })
