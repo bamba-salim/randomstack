@@ -49,8 +49,7 @@ services:
       - DATABASE_URL=postgresql://postgres:devpassword@postgres_db:5432/randomstack?schema=public
     depends_on:
       - postgres_db
-    command: npx prisma studio --browser none
-
+    command: npx prisma studio --port 5555 --browser none
   client:
     build:
       context: ./apps/client
