@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { StackService, type DrawnStack, type ClientTechnology } from '#services'
+import {HomeScript} from '#scripts'
 
-// États de la machine
 const currentStack = ref<DrawnStack | null>(null)
 const history = ref<DrawnStack[]>([])
 const loading = ref(false)
@@ -10,78 +10,50 @@ const isSpinning = ref(false)
 const animateEnabled = ref(true)
 const showSidebar = ref(false)
 
-// États de verrouillage
 const clientLocked = ref(false)
 const serverLocked = ref(false)
 const databaseLocked = ref(false)
 
-// Listes d'animation de rouleaux
 const clientReel = ref<ClientTechnology[]>([])
 const serverReel = ref<ClientTechnology[]>([])
 const databaseReel = ref<ClientTechnology[]>([])
-
-const placeholders: ClientTechnology[] = [
-  { id: 'p1', name: 'Angular', language: 'TypeScript', usage: 'Frontend', description: '', category: 'FRONTEND' },
-  { id: 'p2', name: 'Django', language: 'Python', usage: 'Backend', description: '', category: 'BACKEND' },
-  { id: 'p3', name: 'MySQL', language: 'SQL', usage: 'Database', description: '', category: 'DATABASE' },
-  { id: 'p4', name: 'React', language: 'JS', usage: 'Frontend', description: '', category: 'FRONTEND' },
-  { id: 'p5', name: 'FastAPI', language: 'Python', usage: 'Backend', description: '', category: 'BACKEND' },
-  { id: 'p6', name: 'MongoDB', language: 'NoSQL', usage: 'Database', description: '', category: 'DATABASE' },
-  { id: 'p7', name: 'Svelte', language: 'JS', usage: 'Frontend', description: '', category: 'FRONTEND' },
-  { id: 'p8', name: 'Spring Boot', language: 'Java', usage: 'Backend', description: '', category: 'BACKEND' },
-  { id: 'p9', name: 'Redis', language: 'NoSQL', usage: 'Database', description: '', category: 'DATABASE' }
-]
-
-const generateReelStrip = (finalItem: ClientTechnology | null, category: string): ClientTechnology[] => {
-  const filteredPlaceholders = placeholders.filter(p => {
-    if (category === 'CLIENT') return ['FRONTEND', 'MOBILE', 'DESKTOP'].includes(p.category)
-    return p.category === category
-  })
-
-  const strip: ClientTechnology[] = []
-  for (let i = 0; i < 9; i++) {
-    const item = filteredPlaceholders[i % filteredPlaceholders.length]
-    if (item) strip.push(item)
-  }
-
-  strip.push(finalItem || { id: 'empty', name: '...', language: '', usage: '', description: '', category: '' })
-  return strip
-}
 
 const handleDraw = async () => {
   if (loading.value) return
   loading.value = true
 
   try {
-    const data = await StackService.triggerDraw()
+    const payload = {
+      locks: {
+        client: clientLocked.value,
+        server: serverLocked.value,
+        database: databaseLocked.value
+      },
+      currentStack: currentStack.value
+    }
 
-    const finalClient = (clientLocked.value && currentStack.value) ? currentStack.value.clientLayer : data.current.clientLayer
-    const finalServer = (serverLocked.value && currentStack.value) ? currentStack.value.serverLayer : data.current.serverLayer
-    const finalDatabase = (databaseLocked.value && currentStack.value) ? currentStack.value.databaseLayer : data.current.databaseLayer
+    const data = await StackService.triggerDraw(payload)
+    const finalClient = data.current.clientLayer
+    const finalServer = data.current.serverLayer
+    const finalDatabase = data.current.databaseLayer
 
     if (animateEnabled.value) {
+      // Appel des méthodes statiques de HomeScript pour générer les bandes 🚀
       if (!clientLocked.value) {
-        clientReel.value = generateReelStrip(finalClient, 'CLIENT')
+        clientReel.value = HomeScript.generateReelStrip(finalClient, 'CLIENT')
       }
       if (!serverLocked.value) {
-        serverReel.value = generateReelStrip(finalServer, 'BACKEND')
+        serverReel.value = HomeScript.generateReelStrip(finalServer, 'BACKEND')
       }
       if (!databaseLocked.value) {
-        databaseReel.value = generateReelStrip(finalDatabase, 'DATABASE')
+        databaseReel.value = HomeScript.generateReelStrip(finalDatabase, 'DATABASE')
       }
 
       isSpinning.value = true
 
       setTimeout(() => {
-        currentStack.value = {
-          clientLayer: finalClient,
-          serverLayer: finalServer,
-          databaseLayer: finalDatabase,
-          timestamp: data.current.timestamp
-        }
+        currentStack.value = data.current
 
-        // --- LA CORRECTION EST ICI 🚀 ---
-        // Dès que l'animation se fige, on nettoie les rouleaux pour ne garder que l'élément final unique
         clientReel.value = [finalClient!]
         serverReel.value = [finalServer!]
         databaseReel.value = [finalDatabase!]
@@ -91,15 +63,11 @@ const handleDraw = async () => {
         loading.value = false
       }, 3100)
     } else {
-      currentStack.value = {
-        clientLayer: finalClient,
-        serverLayer: finalServer,
-        databaseLayer: finalDatabase,
-        timestamp: data.current.timestamp
-      }
+      currentStack.value = data.current
       clientReel.value = [finalClient!]
       serverReel.value = [finalServer!]
       databaseReel.value = [finalDatabase!]
+      history.value = data.history
       loading.value = false
     }
   } catch (err) {
