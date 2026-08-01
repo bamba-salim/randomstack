@@ -1,15 +1,28 @@
 import express from 'express'
 import cors from 'cors'
-import { DatabaseConfig } from '#config'
-import { SessionMiddleware } from '#middlewares'
-import { SeedAction } from '#action-support' // <-- 1. IMPORTATION ICI
-import { StackRoute } from '#routes'
+import {DatabaseConfig} from '#config'
+import {SessionMiddleware} from '#middlewares'
+import {SeedAction} from '#action-support' // <-- 1. IMPORTATION ICI
+import {StackRoute} from '#routes'
 
 const app = express()
 
+const ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5175'
+]
+
 // Activation de CORS avec partage de credentials pour la session
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: (origin, callback) => {
+        // On autorise les requêtes sans origine (comme Postman ou curl) ou celles dans notre liste blanche
+        if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+            callback(null, true)
+        } else {
+            callback(new Error('Accès refusé par la politique CORS.'))
+        }
+    },
     credentials: true
 }))
 
