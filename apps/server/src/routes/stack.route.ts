@@ -7,7 +7,7 @@ export default class StackRoute {
 
         router.post('/draw', StackController.draw)
         router.get('/history', StackController.getHistory)
-        router.get('/technologies', StackController.fetcTechnologies)
+        router.get('/technologies', StackController.fetchTechnologies)
 
         return router
     }

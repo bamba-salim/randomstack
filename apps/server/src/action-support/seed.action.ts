@@ -12,15 +12,12 @@ interface RawExcelTech {
 
 export default class SeedAction {
     static async execute(): Promise<void> {
-        console.log("[Seed] ⏳ Démarrage de la vérification du seeding...");
 
         try {
             // 1. Vérification du nombre d'éléments existants
             const count = await DbClient.client.technology.count()
-            console.log(`[Seed] 📊 Nombre de technologies actuellement en BDD : ${count}`)
 
             if (count > 0) {
-                console.log("[Seed] ℹ️ La base de données contient déjà des données. Seeding ignoré.")
                 return
             }
 
@@ -35,12 +32,10 @@ export default class SeedAction {
                 return
             }
 
-            console.log(`[Seed] 📂 Fichier de données trouvé : ${filePath}`)
 
             // 3. Lecture et parsing du JSON
             const rawData = fs.readFileSync(filePath, 'utf-8')
             const rawTechs: RawExcelTech[] = JSON.parse(rawData)
-            console.log(`[Seed] ⚙️ Parsing réussi. Nombre d'éléments trouvés dans votre JSON : ${rawTechs.length}`)
 
             // 4. Ingestion dans PostgreSQL
             let importedCount = 0

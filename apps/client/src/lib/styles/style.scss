@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@use "tailwindcss";
 
 // Importation des sous-fichiers de pages
-@import "./pages/home";
+@use "./pages/home";

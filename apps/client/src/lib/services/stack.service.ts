@@ -23,12 +23,16 @@ export interface DrawResponse {
 }
 
 export default class StackService extends ApiClient {
-    static async triggerDraw(): Promise<DrawResponse> {
-        return await this.post<DrawResponse>('/api/draw')
+    // Envoi des verrous et de la blacklist sous forme d'IDs exclus 🚀
+    static async triggerDraw(payload: {
+        locks: { client: boolean, server: boolean, database: boolean },
+        currentStack: DrawnStack | null,
+        blacklist: string[]
+    }): Promise<DrawResponse> {
+        return await this.post<DrawResponse>('/api/draw', payload)
     }
 
-    static async fetchHistory(): Promise<DrawnStack[]> {
-        const data = await this.get<{ history: DrawnStack[] }>('/api/history')
-        return data.history
+    static async fetchAllTechnologies(): Promise<ClientTechnology[]> {
+        return await this.get<ClientTechnology[]>('/api/technologies')
     }
 }

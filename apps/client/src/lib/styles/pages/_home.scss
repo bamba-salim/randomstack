@@ -8,7 +8,6 @@ $slot-height: 140px;
   @apply flex flex-col items-center justify-center min-h-screen bg-slate-950 text-slate-100 p-4 relative overflow-hidden;
 
   .cabinet-wrap {
-    // Changé p-6 à p-4 sur mobile pour gagner de la place, puis sm:p-6 🚀
     @apply bg-slate-900 border-4 border-slate-800 rounded-3xl p-4 sm:p-6 w-full max-w-xl shadow-2xl relative;
     box-shadow: 0 0 40px rgba(59, 130, 246, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.05);
 
@@ -23,18 +22,27 @@ $slot-height: 140px;
     @apply relative z-10 flex flex-col;
   }
 
-  // En-tête empilé verticalement et centré sur mobile, puis côte-à-côte sur desktop (sm:) 🚀
+  // En-tête du Cabinet Symétrique 🚀
   .cabinet-header {
     @apply flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 relative w-full;
 
     .title-area {
-      @apply flex flex-col items-center sm:items-start text-center sm:text-left;
+      @apply flex flex-col items-center sm:items-start text-center sm:text-left order-1 sm:order-2;
+    }
+
+    // Bouton Exclusion à Gauche
+    .blacklist-trigger-btn {
+      @apply w-full sm:w-auto flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-wider rounded-lg transition-colors duration-200 cursor-pointer order-2 sm:order-1;
+    }
+
+    // Bouton Historique à Droite
+    .history-trigger-btn {
+      @apply w-full sm:w-auto flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-wider rounded-lg transition-colors duration-200 cursor-pointer order-3;
     }
   }
 
   .title {
-    // Taille de police légèrement réduite sur mobile (text-2xl) 🚀
-    @apply text-2xl sm:text-3xl font-extrabold uppercase tracking-wider text-left;
+    @apply text-2xl sm:text-3xl font-extrabold uppercase tracking-wider text-center sm:text-left;
     background: linear-gradient(to right, $neon-cyan, $primary, $neon-pink);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -43,10 +51,6 @@ $slot-height: 140px;
 
   .description {
     @apply text-[9px] text-slate-500 uppercase tracking-widest font-bold;
-  }
-
-  .history-trigger-btn {
-    @apply flex items-center gap-1.5 py-2 px-3 sm:py-2.5 sm:px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-wider rounded-lg transition-colors duration-200 cursor-pointer;
   }
 
   // --- SLOT MACHINE ENGINE ---
@@ -63,7 +67,6 @@ $slot-height: 140px;
     }
 
     .lock-btn {
-      // Ajustement de taille pour s'accorder sur mobile (padding plus fin) 🚀
       @apply self-center mb-2 px-2.5 sm:px-3 py-1 bg-slate-900 border border-slate-800 text-[9px] sm:text-[10px] font-black tracking-wide rounded-md transition-all duration-200 cursor-pointer select-none;
       color: $neon-cyan;
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
@@ -107,7 +110,6 @@ $slot-height: 140px;
     @apply flex flex-col justify-center items-center gap-1.5 sm:gap-2.5 px-1 text-center shrink-0;
 
     .tech-logo-placeholder {
-      // Taille légèrement adaptée sur mobile (w-10 h-10) puis w-14 h-14 sur desktop 🚀
       @apply w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-slate-800 flex items-center justify-center font-black text-xs border border-slate-700 shadow-md shrink-0;
       color: $neon-cyan;
     }
@@ -116,7 +118,6 @@ $slot-height: 140px;
       @apply flex flex-col justify-center items-center w-full;
 
       .tech-name {
-        // Ajustement responsive du nom pour s'assurer que ça reste lisible sur 375px 🚀
         @apply text-[10px] sm:text-xs font-black text-slate-200 tracking-wide truncate max-w-full;
       }
 
@@ -161,11 +162,12 @@ $slot-height: 140px;
     }
   }
 
-  // --- BARRE LATÉRALE ---
+  // --- BARRES LATÉRALES (DRAWERS GAUCHE & DROITE) & OVERLAY ---
   .sidebar-overlay {
     @apply fixed inset-0 bg-black/60 z-40;
   }
 
+  // 1. Volet Historique (À Droite)
   .sidebar-panel {
     @apply fixed top-0 right-0 h-full w-full sm:w-80 bg-slate-900 border-l border-slate-800 shadow-2xl z-50 p-6 flex flex-col;
 
@@ -209,14 +211,66 @@ $slot-height: 140px;
       @apply text-center text-slate-500 italic text-xs my-auto;
     }
   }
+
+  // 2. Nouveau Volet Blacklist (À Gauche) 🚀
+  .blacklist-panel {
+    @apply fixed top-0 left-0 h-full w-full sm:w-80 bg-slate-900 border-r border-slate-800 shadow-2xl z-50 p-6 flex flex-col;
+
+    .blacklist-header {
+      @apply flex items-center justify-between border-b border-slate-800 pb-4 mb-4;
+
+      .blacklist-title {
+        @apply text-xs font-black text-slate-400 uppercase tracking-widest;
+      }
+
+      .close-btn {
+        @apply text-xs font-bold text-slate-500 hover:text-slate-300 uppercase tracking-wider cursor-pointer;
+      }
+    }
+
+    .blacklist-content {
+      @apply flex-1 space-y-5 overflow-y-auto pr-1;
+    }
+
+    .category-section {
+      @apply flex flex-col gap-2;
+
+      .category-name {
+        @apply text-[8px] font-black text-slate-600 uppercase tracking-wider pl-1 text-left;
+      }
+
+      .tech-checkbox-grid {
+        @apply flex flex-col gap-1.5;
+      }
+
+      .tech-checkbox-item {
+        @apply flex items-center gap-2 p-2.5 bg-slate-950/40 border border-slate-900 rounded-lg text-[10px] font-bold text-slate-400 cursor-pointer select-none transition-all duration-200 text-left;
+
+        &.blacklisted {
+          @apply border-red-950 bg-red-950/10 text-red-500/80;
+          text-decoration: line-through;
+          filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.15));
+        }
+      }
+    }
+  }
 }
 
 // --- ANIMATIONS ---
+// Transition Volet Droite (Slide de droite à gauche)
 .slide-enter-active, .slide-leave-active {
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .slide-enter-from, .slide-leave-to {
   transform: translateX(100%);
+}
+
+// Transition Volet Gauche (Slide de gauche à droite) 🚀
+.slide-left-enter-active, .slide-left-leave-active {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.slide-left-enter-from, .slide-left-leave-to {
+  transform: translateX(-100%);
 }
 
 .fade-enter-active, .fade-leave-active {

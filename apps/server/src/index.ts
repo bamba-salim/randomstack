@@ -23,9 +23,7 @@ const PORT = process.env['PORT'] || 4000
 
 // Validation et démarrage de l'infrastructure
 DatabaseConfig.checkConnection().then(async (connected) => {
-    console.log(`[Diagnostic] Connexion BDD établie ? ${connected}`); // <-- AJOUTEZ CE LOG
     if (connected) {
-        console.log("[Diagnostic] Appel de SeedAction.execute() imminent..."); // <-- AJOUTEZ CE LOG
         await SeedAction.execute()
 
         app.listen(PORT, () => {

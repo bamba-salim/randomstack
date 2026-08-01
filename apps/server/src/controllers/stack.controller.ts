@@ -5,18 +5,38 @@ import { DrawAction } from '#action-support'
 export default class StackController {
     static async draw(req: Request, res: Response): Promise<void> {
         try {
-            const techs = await TechnologyModel.findAll()
-            const drawnStack = DrawAction.run(techs)
+            const { locks, currentStack, blacklist } = req.body
 
+            const allTechs = await TechnologyModel.findAll()
+
+            // 1. Filtrage par la Blacklist (exclure les IDs d'une liste) 🚀
+            const blacklistedIds = Array.isArray(blacklist) ? blacklist : []
+            const allowedTechs = allTechs.filter(t => !blacklistedIds.includes(t.id))
+
+            // 2. Tirage aléatoire uniquement sur les technologies autorisées 🚀
+            const newDraw = DrawAction.run(allowedTechs)
+
+            // 3. Résolution des Cadenas (Locks)
+            const finalClient = (locks?.client && currentStack) ? currentStack.clientLayer : newDraw.clientLayer
+            const finalServer = (locks?.server && currentStack) ? currentStack.serverLayer : newDraw.serverLayer
+            const finalDatabase = (locks?.database && currentStack) ? currentStack.databaseLayer : newDraw.databaseLayer
+
+            const resolvedStack = {
+                clientLayer: finalClient,
+                serverLayer: finalServer,
+                databaseLayer: finalDatabase,
+                timestamp: newDraw.timestamp
+            }
+
+            // 4. Enregistrement de la stack réellement résolue dans la session
             const session = req.session as any
             if (!session.history) {
                 session.history = []
             }
-
-            session.history.unshift(drawnStack)
+            session.history.unshift(resolvedStack)
 
             res.json({
-                current: drawnStack,
+                current: resolvedStack,
                 history: session.history
             })
         } catch (error) {
@@ -31,8 +51,12 @@ export default class StackController {
         })
     }
 
-    static async fetcTechnologies(req: Request, res: Response): Promise<void> {
-        const technologies = await TechnologyModel.findAll()
-        res.json(technologies)
+    static async fetchTechnologies(req: Request, res: Response): Promise<void> {
+        try {
+            const techs = await TechnologyModel.findAll()
+            res.json(techs)
+        } catch {
+            res.status(500).json({ error: 'Erreur lors du chargement des technologies.' })
+        }
     }
 }
