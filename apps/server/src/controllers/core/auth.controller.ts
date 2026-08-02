@@ -10,12 +10,16 @@ export default class AuthController {
             return { user: null, error: 'Email et mot de passe requis.' }
         }
 
+
         const user = await UserModel.findByEmail(email)
+
         if (!user) {
             return { user: null, error: "Ce compte n'existe pas." } // Existence du compte 🚀
         }
 
-        const isPasswordValid = PasswUtils.verify(password, user.passwordHash)
+        const isPasswordValid = PasswordUtils.verify(password, user.passwordHash)
+
+        console.log(isPasswordValid)
         if (!isPasswordValid) {
             return { user: null, error: 'Mot de passe incorrect.' }
         }
@@ -50,7 +54,10 @@ export default class AuthController {
     static async adminLogin(req: Request, res: Response): Promise<void> {
         try {
             const { email, password } = req.body
+
+
             const { user, error } = await AuthController.verifyCredentials(email, password)
+
 
             // Si la vérification de base (email/mot de passe) échoue, on renvoie l'erreur
             if (error) {

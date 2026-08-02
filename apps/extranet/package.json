@@ -6,8 +6,25 @@
   "scripts": {
     "dev": "vite"
   },
+  "imports": {
+    "#pages": {
+      "development": "./src/pages/index.ts",
+      "default": "./dist/pages/index.js"
+    },
+    "#services": {
+      "development": "./src/services/index.ts",
+      "default": "./dist/services/index.js"
+    },
+
+    "#interfaces": {
+      "development": "./src/lib/interfaces/index.ts",
+      "default": "./dist/lib/interfaces/index.js"
+    }
+
+  },
   "dependencies": {
-    "vue": "^3.4.15"
+    "vue": "^3.4.15",
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",

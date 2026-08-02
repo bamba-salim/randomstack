@@ -1,5 +1,8 @@
 @use "tailwindcss";
 
+@use "pages/login";
+@use "pages/dashboard";
+
 body {
   font-family: 'Inter', sans-serif;
 }

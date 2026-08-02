@@ -1,0 +1,115 @@
+.dashboard-page-container {
+  @apply flex min-h-screen bg-slate-950 text-slate-100 font-sans;
+
+  .admin-sidebar {
+    @apply w-64 bg-slate-900 border-r border-slate-800 p-6 flex flex-col gap-6;
+
+    .sidebar-logo {
+      @apply flex flex-col;
+
+      .logo-main {
+        @apply text-sm font-black tracking-widest text-blue-500 uppercase;
+      }
+
+      .logo-sub {
+        @apply text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1;
+      }
+    }
+
+    .sidebar-nav {
+      @apply flex flex-col gap-2 mt-4 text-xs font-semibold h-full;
+
+      .nav-link {
+        @apply px-4 py-3 border border-transparent rounded-xl transition-all duration-150;
+
+        &.active {
+          @apply bg-slate-950 text-blue-400 border-slate-800;
+        }
+
+        &.disabled {
+          @apply text-slate-500 hover:text-slate-300 rounded-xl cursor-not-allowed;
+        }
+      }
+
+      .logout-btn {
+        @apply px-4 py-3 text-red-500 hover:bg-red-950/10 border border-transparent hover:border-red-950/40 rounded-xl text-left font-bold mt-auto cursor-pointer;
+      }
+    }
+  }
+
+  .admin-main {
+    @apply flex-1 p-8 flex flex-col;
+
+    .main-header {
+      @apply flex items-center justify-between border-b border-slate-900 pb-6 mb-8;
+
+      .header-title {
+        @apply text-2xl font-extrabold tracking-tight;
+      }
+
+      .header-sub {
+        @apply text-xs text-slate-500 mt-1 uppercase font-semibold tracking-wider;
+      }
+
+      .add-btn {
+        @apply py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white rounded-lg transition-colors duration-200 shadow-lg shadow-blue-900/20 cursor-pointer;
+      }
+    }
+
+    .loading-text {
+      @apply text-sm text-blue-500 font-medium my-auto mx-auto animate-pulse;
+    }
+
+    .error-box {
+      @apply p-4 bg-red-950/20 border border-red-900 text-red-400 rounded-xl text-xs max-w-md mx-auto my-auto text-center;
+    }
+
+    .table-container {
+      @apply bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl;
+    }
+
+    .admin-table {
+      @apply w-full text-left border-collapse text-xs;
+
+      thead {
+        @apply bg-slate-950 border-b border-slate-800 text-[10px] font-black text-slate-500 uppercase tracking-widest;
+      }
+
+      th {
+        @apply p-4;
+      }
+
+      tbody {
+        @apply divide-y divide-slate-800/60 font-medium;
+      }
+
+      tr {
+        @apply hover:bg-slate-950/30 transition-colors;
+      }
+
+      td {
+        @apply p-4;
+
+        &.tech-name {
+          @apply font-bold text-slate-200;
+        }
+
+        &.tech-lang {
+          @apply text-slate-400 font-mono;
+        }
+
+        &.tech-desc {
+          @apply text-slate-400 max-w-xs truncate;
+        }
+      }
+
+      .category-badge {
+        @apply px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase bg-slate-950 text-slate-400 border border-slate-800;
+      }
+
+      .edit-btn {
+        @apply px-3 py-1.5 bg-slate-950 border border-slate-800 hover:border-slate-700 rounded-md text-[10px] text-slate-400 hover:text-slate-200 transition-colors duration-200 cursor-pointer;
+      }
+    }
+  }
+}

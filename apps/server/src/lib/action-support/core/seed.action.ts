@@ -60,8 +60,9 @@ export default class SeedAction {
     }
 
     private static async injectAdminUser() {
+
         // INGESTION DU COMPTE ADMINISTRATEUR PAR DÉFAUT 🚀
-        const userCount = UserModel.count()
+        const userCount = await UserModel.count()
         if (userCount === 0) {
 
             const defaultEmail = 'admin@randomstack.com'
