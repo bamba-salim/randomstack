@@ -1,9 +1,10 @@
 import express from 'express'
 import cors from 'cors'
-import {DatabaseConfig} from '#config'
+
+import {Database} from '#db'
+import AppRouter from '#routes'
 import {SessionMiddleware} from '#middlewares'
-import {SeedAction} from '#action-support' // <-- 1. IMPORTATION ICI
-import {StackRoute} from '#routes'
+import {SeedAction} from '#action-support'
 
 const app = express()
 
@@ -30,12 +31,13 @@ app.use(express.json())
 app.use(SessionMiddleware.config)
 
 // Enregistrement des points d'API
-app.use('/api', StackRoute.routes)
+app.use('/api', AppRouter.routes)
+
 
 const PORT = process.env['PORT'] || 4000
 
 // Validation et démarrage de l'infrastructure
-DatabaseConfig.checkConnection().then(async (connected) => {
+Database.checkConnection().then(async (connected) => {
     if (connected) {
         await SeedAction.execute()
 

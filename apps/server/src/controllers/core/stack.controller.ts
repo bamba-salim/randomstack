@@ -1,11 +1,14 @@
-import type { Request, Response } from 'express'
-import { TechnologyModel } from '#models'
-import { DrawAction } from '#action-support'
+import type {Request, Response} from 'express'
+
+import {TechnologyModel} from '#models'
+
+import {DrawAction} from '#action-support'
 
 export default class StackController {
+
     static async draw(req: Request, res: Response): Promise<void> {
         try {
-            const { locks, currentStack, blacklist } = req.body
+            const {locks, currentStack, blacklist} = req.body
 
             const allTechs = await TechnologyModel.findAll()
 
@@ -40,7 +43,7 @@ export default class StackController {
                 history: session.history
             })
         } catch (error) {
-            res.status(500).json({ error: 'Une erreur est survenue lors du tirage.' })
+            res.status(500).json({error: 'Une erreur est survenue lors du tirage.'})
         }
     }
 
@@ -56,7 +59,8 @@ export default class StackController {
             const techs = await TechnologyModel.findAll()
             res.json(techs)
         } catch {
-            res.status(500).json({ error: 'Erreur lors du chargement des technologies.' })
+            res.status(500).json({error: 'Erreur lors du chargement des technologies.'})
         }
     }
+
 }

@@ -1,1 +1,1 @@
-export { default as DbClient } from './client'
+export {default as Database} from './core/database'

@@ -1,4 +1,5 @@
 import {Router} from 'express'
+
 import {StackController} from '#controllers'
 
 export default class StackRoute {

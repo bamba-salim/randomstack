@@ -7,17 +7,9 @@
     "dev": "tsx watch src/index.ts"
   },
   "imports": {
-    "#config": {
-      "development": "./src/config/index.ts",
-      "default": "./dist/config/index.js"
-    },
-    "#db": {
-      "development": "./src/lib/db/index.ts",
-      "default": "./dist/lib/db/index.js"
-    },
-    "#middlewares": {
-      "development": "./src/lib/middlewares/index.ts",
-      "default": "./dist/lib/middlewares/index.js"
+    "#models": {
+      "development": "./src/models/index.ts",
+      "default": "./dist/models/index.js"
     },
     "#routes": {
       "development": "./src/routes/index.ts",
@@ -27,14 +19,28 @@
       "development": "./src/controllers/index.ts",
       "default": "./dist/controllers/index.js"
     },
+
     "#action-support": {
-      "development": "./src/action-support/index.ts",
-      "default": "./dist/action-support/index.js"
+      "development": "./src/lib/action-support/index.ts",
+      "default": "./dist/lib/action-support/index.js"
     },
-    "#models": {
-      "development": "./src/models/index.ts",
-      "default": "./dist/models/index.js"
+    "#db": {
+      "development": "./src/lib/db/index.ts",
+      "default": "./dist/lib/db/index.js"
+    },
+    "#interfaces": {
+      "development": "./src/lib/interfaces/index.ts",
+      "default": "./dist/lib/interfaces/index.js"
+    },
+    "#middlewares": {
+      "development": "./src/lib/middlewares/index.ts",
+      "default": "./dist/lib/middlewares/index.js"
+    },
+    "#utils": {
+      "development": "./src/lib/utils/index.ts",
+      "default": "./dist/lib/utils/index.js"
     }
+
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",

@@ -1,13 +1,9 @@
 import type {Technology, Category} from '@prisma/client'
+import type {DrawnStack} from '#interfaces'
 
-export interface DrawnStack {
-    clientLayer: Technology | null     // Présentation (Frontend, Mobile ou Desktop)
-    serverLayer: Technology | null     // Logique métier (Backend)
-    databaseLayer: Technology | null   // Persistance (Database, Cache, BaaS)
-    timestamp: string
-}
 
 export default class DrawAction {
+
     static run(techs: Technology[]): DrawnStack {
         const getByCategory = (cats: Category[]): Technology | null => {
             const filtered = techs.filter(t => cats.includes(t.category))
@@ -26,4 +22,5 @@ export default class DrawAction {
             timestamp: new Date().toLocaleTimeString('fr-FR')
         }
     }
+
 }

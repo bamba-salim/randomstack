@@ -13,13 +13,16 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "paths": {
-      "#config": ["./src/config/index.ts"],
-      "#db": ["./src/lib/db/index.ts"],
-      "#middlewares": ["./src/lib/middlewares/index.ts"],
+      "#models": ["./src/models/index.ts"],
       "#routes": ["./src/routes/index.ts"],
       "#controllers": ["./src/controllers/index.ts"],
-      "#action-support": ["./src/action-support/index.ts"],
-      "#models": ["./src/models/index.ts"]
+
+      "#action-support": ["./src/lib/action-support/index.ts"],
+      "#db": ["./src/lib/db/index.ts"],
+      "#interfaces": ["./src/lib/interfaces/index.ts"],
+      "#middlewares": ["./src/lib/middlewares/index.ts"],
+      "#utils": ["./src/lib/utils/index.ts"],
+
     }
   },
   "include": [

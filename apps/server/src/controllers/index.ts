@@ -1,1 +1,2 @@
-export { default as StackController } from './stack.controller'
+export {default as StackController} from './core/stack.controller'
+export {default as AuthController} from './core/auth.controller'
