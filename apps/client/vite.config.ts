@@ -16,5 +16,13 @@ export default defineConfig({
         watch: {
             usePolling: true // Force le "watch" par scrutation pour fonctionner sous Docker sur Mac
         }
+    },
+    // AJOUTEZ CE BLOC CSS POUR SASS MODERNE 🚀
+    css: {
+        preprocessorOptions: {
+            scss: {
+                api: 'modern-compiler'
+            }
+        }
     }
 })

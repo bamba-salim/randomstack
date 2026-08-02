@@ -76,7 +76,7 @@ services:
       - ./apps/extranet:/app
       - /app/node_modules
     ports:
-      - "5175:5173" # Mappe le port 5175 de votre Mac vers le port 5173 interne
+      - "5175:5175" # Mappe le port 5175 de votre Mac vers le port 5173 interne
     environment:
       - VITE_API_URL=http://localhost:4000
     depends_on:

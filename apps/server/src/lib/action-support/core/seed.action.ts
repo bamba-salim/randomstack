@@ -41,22 +41,28 @@ export default class SeedAction {
     }
 
     private static async injectTechnologies() {
-        // Lecture simplifiée et sécurisée via FileUtils ! 🚀
-        let technologies = FileUtils.readJSON<RawExcelTech[]>('technologies.json')
-        if (!technologies) {
-            technologies = FileUtils.readJSON<RawExcelTech[]>('techno.json')
-        }
 
-        if (!technologies) {
-            console.warn("[Seed] Aucun fichier de technologies valide trouvé pour l'alimentation.")
-            return
-        }
 
-        for (const tech of technologies) {
-            const category = this.determineCategory(tech.Utilisation)
-            await TechnologyModel.insertTechnology(tech, category)
+        const techCount = await TechnologyModel.count()
+        if (techCount === 0) {
+            // Lecture simplifiée et sécurisée via FileUtils ! 🚀
+            let technologies = FileUtils.readJSON<RawExcelTech[]>('technologies.json')
+            if (!technologies) {
+                technologies = FileUtils.readJSON<RawExcelTech[]>('techno.json')
+            }
+
+            if (!technologies) {
+                console.warn("[Seed] Aucun fichier de technologies valide trouvé pour l'alimentation.")
+                return
+            }
+
+            for (const tech of technologies) {
+                const category = this.determineCategory(tech.Utilisation)
+                await TechnologyModel.insertTechnology(tech, category)
+            }
+            console.log(`[Seed] ✅ Ingestion réussie : ${technologies.length} technologies importées de l'Excel.`)
+
         }
-        console.log(`[Seed] ✅ Ingestion réussie : ${technologies.length} technologies importées de l'Excel.`)
     }
 
     private static async injectAdminUser() {

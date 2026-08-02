@@ -25,5 +25,9 @@ export default class TechnologyModel {
         return await Database.client.technology.findMany()
     }
 
+    static async count(): Promise<number> {
+        return await Database.client.technology.count()
+    }
+
 
 }
