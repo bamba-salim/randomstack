@@ -19,7 +19,6 @@
       "development": "./src/controllers/index.ts",
       "default": "./dist/controllers/index.js"
     },
-
     "#action-support": {
       "development": "./src/lib/action-support/index.ts",
       "default": "./dist/lib/action-support/index.js"
@@ -32,6 +31,10 @@
       "development": "./src/lib/interfaces/index.ts",
       "default": "./dist/lib/interfaces/index.js"
     },
+    "#mappers": {
+      "development": "./src/lib/mappers/index.ts",
+      "default": "./dist/lib/mappers/index.js"
+    },
     "#middlewares": {
       "development": "./src/lib/middlewares/index.ts",
       "default": "./dist/lib/middlewares/index.js"
@@ -40,7 +43,6 @@
       "development": "./src/lib/utils/index.ts",
       "default": "./dist/lib/utils/index.js"
     }
-
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
@@ -49,12 +51,14 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
+    "multer": "^2.2.0",
     "pg": "^8.22.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/express-session": "^1.17.10",
+    "@types/multer": "^2.2.0",
     "@types/node": "^20.11.0",
     "@types/pg": "^8.20.0",
     "prisma": "^7.0.0",

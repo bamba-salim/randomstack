@@ -1,7 +1,7 @@
 import {Database} from '#db'
 import type {Technology} from '@prisma/client'
 
-import type {RawExcelTech} from '#interfaces'
+import type {RawExcelTech, SaveTechnologyDTO} from '#interfaces'
 
 
 export default class TechnologyModel {
@@ -29,5 +29,25 @@ export default class TechnologyModel {
         return await Database.client.technology.count()
     }
 
+    // Récupérer une seule technologie 🚀
+    static async findById(id: string) {
+        return await Database.client.technology.findUnique({
+            where: {id}
+        })
+    }
 
+    // Modifier une technologie 🚀
+    static async update(data: SaveTechnologyDTO) {
+        const {id: _, ...updateData} = data
+        return await Database.client.technology.update({
+            where: {id: data.id},
+            data: updateData
+        })
+    }
+
+    static async create(data: SaveTechnologyDTO) {
+        return await Database.client.technology.create({
+            data
+        })
+    }
 }

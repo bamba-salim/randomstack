@@ -164,7 +164,9 @@ onMounted(async () => {
               <div :class="['reel-strip', { 'spinning': isSpinning && !clientLocked }]">
                 <div v-for="tech in clientReel" :key="tech.id" class="reel-item">
                   <div class="tech-logo-placeholder">
-                    {{ tech.name.substring(0, 2) }}
+                    <!-- Affiche l'image si elle existe, sinon les initiales 🚀 -->
+                    <img v-if="tech.logo" :src="`http://localhost:4000${tech.logo}`" class="w-full h-full object-cover" />
+                    <span v-else>{{ tech.name.substring(0, 2) }}</span>
                   </div>
                   <div class="tech-details">
                     <span class="tech-name">{{ tech.name }}</span>

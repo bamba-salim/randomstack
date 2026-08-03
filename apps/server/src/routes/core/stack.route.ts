@@ -1,14 +1,18 @@
 import {Router} from 'express'
 
-import {StackController} from '#controllers'
+import {StackController, TechnologyController} from '#controllers'
 
 export default class StackRoute {
     static get routes(): Router {
         const router = Router()
 
-        router.post('/draw', StackController.draw)
         router.get('/history', StackController.getHistory)
-        router.get('/technologies', StackController.fetchTechnologies)
+
+        router.post('/draw-stack', StackController.draw)
+        router.get('/fetch-history', StackController.getHistory)
+        router.get('/fetch-technologies', TechnologyController.getAll)
+        router.get('/fetch-technology/:id', TechnologyController.getById)
+
 
         return router
     }

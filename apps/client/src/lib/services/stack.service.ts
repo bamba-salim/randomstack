@@ -29,10 +29,10 @@ export default class StackService extends ApiClient {
         currentStack: DrawnStack | null,
         blacklist: string[]
     }): Promise<DrawResponse> {
-        return await this.post<DrawResponse>('/api/draw', payload)
+        return await this.post<DrawResponse>('/api/draw-stack', payload)
     }
 
     static async fetchAllTechnologies(): Promise<ClientTechnology[]> {
-        return await this.get<ClientTechnology[]>('/api/technologies')
+        return await this.get<ClientTechnology[]>('/api/fetch-technologies')
     }
 }

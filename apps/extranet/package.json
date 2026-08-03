@@ -15,12 +15,22 @@
       "development": "./src/services/index.ts",
       "default": "./dist/services/index.js"
     },
-
+    "#components": {
+      "development": "./src/components/index.ts",
+      "default": "./dist/components/index.js"
+    },
     "#interfaces": {
       "development": "./src/lib/interfaces/index.ts",
       "default": "./dist/lib/interfaces/index.js"
+    },
+    "#scripts": {
+      "development": "./src/lib/scripts/index.ts",
+      "default": "./dist/lib/scripts/index.js"
+    },
+    "#utils": {
+      "development": "./src/lib/utils/index.ts",
+      "default": "./dist/lib/utils/index.js"
     }
-
   },
   "dependencies": {
     "vue": "^3.4.15",

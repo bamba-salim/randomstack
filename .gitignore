@@ -1,1 +1,7 @@
 /.idea
+
+# Ignorer toutes les images d'uploads
+apps/server/public/uploads/*
+
+# Sauf le fichier de garde .gitkeep pour préserver le dossier
+!apps/server/public/uploads/.gitkeep

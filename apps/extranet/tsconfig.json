@@ -16,9 +16,13 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "#services": ["./src/services/index.ts"],
-      "#pages": ["./src/pages/index.ts"],
+      "#services": ["./src/services/index.ts"],      "#pages": ["./src/pages/index.ts"],
+
+      "#components": ["./src/components/index.ts"],
+
       "#interfaces": ["./src/lib/interfaces/index.ts"],
+      "#scripts": ["./src/lib/scripts/index.ts"],
+      "#utils": ["./src/lib/utils/index.ts"],
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue", "vite.config.ts"]

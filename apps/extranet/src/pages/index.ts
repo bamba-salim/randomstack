@@ -1,3 +1,62 @@
-export {default as Dashboard} from './core/Dashboard.vue'
-export {default as Login} from './core/Login.vue'
-export {default as router} from './router'
+import {createRouter, createWebHistory} from 'vue-router'
+
+import {AuthService} from '#services'
+
+import AdminLayout from './core/@AdminLayout.vue'
+
+import Login from './core/Login.vue'
+import Dashboard from './core/Dashboard.vue'
+import TechnologyForm from './core/TechnologyForm.vue'
+
+const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+        {
+            path: '/login',
+            name: 'login',
+            component: Login,
+            meta: {guestOnly: true}
+        },
+        // ROUTES D'ADMINISTRATION IMBRIQUÉES DANS LE LAYOUT PARENT 🚀
+        {
+            path: '/',
+            component: AdminLayout, // Le cadre commun de toutes les pages admin
+            meta: {requiresAuth: true},
+            children: [
+                {
+                    path: 'dashboard',
+                    name: 'dashboard',
+                    component: Dashboard
+                },
+                {
+                    path: 'edit-technology/:id?',
+                    name: 'technology-form',
+                    component: TechnologyForm
+                }
+            ]
+        },
+        {
+            path: '/:pathMatch(.*)*',
+            redirect: '/dashboard'
+        }
+    ]
+})
+
+router.beforeEach(async (to, _from, next) => {
+    let user = null
+    try {
+        user = await AuthService.getMe()
+    } catch {
+        user = null
+    }
+
+    if (to.meta['requiresAuth'] && !user) {
+        next('/login')
+    } else if (to.meta['guestOnly'] && user) {
+        next('/dashboard')
+    } else {
+        next()
+    }
+})
+
+export default router

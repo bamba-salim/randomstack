@@ -1,0 +1,1 @@
+export { default as DashboardScript } from './core/dashboard.script'

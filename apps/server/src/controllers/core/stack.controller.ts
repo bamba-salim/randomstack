@@ -54,13 +54,4 @@ export default class StackController {
         })
     }
 
-    static async fetchTechnologies(req: Request, res: Response): Promise<void> {
-        try {
-            const techs = await TechnologyModel.findAll()
-            res.json(techs)
-        } catch {
-            res.status(500).json({error: 'Erreur lors du chargement des technologies.'})
-        }
-    }
-
 }

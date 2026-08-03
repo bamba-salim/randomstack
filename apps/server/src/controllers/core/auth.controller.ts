@@ -19,7 +19,6 @@ export default class AuthController {
 
         const isPasswordValid = PasswordUtils.verify(password, user.passwordHash)
 
-        console.log(isPasswordValid)
         if (!isPasswordValid) {
             return { user: null, error: 'Mot de passe incorrect.' }
         }

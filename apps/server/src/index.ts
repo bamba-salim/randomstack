@@ -1,5 +1,7 @@
 import express from 'express'
 import cors from 'cors'
+import path from 'path' // <-- S'assurer que path est importé
+
 
 import {Database} from '#db'
 import AppRouter from '#routes'
@@ -29,6 +31,10 @@ app.use(cors({
 
 app.use(express.json())
 app.use(SessionMiddleware.config)
+
+app.use('/public', express.static(path.resolve(process.cwd(), 'public')))
+
+
 
 // Enregistrement des points d'API
 app.use('/api', AppRouter.routes)

@@ -29,23 +29,21 @@ export default class FileUtils {
     }
 
     // 3. Sauvegarde d'images / fichiers téléversés (Prêt pour la V2) 🚀
-    static saveUpload(fileBuffer: Buffer, originalName: string, subFolder: string = 'uploads'): string | null {
+    // Ajout du paramètre "prefix" pour rendre le nommage totalement générique par table 🚀
+    static saveUpload(fileBuffer: Buffer, originalName: string, prefix: string, itemId: string, subFolder: string = 'uploads'): string | null {
         try {
             const uploadDir = path.resolve(process.cwd(), 'public', subFolder)
 
-            // S'assurer que le dossier public d'upload existe
             if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir, { recursive: true })
             }
 
-            // Génération d'un nom de fichier unique avec timestamp pour éviter les collisions
-            const ext = path.extname(originalName)
-            const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`
+            // Nommage dynamique : {table}-{id}.{extension} (ex: technology-uuid.png) 🚀
+            const ext = path.extname(originalName).toLowerCase()
+            const uniqueName = `${prefix.toLowerCase()}-${itemId}${ext}`
             const finalPath = path.join(uploadDir, uniqueName)
 
             fs.writeFileSync(finalPath, fileBuffer)
-
-            // On renvoie l'URL relative d'accès public à enregistrer en BDD
             return `/public/${subFolder}/${uniqueName}`
         } catch (error: any) {
             console.error("[FileUtils] Échec de la sauvegarde physique du fichier :", error.message || error)

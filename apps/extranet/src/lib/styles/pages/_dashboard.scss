@@ -1,18 +1,32 @@
 .dashboard-page-container {
-  @apply flex min-h-screen bg-slate-950 text-slate-100 font-sans;
+  @apply flex min-h-screen bg-[#f0f0f1] text-[#3c434a] font-sans relative;
 
+  // --- BOUTON BURGER (Mobile uniquement) 📱 ---
+  .mobile-burger-btn {
+    @apply fixed top-4 left-4 z-50 flex items-center justify-center py-2 px-3 bg-[#2271b1] text-white font-black text-[11px] uppercase tracking-wider rounded border border-[#135e96] shadow-md sm:hidden cursor-pointer;
+  }
+
+  .mobile-sidebar-overlay {
+    @apply fixed inset-0 bg-black/60 z-40 sm:hidden;
+  }
+
+  // --- LA BARRE LATÉRALE RESPONSIVE (SIDEBAR) 🚀 ---
   .admin-sidebar {
-    @apply w-64 bg-slate-900 border-r border-slate-800 p-6 flex flex-col gap-6;
+    @apply fixed sm:sticky top-0 left-0 h-screen w-64 bg-[#2271b1] p-6 flex flex-col gap-6 text-white shrink-0 z-40 transition-transform duration-300 -translate-x-full sm:translate-x-0;
+
+    &.mobile-open {
+      @apply translate-x-0 shadow-2xl;
+    }
 
     .sidebar-logo {
       @apply flex flex-col;
 
       .logo-main {
-        @apply text-sm font-black tracking-widest text-blue-500 uppercase;
+        @apply text-sm font-black tracking-widest text-white uppercase;
       }
 
       .logo-sub {
-        @apply text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1;
+        @apply text-[9px] font-bold text-blue-200 uppercase tracking-widest mt-1;
       }
     }
 
@@ -20,39 +34,41 @@
       @apply flex flex-col gap-2 mt-4 text-xs font-semibold h-full;
 
       .nav-link {
-        @apply px-4 py-3 border border-transparent rounded-xl transition-all duration-150;
+        @apply px-4 py-3 border border-transparent rounded transition-all duration-150 text-blue-100 hover:bg-[#135e96] hover:text-white;
 
         &.active {
-          @apply bg-slate-950 text-blue-400 border-slate-800;
+          @apply bg-[#135e96] text-white border-[#135e96];
         }
 
         &.disabled {
-          @apply text-slate-500 hover:text-slate-300 rounded-xl cursor-not-allowed;
+          @apply text-blue-300/60 hover:text-blue-300 rounded cursor-not-allowed hover:bg-transparent;
         }
       }
 
       .logout-btn {
-        @apply px-4 py-3 text-red-500 hover:bg-red-950/10 border border-transparent hover:border-red-950/40 rounded-xl text-left font-bold mt-auto cursor-pointer;
+        @apply px-4 py-3 text-red-200 hover:bg-red-950/20 border border-transparent hover:border-red-950/40 rounded text-left font-bold mt-auto cursor-pointer;
       }
     }
   }
 
+  // --- LE CONTENEUR DE CONTENU PRINCIPAL UNIQUE (TEMPLATE) 🚀 ---
   .admin-main {
-    @apply flex-1 p-8 flex flex-col;
+    @apply flex-1 p-6 sm:p-8 flex flex-col bg-white border border-[#c3c4c7] m-4 sm:m-6 rounded shadow-sm max-w-5xl mx-auto w-full mt-16 sm:mt-6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 
-    .main-header {
-      @apply flex items-center justify-between border-b border-slate-900 pb-6 mb-8;
+    .main-header, .form-header-box {
+      @apply flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#c3c4c7] pb-6 mb-8;
 
       .header-title {
-        @apply text-2xl font-extrabold tracking-tight;
+        @apply text-xl sm:text-2xl font-extrabold tracking-tight text-[#1d2327];
       }
 
       .header-sub {
-        @apply text-xs text-slate-500 mt-1 uppercase font-semibold tracking-wider;
+        @apply text-xs text-slate-500 mt-1 uppercase font-semibold tracking-wider text-left;
       }
 
       .add-btn {
-        @apply py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white rounded-lg transition-colors duration-200 shadow-lg shadow-blue-900/20 cursor-pointer;
+        @apply w-full sm:w-auto py-2.5 px-4 bg-[#2271b1] hover:bg-[#135e96] border border-[#2271b1] text-xs font-bold text-white rounded shadow-sm transition-colors duration-200 cursor-pointer text-center;
       }
     }
 
@@ -64,15 +80,35 @@
       @apply p-4 bg-red-950/20 border border-red-900 text-red-400 rounded-xl text-xs max-w-md mx-auto my-auto text-center;
     }
 
+    // --- RECHERCHE RESPONSIVE 🚀 ---
+    // --- BARRE DE FILTRES RESPONSIVE ET MULTI-CRITÈRES 🚀 ---
+    .filter-bar-wrap {
+      // S'empile sur mobile, s'aligne horizontalement à partir de sm: (desktop) 📱
+      @apply flex flex-col sm:flex-row items-center gap-3 w-full mb-4 text-left;
+
+      .filter-input, .filter-select {
+        @apply w-full sm:w-auto p-2.5 bg-white border border-[#8c8f94] text-[#2c3338] text-xs rounded shadow-inner focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] outline-none transition-all duration-100;
+      }
+
+      .filter-input {
+        @apply sm:flex-1 sm:max-w-xs; // La barre de recherche prend plus de place sur desktop
+      }
+
+      .filter-select {
+        @apply sm:min-w-[150px]; // Largeur minimale fixe des listes déroulantes pour s'aligner
+      }
+    }
+
+    // Gestion du scroll horizontal sur table mobile
     .table-container {
-      @apply bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl;
+      @apply border border-[#c3c4c7] rounded overflow-x-auto shadow-sm w-full;
     }
 
     .admin-table {
-      @apply w-full text-left border-collapse text-xs;
+      @apply w-full text-left border-collapse text-xs min-w-[600px];
 
       thead {
-        @apply bg-slate-950 border-b border-slate-800 text-[10px] font-black text-slate-500 uppercase tracking-widest;
+        @apply bg-[#f6f8fa] border-b border-[#c3c4c7] text-[10px] font-black text-slate-500 uppercase tracking-widest;
       }
 
       th {
@@ -80,36 +116,111 @@
       }
 
       tbody {
-        @apply divide-y divide-slate-800/60 font-medium;
+        @apply divide-y divide-[#c3c4c7]/60 font-medium;
       }
 
       tr {
-        @apply hover:bg-slate-950/30 transition-colors;
+        @apply hover:bg-[#f6f8fa] transition-colors;
       }
 
       td {
         @apply p-4;
 
         &.tech-name {
-          @apply font-bold text-slate-200;
+          @apply font-bold text-[#1d2327];
         }
 
         &.tech-lang {
-          @apply text-slate-400 font-mono;
+          @apply text-slate-500 font-mono;
         }
 
         &.tech-desc {
-          @apply text-slate-400 max-w-xs truncate;
+          @apply text-slate-500 max-w-xs truncate;
         }
       }
 
       .category-badge {
-        @apply px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase bg-slate-950 text-slate-400 border border-slate-800;
+        @apply px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase bg-[#f6f8fa] text-slate-600 border border-[#c3c4c7];
       }
 
       .edit-btn {
-        @apply px-3 py-1.5 bg-slate-950 border border-slate-800 hover:border-slate-700 rounded-md text-[10px] text-slate-400 hover:text-slate-200 transition-colors duration-200 cursor-pointer;
+        @apply px-3 py-1.5 bg-[#f6f8fa] border border-[#c3c4c7] hover:bg-[#e0e0e0] rounded text-[10px] text-slate-600 font-bold transition-colors duration-150 cursor-pointer;
       }
+    }
+
+    // --- SYSTEM DE PAGINATION DESIGN WP-ADMIN 🚀 ---
+    .pagination-container {
+      @apply flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#c3c4c7] pt-4 mt-4 text-xs;
+
+      .pagination-info {
+        @apply text-slate-500 font-bold;
+      }
+
+      .pagination-actions {
+        @apply flex gap-2 w-full sm:w-auto;
+      }
+
+      .page-btn {
+        @apply w-full sm:w-auto py-2 px-4 bg-[#f6f8fa] border border-[#c3c4c7] hover:bg-[#e0e0e0] rounded text-[10px] text-slate-600 font-black uppercase transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
+      }
+    }
+  }
+}
+
+// --- STYLE DU FORMULAIRE UNIQUE ---
+.form-page-container {
+  @apply flex flex-col gap-6 text-left max-w-2xl;
+
+  .form-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
+  }
+
+  .form-group {
+    @apply flex flex-col gap-1.5;
+
+    &.col-span-2 {
+      @apply sm:col-span-2;
+    }
+
+    .form-label {
+      @apply text-xs font-bold text-[#1d2327];
+    }
+
+    .form-input, .form-select, .form-textarea {
+      @apply w-full p-2.5 bg-white border border-[#8c8f94] text-[#2c3338] text-sm rounded shadow-inner focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] outline-none transition-all duration-100;
+    }
+
+    .form-textarea {
+      @apply h-32 resize-none;
+    }
+  }
+
+  // Zone d'upload d'images
+  .file-upload-zone {
+    @apply flex items-center gap-4 p-4 bg-[#f0f0f1] border border-[#c3c4c7] rounded;
+
+    .current-logo-preview {
+      @apply w-16 h-14 bg-white border border-[#c3c4c7] flex items-center justify-center text-slate-400 font-extrabold text-xs overflow-hidden shadow-sm;
+
+      img {
+        @apply w-full h-full object-cover;
+      }
+    }
+
+    .file-input {
+      @apply text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-[#8c8f94] file:text-xs file:font-bold file:bg-[#f0f0f1] file:text-slate-700 hover:file:bg-[#e0e0e0] file:cursor-pointer;
+    }
+  }
+
+  .form-actions {
+    @apply flex items-center gap-3 border-t border-[#c3c4c7] pt-6 mt-4;
+
+    .cancel-btn {
+      @apply py-2.5 px-4 bg-white border border-[#c3c4c7] hover:bg-[#f6f8fa] text-xs font-bold text-slate-600 rounded cursor-pointer transition-colors duration-150 text-center;
+    }
+
+    .save-btn {
+      @apply py-2.5 px-5 bg-[#2271b1] hover:bg-[#135e96] border border-[#2271b1] text-xs font-bold text-white rounded cursor-pointer transition-colors duration-150 shadow-sm text-center;
     }
   }
 }
