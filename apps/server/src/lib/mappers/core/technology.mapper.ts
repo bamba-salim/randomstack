@@ -1,10 +1,8 @@
-import {Category} from '@prisma/client'
-
-import type {SaveTechnologyDTO} from "#interfaces"
+import type {Category, SaveTechnologyInput} from '@randomstack/commons'
 
 export default class TechnologyMapper {
     // Convertit l'objet req.body brut en DTO typé et sécurisé pour la BDD 🚀
-    static toSaveDTO(rawBody: any, logoUrl: string | null, targetId: string): SaveTechnologyDTO {
+    static toSaveDTO(rawBody: any, logoUrl: string | null, targetId: string): SaveTechnologyInput {
         return {
             id: targetId,
             name: String(rawBody.name || '').trim(),

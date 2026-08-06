@@ -32,11 +32,26 @@ model Technology {
   createdAt   DateTime @default(now())
 }
 
+model SavedStack {
+  id          String   @id @default(uuid())
+  shareCode   String   @unique
+  projectType Category
+  frontendId  String
+  backendId   String
+  databaseId  String
+  ormId       String?
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
+  id           String       @id @default(uuid())
+  email        String       @unique
   passwordHash String
-  role         Role     @default(USER)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  role         Role         @default(USER)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  savedStacks  SavedStack[]
 }

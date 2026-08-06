@@ -7,9 +7,17 @@
     "dev": "tsx watch src/index.ts"
   },
   "imports": {
-    "#models": {
-      "development": "./src/models/index.ts",
-      "default": "./dist/models/index.js"
+    "#config": {
+      "development": "./src/config/index.ts",
+      "default": "./dist/config/index.js"
+    },
+    "#db": {
+      "development": "./src/lib/db/index.ts",
+      "default": "./dist/lib/db/index.js"
+    },
+    "#middlewares": {
+      "development": "./src/lib/middlewares/index.ts",
+      "default": "./dist/lib/middlewares/index.js"
     },
     "#routes": {
       "development": "./src/routes/index.ts",
@@ -20,50 +28,40 @@
       "default": "./dist/controllers/index.js"
     },
     "#action-support": {
-      "development": "./src/lib/action-support/index.ts",
-      "default": "./dist/lib/action-support/index.js"
+      "development": "./src/action-support/index.ts",
+      "default": "./dist/action-support/index.js"
     },
-    "#db": {
-      "development": "./src/lib/db/index.ts",
-      "default": "./dist/lib/db/index.js"
-    },
-    "#interfaces": {
-      "development": "./src/lib/interfaces/index.ts",
-      "default": "./dist/lib/interfaces/index.js"
-    },
-    "#mappers": {
-      "development": "./src/lib/mappers/index.ts",
-      "default": "./dist/lib/mappers/index.js"
-    },
-    "#middlewares": {
-      "development": "./src/lib/middlewares/index.ts",
-      "default": "./dist/lib/middlewares/index.js"
+    "#models": {
+      "development": "./src/models/index.ts",
+      "default": "./dist/models/index.js"
     },
     "#utils": {
-      "development": "./src/lib/utils/index.ts",
-      "default": "./dist/lib/utils/index.js"
+      "development": "./src/utils/index.ts",
+      "default": "./dist/utils/index.js"
     }
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.0.0",
+    "@prisma/adapter-pg": "^7.0.0",
+    "@randomstack/commons": "*",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
-    "multer": "^2.2.0",
-    "pg": "^8.22.0"
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.3",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/express-session": "^1.17.10",
-    "@types/multer": "^2.2.0",
+    "@types/multer": "^1.4.11",
     "@types/node": "^20.11.0",
-    "@types/pg": "^8.20.0",
+    "@types/node-cron": "^3.0.11",
+    "@types/pg": "^8.11.0",
     "prisma": "^7.0.0",
-    "ts-node-dev": "^2.0.0",
-    "tsx": "^4.23.1",
+    "tsx": "^4.7.1",
     "typescript": "^5.3.3"
   }
 }

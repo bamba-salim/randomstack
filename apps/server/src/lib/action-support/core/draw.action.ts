@@ -1,6 +1,4 @@
-import type {Technology, Category} from '@prisma/client'
-import type {DrawnStack} from '#interfaces'
-
+import type {Technology, Category, DrawnStack} from '@randomstack/commons'
 
 export default class DrawAction {
 

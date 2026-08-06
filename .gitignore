@@ -1,7 +1,12 @@
-/.idea
 
 # Ignorer toutes les images d'uploads
 apps/server/public/uploads/*
 
 # Sauf le fichier de garde .gitkeep pour préserver le dossier
 !apps/server/public/uploads/.gitkeep
+
+/.idea/
+/apps/server/node_modules/
+/apps/client/node_modules/
+/apps/extranet/node_modules/
+/node_modules/

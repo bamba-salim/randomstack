@@ -7,23 +7,24 @@ services:
       POSTGRES_PASSWORD: devpassword
       POSTGRES_DB: randomstack
     ports:
-      - "5435:5432" # Utilise le port 5435 en externe pour éviter les conflits
+      - "5435:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   server:
     build:
-      context: ./apps/server
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: apps/server/Dockerfile.dev
     container_name: randomstack_server
     volumes:
-      - ./apps/server:/app
+      - .:/app
       - /app/node_modules
+      - /app/apps/server/node_modules # Isolation des modules serveurs Linux 🚀
     ports:
       - "4000:4000"
     environment:
@@ -31,57 +32,59 @@ services:
       - PORT=4000
     depends_on:
       postgres_db:
-        condition: service_healthy # Attend que la BDD soit active pour migrer et lancer le seeder
-    # Ligne modifiée ci-dessous pour inclure npx prisma generate en premier 🚀
-    command: sh -c "npx prisma generate && npx prisma db push && npm run dev"
-
+        condition: service_healthy
+    command: sh -c "npx prisma generate --config=apps/server/prisma.config.ts && npx prisma db push --config=apps/server/prisma.config.ts && npm run dev --workspace=apps/server"
   prisma-studio:
     build:
-      context: ./apps/server
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: apps/server/Dockerfile.dev
     container_name: randomstack_prisma_studio
     volumes:
-      - ./apps/server:/app
+      - .:/app
       - /app/node_modules
+      - /app/apps/server/node_modules # Isolation des modules serveurs Linux 🚀
     ports:
       - "5555:5555"
     environment:
       - DATABASE_URL=postgresql://postgres:devpassword@postgres_db:5432/randomstack?schema=public
     depends_on:
       - postgres_db
-    command: npx prisma studio --port 5555 --browser none
+    command: npx prisma studio --config=apps/server/prisma.config.ts --port 5555 --browser none
+
 
   client:
     build:
-      context: ./apps/client
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: apps/client/Dockerfile.dev
     container_name: randomstack_client
     volumes:
-      - ./apps/client:/app
+      - .:/app
       - /app/node_modules
+      - /app/apps/client/node_modules # Isolation des modules clients Linux 🚀
     ports:
       - "5173:5173"
     environment:
       - VITE_API_URL=http://localhost:4000
     depends_on:
       - server
-    command: npm run dev -- --host # <-- Ligne ajoutée pour démarrer le compilateur Vite
+    command: npm run dev --workspace=apps/client -- --host
 
   extranet:
     build:
-      context: ./apps/extranet
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: apps/extranet/Dockerfile.dev
     container_name: randomstack_extranet
     volumes:
-      - ./apps/extranet:/app
+      - .:/app
       - /app/node_modules
+      - /app/apps/extranet/node_modules # Isolation des modules extranet Linux 🚀
     ports:
-      - "5175:5175" # Mappe le port 5175 de votre Mac vers le port 5173 interne
+      - "5175:5175"
     environment:
       - VITE_API_URL=http://localhost:4000
     depends_on:
       - server
-    command: npm run dev -- --host
+    command: npm run dev --workspace=apps/extranet -- --host
 
 volumes:
   postgres_data:

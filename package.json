@@ -1,0 +1,8 @@
+{
+  "name": "randomstack-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

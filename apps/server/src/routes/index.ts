@@ -8,8 +8,8 @@ export default class AppRouter {
         const router = Router()
 
         // Routage sémantique
-        router.use('/', StackRoute.routes)        // Expose: /draw, /history, /technologies
-        router.use('/auth', AuthRoute.routes)    // Expose: /auth/login, /auth/me, /auth/logout
+        router.use('/', StackRoute.routes)
+        router.use('/auth', AuthRoute.routes)
         router.use('/admin', AdminRoute.routes)
 
         return router

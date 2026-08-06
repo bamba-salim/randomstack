@@ -1,5 +1,5 @@
 import {Database} from '#db'
-import {Role} from '@prisma/client'
+import type {Role} from '@randomstack/commons'
 
 
 export default class UserModel {

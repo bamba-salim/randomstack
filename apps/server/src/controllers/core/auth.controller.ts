@@ -1,15 +1,17 @@
 import type { Request, Response } from 'express'
+
 import { UserModel } from '#models'
-import {PasswordUtils} from '#utils' // Ajusté selon votre arborescence 🚀
+import {PasswordUtils} from '#utils'
 
 export default class AuthController {
 
     // Méthode d'aide privée pour valider les identifiants sans dupliquer de code 🚀
     private static async verifyCredentials(email: string, password: string) {
+        //TODO: user dto or mapper
+
         if (!email || !password) {
             return { user: null, error: 'Email et mot de passe requis.' }
         }
-
 
         const user = await UserModel.findByEmail(email)
 
@@ -29,6 +31,7 @@ export default class AuthController {
     // 1. LOGIN PUBLIC (Connexion classique)
     static async login(req: Request, res: Response): Promise<void> {
         try {
+            //TODO: user dto or mapper
             const { email, password } = req.body
             const { user, error } = await AuthController.verifyCredentials(email, password)
 

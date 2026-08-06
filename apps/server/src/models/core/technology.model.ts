@@ -1,10 +1,24 @@
 import {Database} from '#db'
-import type {Technology} from '@prisma/client'
-
-import type {RawExcelTech, SaveTechnologyDTO} from '#interfaces'
+import type {Category, SaveTechnologyInput, RawExcelTech} from '@randomstack/commons'
 
 
 export default class TechnologyModel {
+
+    static async findAll() {
+        return await Database.client.technology.findMany()
+    }
+
+    static async findById(id: string) {
+        return await Database.client.technology.findUnique({
+            where: {id}
+        })
+    }
+
+    static async create(data: SaveTechnologyDTO) {
+        return await Database.client.technology.create({
+            data
+        })
+    }
 
     static async insertTechnology(tech: RawExcelTech, category: string) {
         await Database.client.technology.upsert({
@@ -21,22 +35,6 @@ export default class TechnologyModel {
         })
     }
 
-    static async findAll() {
-        return await Database.client.technology.findMany()
-    }
-
-    static async count(): Promise<number> {
-        return await Database.client.technology.count()
-    }
-
-    // Récupérer une seule technologie 🚀
-    static async findById(id: string) {
-        return await Database.client.technology.findUnique({
-            where: {id}
-        })
-    }
-
-    // Modifier une technologie 🚀
     static async update(data: SaveTechnologyDTO) {
         const {id: _, ...updateData} = data
         return await Database.client.technology.update({
@@ -45,9 +43,9 @@ export default class TechnologyModel {
         })
     }
 
-    static async create(data: SaveTechnologyDTO) {
-        return await Database.client.technology.create({
-            data
-        })
+
+    static async count(): Promise<number> {
+        return await Database.client.technology.count()
     }
+
 }

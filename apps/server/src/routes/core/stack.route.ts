@@ -13,6 +13,8 @@ export default class StackRoute {
         router.get('/fetch-technologies', TechnologyController.getAll)
         router.get('/fetch-technology/:id', TechnologyController.getById)
 
+        router.post('/save-share', StackController.saveShare)
+        router.get('/fetch-share/:code', StackController.fetchShare)
 
         return router
     }

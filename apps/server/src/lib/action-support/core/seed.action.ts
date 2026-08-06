@@ -1,11 +1,7 @@
-import fs from 'fs'
-import path from 'path'
-
 import {UserModel, TechnologyModel} from '#models'
 import {PasswordUtils, FileUtils} from '#utils'
 
-import type {RawExcelTech} from '#interfaces'
-import type {Category, Role} from '@prisma/client'
+import type {Category, RawExcelTech} from '@randomstack/commons'
 
 
 export default class SeedAction {

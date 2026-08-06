@@ -23,6 +23,8 @@
       "#mappers": ["./src/lib/mappers/index.ts"],
       "#middlewares": ["./src/lib/middlewares/index.ts"],
       "#utils": ["./src/lib/utils/index.ts"],
+      "@randomstack/commons": ["../../packages/commons/src/index.ts"]
+
 
     }
   },

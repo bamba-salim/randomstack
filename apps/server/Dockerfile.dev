@@ -1,8 +1,14 @@
 FROM node:20-alpine
 WORKDIR /app
+
+# Copie des configurations de paquets requises pour l'espace de travail 🚀
 COPY package*.json ./
+COPY packages/commons/package*.json ./packages/commons/
+COPY apps/server/package*.json ./apps/server/
+
 RUN npm install
+
 COPY . .
-RUN npx prisma generate
+
+# Génération Prisma en pointant vers le bon sous-dossier
 EXPOSE 4000
-CMD ["npm", "run", "dev"]

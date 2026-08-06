@@ -13,7 +13,13 @@ export default class AdminRoute {
         const router = Router()
 
         // Route unique d'écriture RPC avec ID optionnel 🚀
-        router.post('/save-technology/:id?', AuthMiddleware.isAuthenticated, AuthMiddleware.permit('ADMIN', 'EDITOR'), upload.single('logo'), TechnologyController.save)
+        router.post(
+            '/save-technology/:id?',
+            AuthMiddleware.isAuthenticated,
+            AuthMiddleware.permit('ADMIN', 'EDITOR'),
+            upload.single('logo'),
+            TechnologyController.save
+        )
 
         return router
     }

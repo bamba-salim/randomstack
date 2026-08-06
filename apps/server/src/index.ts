@@ -6,7 +6,7 @@ import path from 'path' // <-- S'assurer que path est importé
 import {Database} from '#db'
 import AppRouter from '#routes'
 import {SessionMiddleware} from '#middlewares'
-import {SeedAction} from '#action-support'
+import {SeedAction, CronJobs} from '#action-support'
 
 const app = express()
 
@@ -46,6 +46,8 @@ const PORT = process.env['PORT'] || 4000
 Database.checkConnection().then(async (connected) => {
     if (connected) {
         await SeedAction.execute()
+
+        CronJobs.boot()
 
         app.listen(PORT, () => {
             console.log(`[Server] Prêt et opérationnel sur le port ${PORT}`)
