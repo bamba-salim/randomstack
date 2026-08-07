@@ -4,6 +4,70 @@ $neon-pink: #ec4899;
 
 $slot-height: 140px;
 
+// --- LOBBY (PAGE D'ACCUEIL / HALL D'ENTRÉE) 🚀 ---
+.lobby-page-container {
+  @apply flex flex-col items-center justify-center min-h-screen bg-slate-950 text-slate-100 p-4;
+
+  .lobby-card {
+    @apply bg-slate-900 border-4 border-slate-800 rounded-3xl p-8 w-full max-w-md shadow-2xl relative text-center;
+    box-shadow: 0 0 35px rgba(59, 130, 246, 0.15), inset 0 0 20px rgba(255, 255, 255, 0.05);
+
+    &::before {
+      content: '';
+      @apply absolute -inset-0.5 rounded-3xl opacity-50 blur-sm pointer-events-none;
+      background: linear-gradient(45deg, $neon-cyan, $neon-pink);
+    }
+  }
+
+  .lobby-title {
+    @apply text-4xl font-black uppercase tracking-wider mb-2 relative z-10;
+    background: linear-gradient(to right, $neon-cyan, $primary, $neon-pink);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 10px rgba(6, 182, 212, 0.4));
+  }
+
+  .lobby-description {
+    @apply text-xs text-slate-400 max-w-xs mx-auto mb-8 relative z-10 font-medium leading-relaxed;
+  }
+
+  .lobby-nav-grid {
+    @apply flex flex-col gap-4 relative z-10 mb-8;
+  }
+
+  .lobby-btn {
+    @apply flex items-center gap-4 p-4 bg-slate-950 hover:bg-slate-800 border-2 border-slate-800 hover:border-blue-600 rounded-2xl transition-all duration-200 cursor-pointer shadow-inner text-left;
+
+    .btn-icon {
+      @apply text-2xl;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); // Sorti de @apply pour corriger l'erreur de build 🚀
+    }
+
+    .btn-text {
+      @apply text-xs font-black uppercase tracking-widest text-slate-200;
+    }
+
+    &.generator-btn {
+      @apply hover:border-cyan-500/80;
+      &:hover .btn-text { @apply text-cyan-400; }
+    }
+
+    &.encyclopedia-btn {
+      @apply hover:border-pink-500/80;
+      &:hover .btn-text { @apply text-pink-400; }
+    }
+  }
+
+  .lobby-footer {
+    @apply relative z-10 text-center;
+
+    .extranet-link {
+      @apply text-[10px] font-bold text-slate-600 hover:text-slate-400 uppercase tracking-widest transition-colors duration-200;
+    }
+  }
+}
+
+// --- GENERATEUR DE TIRAGE (DRAFT) ---
 .home-page-container {
   @apply flex flex-col items-center justify-center min-h-screen bg-slate-950 text-slate-100 p-4 relative overflow-hidden;
 
@@ -22,7 +86,6 @@ $slot-height: 140px;
     @apply relative z-10 flex flex-col;
   }
 
-  // En-tête du Cabinet Symétrique 🚀
   .cabinet-header {
     @apply flex flex-col sm:flex-row items-center justify-between gap-3 mb-6 relative w-full;
 
@@ -30,14 +93,12 @@ $slot-height: 140px;
       @apply flex flex-col items-center sm:items-start text-center sm:text-left order-1 sm:order-2;
     }
 
-    // Bouton Exclusion à Gauche
     .blacklist-trigger-btn {
-      @apply w-full sm:w-auto flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-wider rounded-lg transition-colors duration-200 cursor-pointer order-2 sm:order-1;
+      @apply w-full sm:w-auto flex items-center justify-center gap-1.5 py-2.5 px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-wider rounded-lg transition-colors duration-200 cursor-pointer order-2 sm:order-1;
     }
 
-    // Bouton Historique à Droite
     .history-trigger-btn {
-      @apply w-full sm:w-auto flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-wider rounded-lg transition-colors duration-200 cursor-pointer order-3;
+      @apply w-full sm:w-auto flex items-center justify-center gap-1.5 py-2.5 px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-wider rounded-lg transition-colors duration-200 cursor-pointer order-3;
     }
   }
 
@@ -51,6 +112,21 @@ $slot-height: 140px;
 
   .description {
     @apply text-[9px] text-slate-500 uppercase tracking-widest font-bold;
+  }
+
+  // --- SELECTION DE PROJET (BOUTONS D'ARCADE) ---
+  .project-type-selector {
+    @apply grid grid-cols-3 gap-2 mb-6;
+
+    .arcade-type-btn {
+      @apply py-2 px-1 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-[9px] sm:text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-200 cursor-pointer shadow-inner;
+      color: #64748b;
+
+      &.active {
+        @apply border-blue-500 bg-blue-950/20 text-blue-400;
+        filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.3));
+      }
+    }
   }
 
   // --- SLOT MACHINE ENGINE ---
@@ -110,7 +186,7 @@ $slot-height: 140px;
     @apply flex flex-col justify-center items-center gap-1.5 sm:gap-2.5 px-1 text-center shrink-0;
 
     .tech-logo-placeholder {
-      @apply w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-slate-800 flex items-center justify-center font-black text-xs border border-slate-700 shadow-md shrink-0;
+      @apply w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-slate-800 flex items-center justify-center font-black text-xs border border-slate-700 shadow-md shrink-0 overflow-hidden;
       color: $neon-cyan;
     }
 
@@ -130,6 +206,14 @@ $slot-height: 140px;
   // --- CONTRÔLES ---
   .controls-panel {
     @apply flex flex-col gap-4 mt-2;
+
+    .share-stack-btn {
+      @apply w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 border-2 border-emerald-800 hover:border-emerald-600 text-white font-black text-[11px] uppercase tracking-wider rounded-xl transition-all duration-200 cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+
+    .lobby-back-link {
+      @apply text-[10px] font-bold text-slate-500 hover:text-slate-400 uppercase tracking-widest transition-colors duration-200 text-center mt-2;
+    }
   }
 
   .draw-btn {
@@ -167,7 +251,7 @@ $slot-height: 140px;
     @apply fixed inset-0 bg-black/60 z-40;
   }
 
-  // 1. Volet Historique (À Droite)
+  // Volet Historique
   .sidebar-panel {
     @apply fixed top-0 right-0 h-full w-full sm:w-80 bg-slate-900 border-l border-slate-800 shadow-2xl z-50 p-6 flex flex-col;
 
@@ -212,7 +296,7 @@ $slot-height: 140px;
     }
   }
 
-  // 2. Nouveau Volet Blacklist (À Gauche) 🚀
+  // Volet Blacklist
   .blacklist-panel {
     @apply fixed top-0 left-0 h-full w-full sm:w-80 bg-slate-900 border-r border-slate-800 shadow-2xl z-50 p-6 flex flex-col;
 
@@ -254,23 +338,166 @@ $slot-height: 140px;
       }
     }
   }
+
+  // --- MODAL DE SUCCÈS DE PARTAGE ---
+  .share-modal-overlay {
+    @apply fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm;
+  }
+
+  .share-modal-card {
+    @apply bg-slate-900 border border-slate-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl flex flex-col items-center text-center relative;
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.1);
+
+    .modal-icon {
+      @apply text-4xl mb-3;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); // Sorti de @apply pour corriger l'erreur de build 🚀
+    }
+
+    .modal-title {
+      @apply text-base font-extrabold text-slate-200 tracking-wide uppercase;
+    }
+
+    .modal-info {
+      @apply text-[10px] text-slate-500 mt-1 max-w-[240px] leading-relaxed;
+    }
+
+    .link-copy-box {
+      @apply flex w-full gap-2 mt-5 p-2 bg-slate-950 border border-slate-800 rounded-xl;
+
+      .copy-input {
+        @apply flex-1 p-2 bg-transparent border-0 text-xs text-slate-300 font-bold select-all outline-none truncate;
+      }
+
+      .copy-btn {
+        @apply py-2 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[10px] uppercase rounded-lg transition-colors duration-150 cursor-pointer;
+      }
+    }
+
+    .close-modal-btn {
+      @apply mt-6 py-2 px-6 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-400 rounded-lg cursor-pointer transition-colors duration-150;
+    }
+  }
 }
 
-// --- ANIMATIONS ---
-// Transition Volet Droite (Slide de droite à gauche)
-.slide-enter-active, .slide-leave-active {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.slide-enter-from, .slide-leave-to {
-  transform: translateX(100%);
+// --- ENCYCLOPEDIE DES TECHNOLOGIES (V2) 🚀 ---
+.encyclopedia-page-container {
+  @apply flex flex-col items-center justify-center min-h-screen bg-slate-950 text-slate-100 p-4;
+
+  .encyclopedia-card {
+    @apply bg-slate-900 border-4 border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative flex flex-col gap-6;
+    box-shadow: 0 0 35px rgba(59, 130, 246, 0.15), inset 0 0 20px rgba(255, 255, 255, 0.05);
+
+    &::before {
+      content: '';
+      @apply absolute -inset-0.5 rounded-3xl opacity-50 blur-sm pointer-events-none;
+      background: linear-gradient(45deg, $neon-cyan, $neon-pink);
+    }
+  }
+
+  .encyclopedia-header {
+    @apply flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-800 pb-4 relative z-10;
+
+    .back-home-btn {
+      @apply w-full sm:w-auto flex items-center justify-center gap-1.5 py-2 px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-wider rounded-lg transition-colors duration-200 cursor-pointer;
+    }
+  }
+
+  .filter-row {
+    @apply flex flex-col gap-4 relative z-10 w-full text-left;
+
+    .search-input {
+      @apply w-full p-3 bg-slate-950 border-2 border-slate-800 rounded-2xl text-xs text-slate-200 placeholder-slate-500 focus:border-blue-500 outline-none transition-colors duration-200 shadow-inner;
+    }
+
+    .tab-filters {
+      @apply flex flex-wrap gap-2;
+
+      .tab-btn {
+        @apply py-2 px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-[9px] sm:text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-200 cursor-pointer;
+        color: #64748b;
+
+        &.active {
+          @apply border-pink-500/80 bg-pink-950/20 text-pink-400;
+          filter: drop-shadow(0 0 4px rgba(236, 72, 153, 0.3));
+        }
+      }
+    }
+  }
+
+  .loading-state {
+    @apply text-sm text-blue-500 font-medium py-12 mx-auto animate-pulse relative z-10;
+  }
+
+  .error-state {
+    @apply p-4 bg-red-950/20 border border-red-900 text-red-400 rounded-xl text-xs max-w-md mx-auto py-12 text-center relative z-10;
+  }
+
+  .encyclopedia-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10 overflow-y-auto max-h-[480px] pr-1 w-full;
+  }
+
+  .tech-detail-card {
+    @apply bg-slate-950 border border-slate-800/80 rounded-2xl p-5 flex flex-col gap-3 text-left transition-all duration-200 hover:border-cyan-500/60;
+
+    .tech-header {
+      @apply flex items-center gap-3.5;
+
+      .logo-wrap {
+        @apply w-11 h-11 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center font-black text-sm text-cyan-400 overflow-hidden shadow-inner;
+
+        img {
+          @apply w-full h-full object-cover;
+        }
+      }
+
+      .text-wrap {
+        @apply flex flex-col items-start;
+
+        .name {
+          @apply text-sm font-black text-slate-200 tracking-wide;
+        }
+
+        .lang-badge {
+          @apply text-[9px] font-mono font-bold text-slate-500 mt-0.5;
+        }
+      }
+    }
+
+    .desc {
+      @apply text-xs text-slate-400 font-medium leading-relaxed;
+    }
+
+    .meta-footer {
+      @apply flex items-center justify-between border-t border-slate-900/60 pt-3 mt-auto;
+
+      .meta-badge {
+        @apply px-2.5 py-1 rounded-full text-[8px] font-extrabold uppercase;
+      }
+
+      .meta-usage {
+        @apply text-[9px] text-slate-500 uppercase tracking-wider truncate max-w-[140px];
+      }
+    }
+  }
+
+  .empty-state {
+    @apply text-center text-slate-500 italic text-xs py-12 mx-auto relative z-10;
+  }
 }
 
-// Transition Volet Gauche (Slide de gauche à droite) 🚀
+// --- ALIGNEMENT DES ANIMATIONS DU ROULEAU ---
 .slide-left-enter-active, .slide-left-leave-active {
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .slide-left-enter-from, .slide-left-leave-to {
   transform: translateX(-100%);
+}
+
+.slide-enter-active, .slide-leave-active {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.slide-enter-from, .slide-leave-to {
+  transform: translateX(100%);
 }
 
 .fade-enter-active, .fade-leave-active {

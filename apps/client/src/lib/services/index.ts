@@ -1,1 +1,0 @@
-export {default as StackService} from "./stack.service"

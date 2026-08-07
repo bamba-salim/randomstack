@@ -9,7 +9,8 @@ import type {Category} from '@randomstack/commons'
 export default class StackController {
 
     private static generateShortCode(): string {
-        return Math.random().toString(36).substring(2, 8).toUpperCase()
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase()
+        return code
     }
 
     static async draw(req: Request, res: Response): Promise<void> {
@@ -71,7 +72,7 @@ export default class StackController {
                 return
             }
 
-            const shareCode = this.generateShortCode()
+            const shareCode = StackController.generateShortCode()
             const expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
 
             //TODO: creae dto and mapper

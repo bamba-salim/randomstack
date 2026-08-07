@@ -1,1 +1,1 @@
-export { default as DashboardScript } from './core/dashboard.script'
+export { default as DraftScript } from './core/draft.script'

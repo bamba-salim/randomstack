@@ -1,7 +1,7 @@
-import { type ClientTechnology } from '#services'
+import type { ClientTechnology } from '#services'
 
-export default class HomeScript {
-    // Vos constantes statiques de placeholders 🚀
+export default class DraftScript {
+    // Constantes de placeholders d'attente pour la rotation des rouleaux 🚀
     static readonly PLACEHOLDERS: ClientTechnology[] = [
         { id: 'p1', name: 'Angular', language: 'TypeScript', usage: 'Frontend', description: '', category: 'FRONTEND' },
         { id: 'p2', name: 'Django', language: 'Python', usage: 'Backend', description: '', category: 'BACKEND' },
@@ -14,7 +14,7 @@ export default class HomeScript {
         { id: 'p9', name: 'Redis', language: 'NoSQL', usage: 'Database', description: '', category: 'DATABASE' }
     ]
 
-    // Fonction pure d'utilité pour générer la bande de défilement (découplée de tout état Vue) 🚀
+    // Fonction de génération de la bande verticale de défilement (pure et déconnectée) 🚀
     static generateReelStrip(finalItem: ClientTechnology | null, category: string): ClientTechnology[] {
         const filtered = this.PLACEHOLDERS.filter(p => {
             if (category === 'CLIENT') return ['FRONTEND', 'MOBILE', 'DESKTOP'].includes(p.category)
@@ -27,7 +27,7 @@ export default class HomeScript {
             if (item) strip.push(item)
         }
 
-        // Le 10ème élément est notre résultat final
+        // Le 10ème élément est notre résultat final de tirage
         strip.push(finalItem || { id: 'empty', name: '...', language: '', usage: '', description: '', category: '' })
         return strip
     }

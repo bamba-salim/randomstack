@@ -22,7 +22,9 @@
 
     "paths": {
       "#services": ["./src/services/index.ts"],
-      "#pages": ["./src/pages/index.ts"]
+      "#pages": ["./src/pages/index.ts"],
+      "#scripts": ["./src/scripts/index.ts"],
+      "@randomstack/commons": ["../../packages/commons/src/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue", "vite.config.ts"]

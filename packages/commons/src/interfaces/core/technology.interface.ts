@@ -20,14 +20,3 @@ export interface SaveTechnologyInput {
     description: string
     logo?: any // File sur le client, string ou Buffer sur le serveur
 }
-
-export interface SaveStackDTO {
-    shareCode: string
-    projectType: Category
-    frontendId: string
-    backendId: string
-    databaseId: string
-    ormId?: string | null
-    expiresAt: Date
-    createdAt: Date
-}

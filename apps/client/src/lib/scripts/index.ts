@@ -1,1 +1,0 @@
-export {default as HomeScript} from './home.script'
