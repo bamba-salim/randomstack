@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { TechnologyService } from '#services'
-import { FormDataUtils } from '#utils'
-import type { Technology } from '@randomstack/commons'
+import {ref, onMounted} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {TechnologyService} from '#services'
+import {FormDataUtils} from '#utils'
+import type {Technology} from '@randomstack/commons'
 
 const route = useRoute()
 const router = useRouter()
@@ -104,11 +104,11 @@ onMounted(async () => {
     <div class="form-grid">
       <div class="form-group">
         <label class="form-label">Nom du Framework / Outil</label>
-        <input v-model="formName" type="text" required class="form-input" placeholder="Ex: Svelte" />
+        <input v-model="formName" type="text" required class="form-input" placeholder="Ex: Svelte"/>
       </div>
       <div class="form-group">
         <label class="form-label">Langage principal</label>
-        <input v-model="formLanguage" type="text" required class="form-input" placeholder="Ex: TypeScript" />
+        <input v-model="formLanguage" type="text" required class="form-input" placeholder="Ex: TypeScript"/>
       </div>
     </div>
 
@@ -125,23 +125,24 @@ onMounted(async () => {
       </div>
       <div class="form-group">
         <label class="form-label">Usage résumé (Utilisation)</label>
-        <input v-model="formUsage" type="text" required class="form-input" placeholder="Ex: Frontend Web" />
+        <input v-model="formUsage" type="text" required class="form-input" placeholder="Ex: Frontend Web"/>
       </div>
     </div>
 
     <div class="form-group col-span-2">
       <label class="form-label">Description d'introduction</label>
-      <textarea v-model="formDescription" required class="form-textarea" placeholder="Entrez une courte explication..."></textarea>
+      <textarea v-model="formDescription" required class="form-textarea"
+                placeholder="Entrez une courte explication..."></textarea>
     </div>
 
     <div class="form-group col-span-2">
       <label class="form-label">Logo / Illustration</label>
       <div class="file-upload-zone">
         <div class="current-logo-preview">
-          <img v-if="previewUrl" :src="previewUrl" />
+          <img v-if="previewUrl" :src="previewUrl"/>
           <span v-else class="text-slate-400 font-bold">?</span>
         </div>
-        <input type="file" accept="image/*" @change="handleFileChange" class="file-input" />
+        <input type="file" accept="image/*" @change="handleFileChange" class="file-input"/>
       </div>
     </div>
 

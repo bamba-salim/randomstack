@@ -19,7 +19,6 @@
 
       "#action-support": ["./src/lib/action-support/index.ts"],
       "#db": ["./src/lib/db/index.ts"],
-      "#interfaces": ["./src/lib/interfaces/index.ts"],
       "#mappers": ["./src/lib/mappers/index.ts"],
       "#middlewares": ["./src/lib/middlewares/index.ts"],
       "#utils": ["./src/lib/utils/index.ts"],
