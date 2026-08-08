@@ -1,23 +1,25 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { TechnologyService } from '#services'
-import { DashboardScript } from '#scripts' // Importation du script utilitaire 🚀
-import type { Technology } from '#interfaces'
+import { useRouter } from 'vue-router'
+import { AuthService, TechnologyService } from '#services'
+// Importation propre du filtre et des types depuis le module commun ! 🚀
+import { TechnologyFilter, type Technology } from '@randomstack/commons'
 
+const router = useRouter()
 const technologies = ref<Technology[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 
-// --- ÉTATS RÉACTIFS DES FILTRES ET DE LA PAGINATION 🚀 ---
+// --- ÉTATS RÉACTIFS DES FILTRES ET DE LA PAGINATION ---
 const searchQuery = ref('')
 const selectedLanguage = ref('')
 const selectedCategory = ref('')
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 
-// 1. Calcul du filtrage et de la pagination délégué au script externe 🚀
+// 1. Appel du filtre partagé de @randomstack/commons 🚀
 const filterResult = computed(() => {
-  return DashboardScript.filterAndPaginate(technologies.value, {
+  return TechnologyFilter.run(technologies.value, {
     searchQuery: searchQuery.value,
     selectedLanguage: selectedLanguage.value,
     selectedCategory: selectedCategory.value,
@@ -26,17 +28,15 @@ const filterResult = computed(() => {
   })
 })
 
-// Déstructuration réactive des calculs du script
 const paginatedTechnologies = computed(() => filterResult.value.paginatedItems)
 const totalPages = computed(() => filterResult.value.totalPages)
 const totalCount = computed(() => filterResult.value.totalItemsCount)
 
-// Extraction dynamique des langages uniques présents en base 🚀
+// 2. Extraction dynamique des langages via l'utilitaire partagé 🚀
 const uniqueLanguages = computed(() => {
-  return DashboardScript.getUniqueLanguages(technologies.value)
+  return TechnologyFilter.getUniqueLanguages(technologies.value)
 })
 
-// Réinitialisation de l'index de page lors du changement de filtre
 const handleFilterChange = () => {
   currentPage.value = 1
 }
@@ -54,6 +54,15 @@ const loadData = async () => {
     error.value = "Impossible de se connecter à l'API d'administration."
   } finally {
     loading.value = false
+  }
+}
+
+const handleLogout = async () => {
+  try {
+    await AuthService.logout()
+    router.push('/login')
+  } catch {
+    alert("Erreur déconnexion.")
   }
 }
 
@@ -83,10 +92,9 @@ onMounted(() => {
 
   <div v-else class="flex flex-col gap-4">
 
-    <!-- BARRE DE FILTRES RESPONSIVE ET DYNAMIQUE 🚀 -->
+    <!-- BARRE DE FILTRES DYNAMIQUE -->
     <div class="filter-bar-wrap">
 
-      <!-- Recherche texte -->
       <input
           v-model="searchQuery"
           @input="handleFilterChange"
@@ -95,7 +103,6 @@ onMounted(() => {
           class="filter-input"
       />
 
-      <!-- Filtre par Langage dynamique -->
       <select v-model="selectedLanguage" @change="handleFilterChange" class="filter-select">
         <option value="">🌐 Tous les langages</option>
         <option v-for="lang in uniqueLanguages" :key="lang" :value="lang">
@@ -103,7 +110,6 @@ onMounted(() => {
         </option>
       </select>
 
-      <!-- Filtre par Catégorie -->
       <select v-model="selectedCategory" @change="handleFilterChange" class="filter-select">
         <option value="">📦 Toutes les catégories</option>
         <option value="FRONTEND">FRONTEND</option>
@@ -154,7 +160,7 @@ onMounted(() => {
       </table>
     </div>
 
-    <!-- SYSTÈME DE PAGINATION DESIGN WP-ADMIN -->
+    <!-- PAGINATION -->
     <div class="pagination-container">
       <span class="pagination-info">
         Page <strong>{{ currentPage }}</strong> sur {{ totalPages }} ({{ totalCount }} éléments)

@@ -1,4 +1,4 @@
-import type {Technology} from "#interfaces";
+import type {Technology} from "./technology.interface";
 
 export interface FilterOptions {
     searchQuery: string

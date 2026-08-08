@@ -2,11 +2,12 @@ import {createRouter, createWebHistory} from 'vue-router'
 
 import {AuthService} from '#services'
 
-import AdminLayout from './core/@AdminLayout.vue'
+import AdminLayout from './layout/AdminLayout.vue'
 
 import Login from './core/Login.vue'
 import Dashboard from './core/Dashboard.vue'
 import TechnologyForm from './core/TechnologyForm.vue'
+
 
 const router = createRouter({
     history: createWebHistory(),

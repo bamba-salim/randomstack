@@ -1,3 +1,4 @@
 export * from './core/technology.interface'
 export * from './core/auth.interface'
 export * from './core/stack.interface'
+export * from './core/filter.interface'

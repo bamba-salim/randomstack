@@ -15,17 +15,13 @@
       "development": "./src/services/index.ts",
       "default": "./dist/services/index.js"
     },
+    "#scripts": {
+      "development": "./src/scripts/index.ts",
+      "default": "./dist/scripts/index.js"
+    },
     "#components": {
       "development": "./src/components/index.ts",
       "default": "./dist/components/index.js"
-    },
-    "#interfaces": {
-      "development": "./src/lib/interfaces/index.ts",
-      "default": "./dist/lib/interfaces/index.js"
-    },
-    "#scripts": {
-      "development": "./src/lib/scripts/index.ts",
-      "default": "./dist/lib/scripts/index.js"
     },
     "#utils": {
       "development": "./src/lib/utils/index.ts",
@@ -33,6 +29,7 @@
     }
   },
   "dependencies": {
+    "@randomstack/commons": "*",
     "vue": "^3.4.15",
     "vue-router": "^4.6.4"
   },

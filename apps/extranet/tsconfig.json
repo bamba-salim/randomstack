@@ -3,7 +3,11 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ESNext",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -16,14 +20,30 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "#services": ["./src/services/index.ts"],      "#pages": ["./src/pages/index.ts"],
-
-      "#components": ["./src/components/index.ts"],
-
-      "#interfaces": ["./src/lib/interfaces/index.ts"],
-      "#scripts": ["./src/lib/scripts/index.ts"],
-      "#utils": ["./src/lib/utils/index.ts"],
+      "#services": [
+        "./src/services/index.ts"
+      ],
+      "#pages": [
+        "./src/pages/index.ts"
+      ],
+      "#scripts": [
+        "./src/scripts/index.ts"
+      ],
+      "#components": [
+        "./src/components/index.ts"
+      ],
+      "#utils": [
+        "./src/lib/utils/index.ts"
+      ],
+      "@randomstack/commons": [
+        "../../packages/commons/src/index.ts"
+      ]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue", "vite.config.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.vue",
+    "vite.config.ts"
+  ]
 }

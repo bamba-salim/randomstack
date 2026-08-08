@@ -6,11 +6,11 @@ export default defineConfig({
     plugins: [vue()],
     resolve: {
         alias: {
-            '#services': fileURLToPath(new URL('./src/services/index.ts', import.meta.url)),
             '#pages': fileURLToPath(new URL('./src/pages/index.ts', import.meta.url)),
-            '#interfaces': fileURLToPath(new URL('./src/lib/interfaces/index.ts', import.meta.url)),
+
+            '#services': fileURLToPath(new URL('./src/services/index.ts', import.meta.url)),
+            '#scripts': fileURLToPath(new URL('./src/scripts/index.ts', import.meta.url)),
             '#components': fileURLToPath(new URL('./src/lib/components/index.ts', import.meta.url)),
-            '#scripts': fileURLToPath(new URL('./src/lib/scripts/index.ts', import.meta.url)),
             '#utils': fileURLToPath(new URL('./src/lib/utils/index.ts', import.meta.url))
         }
     },

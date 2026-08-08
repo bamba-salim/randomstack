@@ -1,4 +1,4 @@
-import {Technology} from "./technology.interface";
+import type {Technology} from "./technology.interface";
 
 
 export interface DrawnStack {

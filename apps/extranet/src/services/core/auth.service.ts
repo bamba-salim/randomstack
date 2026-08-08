@@ -1,11 +1,12 @@
 import ApiClient from '../api.client'
 
-import type {User} from '#interfaces'
+import type {User, LoginCredentials} from '@randomstack/commons'
+
 
 export default class AuthService extends ApiClient {
     static currentUser: User | null = null
 
-    static async login(credentials: { email: string; password: string }): Promise<User> {
+    static async login(credentials: LoginCredentials): Promise<User> {
         // Appelle la route d'auth admin spécifique que nous avons codée 🚀
         const data = await this.post<{ user: User }>('/api/auth/admin/login', credentials)
         this.currentUser = data.user
@@ -28,4 +29,5 @@ export default class AuthService extends ApiClient {
         await this.post('/api/auth/logout')
         this.currentUser = null
     }
+
 }

@@ -1,5 +1,7 @@
 import ApiClient from '../api.client.js'
-import type { Technology } from '#interfaces'
+
+import type { Technology } from '@randomstack/commons'
+
 
 export default class TechnologyService extends ApiClient {
 
@@ -16,4 +18,5 @@ export default class TechnologyService extends ApiClient {
         const endpoint = id ? `/api/admin/save-technology/${id}` : '/api/admin/save-technology'
         return await this.postForm<{ success: boolean; technology: Technology }>(endpoint, formData)
     }
+    
 }

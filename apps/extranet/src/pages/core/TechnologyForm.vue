@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { TechnologyService } from '#services'
 import { FormDataUtils } from '#utils'
-import type { Technology } from '#interfaces'
+import type { Technology } from '@randomstack/commons'
 
 const route = useRoute()
 const router = useRouter()
