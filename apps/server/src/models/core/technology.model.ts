@@ -14,28 +14,13 @@ export default class TechnologyModel {
         })
     }
 
-    static async create(data: SaveTechnologyDTO) {
+    static async create(data: SaveTechnologyInput) {
         return await Database.client.technology.create({
             data
         })
     }
 
-    static async insertTechnology(tech: RawExcelTech, category: string) {
-        await Database.client.technology.upsert({
-            where: {name: tech.Framework},
-            update: {},
-            create: {
-                name: tech.Framework,
-                language: tech.Langage,
-                logo: null,
-                usage: tech.Utilisation,
-                description: tech.Description,
-                category: category
-            }
-        })
-    }
-
-    static async update(data: SaveTechnologyDTO) {
+    static async update(data: SaveTechnologyInput) {
         const {id: _, ...updateData} = data
         return await Database.client.technology.update({
             where: {id: data.id},
@@ -46,6 +31,21 @@ export default class TechnologyModel {
 
     static async count(): Promise<number> {
         return await Database.client.technology.count()
+    }
+
+    static async insertTechnology(tech: RawExcelTech, category: Category[]) {
+        await Database.client.technology.upsert({
+            where: {name: tech.Framework},
+            update: {},
+            create: {
+                name: tech.Framework,
+                language: tech.Langage,
+                logo: null,
+                usage: tech.Utilisation,
+                description: tech.Description,
+                category: category as any
+            }
+        })
     }
 
 }

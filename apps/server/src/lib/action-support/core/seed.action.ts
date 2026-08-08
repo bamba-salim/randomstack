@@ -16,12 +16,13 @@ export default class SeedAction {
 
     }
 
-    private static determineCategory(utilisation: string): Category {
+    private static determineCategories(utilisation: string): Category[] {
         const lower = utilisation.toLowerCase()
+        const categories: Category[] = []
 
-        if (lower.includes('frontend')) return 'FRONTEND'
-        if (lower.includes('mobile')) return 'MOBILE'
-        if (lower.includes('desktop') || lower.includes('bureau')) return 'DESKTOP'
+        if (lower.includes('frontend')) categories.push('FRONTEND')
+        if (lower.includes('mobile')) categories.push('MOBILE')
+        if (lower.includes('desktop') || lower.includes('bureau')) categories.push('DESKTOP')
 
         if (
             lower.includes('base de données') ||
@@ -30,19 +31,22 @@ export default class SeedAction {
             lower.includes('baas') ||
             lower.includes('database')
         ) {
-            return 'DATABASE'
+            categories.push('DATABASE')
         }
 
-        return 'BACKEND'
+        if (categories.length === 0) {
+            categories.push('BACKEND')
+        }
+
+        return categories
     }
 
     private static async injectTechnologies() {
-
-
         const techCount = await TechnologyModel.count()
         if (techCount === 0) {
-            // Lecture simplifiée et sécurisée via FileUtils ! 🚀
+
             let technologies = FileUtils.readJSON<RawExcelTech[]>('technologies.json')
+
             if (!technologies) {
                 technologies = FileUtils.readJSON<RawExcelTech[]>('techno.json')
             }
@@ -53,8 +57,8 @@ export default class SeedAction {
             }
 
             for (const tech of technologies) {
-                const category = this.determineCategory(tech.Utilisation)
-                await TechnologyModel.insertTechnology(tech, category)
+                const categories = this.determineCategories(tech.Utilisation)
+                await TechnologyModel.insertTechnology(tech, categories)
             }
             console.log(`[Seed] ✅ Ingestion réussie : ${technologies.length} technologies importées de l'Excel.`)
 

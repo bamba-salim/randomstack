@@ -4,7 +4,7 @@ export default class DrawAction {
 
     static run(techs: Technology[]): DrawnStack {
         const getByCategory = (cats: Category[]): Technology | null => {
-            const filtered = techs.filter(t => cats.includes(t.category))
+            const filtered = techs.filter(t => t.categories.some(cat => cats.includes(cat)))
             if (filtered.length === 0) return null
             const randomIndex = Math.floor(Math.random() * filtered.length)
             return filtered[randomIndex] || null
