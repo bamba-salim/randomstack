@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {ref, onMounted} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {TechnologyService} from '#services'
-import {Sidebar} from '#components'
-import {FormDataUtils, type Technology, type Category} from '@randomstack/commons' // Import de type Category 🚀
+import { ref, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { TechnologyService } from '#services'
+import { Sidebar } from '#components'
+import { FormDataUtils, TechnologyFilter, type Technology, type Category } from '@randomstack/commons'
 
 const route = useRoute()
 const router = useRouter()
@@ -16,12 +16,40 @@ const errorMsg = ref<string | null>(null)
 
 // Variables de formulaire
 const formName = ref('')
-const formLanguage = ref('')
+const formLanguage = ref('') // Cette variable contiendra TOUJOURS la valeur finale envoyée à l'API 🚀
 const formCategories = ref<Category[]>(['FRONTEND'])
 const formUsage = ref('')
 const formDescription = ref('')
 const formFile = ref<File | null>(null)
 const previewUrl = ref<string | null>(null)
+
+// --- GESTION DE LA LISTE DÉROULANTE INTERACTIVE DES LANGAGES 🚀 ---
+const allTechnologies = ref<Technology[]>([])
+const selectedLanguageDropdown = ref('') // Stocke la valeur choisie dans le select
+const isCustomLanguage = ref(false)       // Détermine s'il faut afficher l'input text libre
+
+// Extraction dynamique des langages uniques de la BDD
+const uniqueLanguages = computed(() => {
+  return TechnologyFilter.getUniqueLanguages(allTechnologies.value)
+})
+
+// Détecte le choix de l'utilisateur dans la liste déroulante 🚀
+const handleLanguageSelect = () => {
+  if (selectedLanguageDropdown.value === '__NEW__') {
+    isCustomLanguage.value = true
+    formLanguage.value = '' // On vide pour laisser l'utilisateur taper son nouveau langage
+  } else {
+    formLanguage.value = selectedLanguageDropdown.value
+  }
+}
+
+// Annuler la saisie libre et revenir à la liste déroulante 🚀
+const cancelCustomLanguage = () => {
+  isCustomLanguage.value = false
+  // On se repositionne sur le premier langage disponible ou sur vide
+  selectedLanguageDropdown.value = uniqueLanguages.value[0] || ''
+  formLanguage.value = selectedLanguageDropdown.value
+}
 
 const handleFileChange = (e: Event) => {
   const files = (e.target as HTMLInputElement).files
@@ -40,8 +68,8 @@ const handleSave = async () => {
   try {
     const payload = {
       name: formName.value,
-      language: formLanguage.value,
-      categories: formCategories.value, // Transmet directement le tableau d'enums 🚀
+      language: formLanguage.value, // Envoie la valeur finale (issue de la liste ou de la saisie libre) 🚀
+      categories: formCategories.value,
       usage: formUsage.value,
       description: formDescription.value,
       logo: formFile.value
@@ -58,6 +86,12 @@ const handleSave = async () => {
 }
 
 onMounted(async () => {
+  try {
+    allTechnologies.value = await TechnologyService.fetchAll()
+  } catch {
+    console.warn("Impossible de charger la liste d'auto-complétion des langages.")
+  }
+
   if (route.params['id']) {
     isEditMode.value = true
     techId.value = route.params['id'] as string
@@ -65,9 +99,13 @@ onMounted(async () => {
     loading.value = true
     try {
       const tech = await TechnologyService.fetchById(techId.value)
-      console.log(tech)
       formName.value = tech.name
+
+      // On affecte la valeur chargée aux deux variables de contrôle 🚀
       formLanguage.value = tech.language
+      selectedLanguageDropdown.value = tech.language
+      isCustomLanguage.value = false
+
       formCategories.value = Array.isArray(tech.categories) ? tech.categories : []
       formUsage.value = tech.usage
       formDescription.value = tech.description
@@ -75,7 +113,7 @@ onMounted(async () => {
         previewUrl.value = `http://localhost:4000${tech.logo}`
       }
     } catch {
-      errorMsg.value = "Impossible de charger la technologie à modifier."
+      errorMsg.value = "Impossible de charger la technologie."
     } finally {
       loading.value = false
     }
@@ -110,7 +148,45 @@ onMounted(async () => {
       </div>
       <div class="form-group">
         <label class="form-label">Langage principal</label>
-        <input v-model="formLanguage" type="text" required class="form-input" placeholder="Ex: TypeScript"/>
+
+        <!-- CAS A : Liste déroulante classique avec tous les langages préchargés -->
+        <div v-if="!isCustomLanguage" class="flex gap-2">
+          <select
+              v-model="selectedLanguageDropdown"
+              @change="handleLanguageSelect"
+              required
+              class="form-select flex-1"
+          >
+            <option value="" disabled>-- Sélectionner un langage --</option>
+
+            <!-- L'option de création libre est déplacée tout en haut de la liste 🚀 -->
+            <option value="__NEW__" class="text-blue-600 font-extrabold">+ Ajouter un autre langage...</option>
+
+            <!-- Boucle sur les langages existants juste en dessous 🚀 -->
+            <option v-for="lang in uniqueLanguages" :key="lang" :value="lang">
+              {{ lang }}
+            </option>
+          </select>
+        </div>
+
+        <!-- CAS B : Champ de saisie libre s'activant si l'utilisateur choisit d'ajouter un nouveau langage -->
+        <div v-else class="flex gap-2">
+          <input
+              v-model="formLanguage"
+              type="text"
+              required
+              class="form-input flex-1"
+              placeholder="Écrivez le nom du nouveau langage..."
+          />
+          <button
+              type="button"
+              @click="cancelCustomLanguage"
+              class="cancel-btn"
+              style="margin: 0; padding: 0.625rem 1rem;"
+          >
+            Annuler
+          </button>
+        </div>
       </div>
     </div>
 
