@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { AuthService, TechnologyService } from '#services'
+import {ref, onMounted, computed} from 'vue'
+import {useRouter} from 'vue-router'
+import {AuthService, TechnologyService} from '#services'
 // Importation propre du filtre et des types depuis le module commun ! 🚀
-import { TechnologyFilter, type Technology } from '@randomstack/commons'
+import {TechnologyFilter, type Technology} from '@randomstack/commons'
+import {TechnologyTable} from "#components"
 
 const router = useRouter()
 const technologies = ref<Technology[]>([])
@@ -121,44 +122,7 @@ onMounted(() => {
 
     </div>
 
-    <!-- TABLEAU D'ADMINISTRATION EXTRANET -->
-    <div class="table-container">
-      <table class="admin-table">
-        <thead>
-        <tr>
-          <th>Logo</th>
-          <th>Nom / Framework</th>
-          <th>Langage</th>
-          <th>Catégorie</th>
-          <th>Utilisation</th>
-          <th class="text-right">Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="tech in paginatedTechnologies" :key="tech.id">
-          <td class="p-4">
-            <div class="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
-              <img v-if="tech.logo" :src="`http://localhost:4000${tech.logo}`" class="w-full h-full object-cover" />
-              <span v-else class="text-[9px] font-black text-slate-400 uppercase">{{ tech.name.substring(0, 2) }}</span>
-            </div>
-          </td>
-          <td class="tech-name">{{ tech.name }}</td>
-          <td class="tech-lang">{{ tech.language }}</td>
-          <td>
-              <span class="category-badge">
-                {{ tech.category }}
-              </span>
-          </td>
-          <td class="tech-desc">{{ tech.usage }}</td>
-          <td class="text-right">
-            <router-link :to="`/edit-technology/${tech.id}`" class="edit-btn">
-              Éditer
-            </router-link>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
+    <TechnologyTable :technologies="paginatedTechnologies"/>
 
     <!-- PAGINATION -->
     <div class="pagination-container">

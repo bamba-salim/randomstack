@@ -19,6 +19,10 @@
     "#pages": {
       "development": "./src/pages/index.ts",
       "default": "./dist/pages/index.js"
+    },
+    "#components": {
+      "development": "./src/lib/components/index.ts",
+      "default": "./dist/lib/components/index.js"
     }
   },
   "dependencies": {

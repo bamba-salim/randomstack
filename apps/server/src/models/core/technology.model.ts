@@ -43,7 +43,7 @@ export default class TechnologyModel {
                 logo: null,
                 usage: tech.Utilisation,
                 description: tech.Description,
-                category: category as any
+                categories: category as any
             }
         })
     }

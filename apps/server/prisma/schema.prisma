@@ -28,7 +28,7 @@ model Technology {
   logo        String?
   usage       String
   description String
-  category    Category[]
+  categories    Category[]
   createdAt   DateTime @default(now())
 }
 

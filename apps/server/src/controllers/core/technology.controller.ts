@@ -54,10 +54,9 @@ export default class TechnologyController {
                 }
             }
 
+            //TODO: mapper dto and mapper
             // Utilisation de la couche de transformation de données 🚀
             const saveDTO = TechnologyMapper.toSaveDTO(req.body, logoUrl, targetId)
-
-
 
             let result
             if (id) {

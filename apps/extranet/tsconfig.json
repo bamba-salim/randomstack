@@ -30,7 +30,7 @@
         "./src/scripts/index.ts"
       ],
       "#components": [
-        "./src/components/index.ts"
+        "./src/lib/components/index.ts"
       ],
       "#utils": [
         "./src/lib/utils/index.ts"

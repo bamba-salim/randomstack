@@ -20,8 +20,8 @@
       "default": "./dist/scripts/index.js"
     },
     "#components": {
-      "development": "./src/components/index.ts",
-      "default": "./dist/components/index.js"
+      "development": "./src/lib/components/index.ts",
+      "default": "./dist/lib/components/index.js"
     },
     "#utils": {
       "development": "./src/lib/utils/index.ts",

@@ -2,8 +2,8 @@
 import {ref, onMounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {TechnologyService} from '#services'
-import {FormDataUtils} from '#utils'
-import type {Technology} from '@randomstack/commons'
+import {Sidebar} from '#components'
+import {FormDataUtils, type Technology, type Category} from '@randomstack/commons' // Import de type Category 🚀
 
 const route = useRoute()
 const router = useRouter()
@@ -17,7 +17,7 @@ const errorMsg = ref<string | null>(null)
 // Variables de formulaire
 const formName = ref('')
 const formLanguage = ref('')
-const formCategory = ref('FRONTEND')
+const formCategories = ref<Category[]>(['FRONTEND'])
 const formUsage = ref('')
 const formDescription = ref('')
 const formFile = ref<File | null>(null)
@@ -41,7 +41,7 @@ const handleSave = async () => {
     const payload = {
       name: formName.value,
       language: formLanguage.value,
-      category: formCategory.value,
+      categories: formCategories.value, // Transmet directement le tableau d'enums 🚀
       usage: formUsage.value,
       description: formDescription.value,
       logo: formFile.value
@@ -65,9 +65,10 @@ onMounted(async () => {
     loading.value = true
     try {
       const tech = await TechnologyService.fetchById(techId.value)
+      console.log(tech)
       formName.value = tech.name
       formLanguage.value = tech.language
-      formCategory.value = tech.category
+      formCategories.value = Array.isArray(tech.categories) ? tech.categories : []
       formUsage.value = tech.usage
       formDescription.value = tech.description
       if (tech.logo) {
@@ -83,13 +84,14 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- Plus de Sidebar ou de container externe ici non plus ! Tout est hérité de AdminLayout 🚀 -->
-  <div class="form-header-box">
-    <h1 class="header-title">
-      {{ isEditMode ? `Édition : ${formName}` : 'Ajouter une Technologie' }}
-    </h1>
-    <p class="header-sub">Formulaire unique d'administration sémantique</p>
-  </div>
+  <header class="main-header">
+    <div>
+      <h1 class="header-title">
+        {{ isEditMode ? `Édition : ${formName}` : 'Ajouter une Technologie' }}
+      </h1>
+      <p class="header-sub">Formulaire d'écriture d'arcade sémantique</p>
+    </div>
+  </header>
 
   <div v-if="loading && isEditMode" class="loading-text">
     Chargement de la technologie...
@@ -113,17 +115,28 @@ onMounted(async () => {
     </div>
 
     <div class="form-grid">
-      <div class="form-group">
-        <label class="form-label">Catégorie technique</label>
-        <select v-model="formCategory" required class="form-select">
-          <option value="FRONTEND">FRONTEND</option>
-          <option value="BACKEND">BACKEND</option>
-          <option value="DATABASE">DATABASE</option>
-          <option value="MOBILE">MOBILE</option>
-          <option value="DESKTOP">DESKTOP</option>
-        </select>
+      <!-- Remplacement du Select par des Checkboxes Multi-sélection sémantiques 🚀 -->
+      <div class="form-group col-span-2">
+        <label class="form-label">Catégories techniques associées (Multi-choix)</label>
+        <div class="flex flex-wrap gap-2.5 mt-2">
+          <label
+              v-for="cat in ['FRONTEND', 'BACKEND', 'DATABASE', 'MOBILE', 'DESKTOP']"
+              :key="cat"
+              class="flex items-center gap-2 px-3 py-2 bg-[#f0f0f1] border border-[#c3c4c7] hover:bg-[#e0e0e0] rounded text-xs font-semibold text-[#1d2327] cursor-pointer select-none transition-colors duration-150"
+          >
+            <input
+                type="checkbox"
+                :value="cat"
+                v-model="formCategories"
+                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
+
+            />
+            <span>{{ cat }}</span>
+          </label>
+        </div>
       </div>
-      <div class="form-group">
+
+      <div class="form-group col-span-2">
         <label class="form-label">Usage résumé (Utilisation)</label>
         <input v-model="formUsage" type="text" required class="form-input" placeholder="Ex: Frontend Web"/>
       </div>
@@ -154,4 +167,5 @@ onMounted(async () => {
     </div>
 
   </form>
+
 </template>

@@ -9,6 +9,7 @@ export default defineConfig({
             '#services': fileURLToPath(new URL('./src/services/index.ts', import.meta.url)),
             '#scripts': fileURLToPath(new URL('./src/scripts/index.ts', import.meta.url)),
             '#pages': fileURLToPath(new URL('./src/pages/index.ts', import.meta.url)),
+            '#components': fileURLToPath(new URL('./src/components/index.ts', import.meta.url)),
         }
     },
     // AJOUTEZ CE BLOC SERVEUR ICI 🚀
