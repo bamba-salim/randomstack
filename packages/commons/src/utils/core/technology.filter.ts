@@ -1,24 +1,39 @@
-import type {Technology, FilterOptions, FilterResult} from '../../interfaces'
+import type { Technology, Category } from '../../types'
 
+export interface FilterOptions {
+    searchQuery: string
+    selectedLanguage: string
+    selectedCategory: string
+    currentPage: number
+    itemsPerPage: number
+}
+
+export interface FilterResult {
+    paginatedItems: Technology[]
+    totalPages: number
+    totalItemsCount: number
+}
 
 export default class TechnologyFilter {
-    // Moteur de tri et de pagination universel (partagé entre client public et admin) 🚀
     static run(techs: Technology[], options: FilterOptions): FilterResult {
-        const {searchQuery, selectedLanguage, selectedCategory, currentPage, itemsPerPage} = options
+        const { searchQuery, selectedLanguage, selectedCategory, currentPage, itemsPerPage } = options
 
         let result = techs
 
-        // 1. Filtrage cumulatif par Langage (exact match)
+        // 1. Filtrage cumulatif par Langage
         if (selectedLanguage) {
             result = result.filter(t => t.language.toLowerCase() === selectedLanguage.toLowerCase())
         }
 
-        // 2. Filtrage par Catégorie (exact match)
+        // 2. CORRECTION : Filtrage par Catégorie adapté pour le tableau categories[] 🚀
         if (selectedCategory && selectedCategory !== 'ALL') {
             result = result.filter(t => {
-                // Pour l'encyclopédie, on regroupe desktop sous le web
-                if (selectedCategory === 'FRONTEND') return ['FRONTEND', 'DESKTOP'].includes(t.category)
-                return t.category === selectedCategory
+                const targetCategories = selectedCategory === 'FRONTEND'
+                    ? ['FRONTEND', 'DESKTOP']
+                    : [selectedCategory]
+
+                // On vérifie si au moins une des catégories de l'élément correspond aux critères 🚀
+                return Array.isArray(t.categories) && t.categories.some(cat => targetCategories.includes(cat))
             })
         }
 
@@ -49,7 +64,6 @@ export default class TechnologyFilter {
         }
     }
 
-    // Extraction dynamique de tous les langages uniques présents dans la liste 🚀
     static getUniqueLanguages(techs: Technology[]): string[] {
         const langs = techs.map(t => t.language.trim()).filter(Boolean)
         return Array.from(new Set(langs)).sort()

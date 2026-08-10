@@ -1,4 +1,10 @@
 @use "tailwindcss";
 
-// Importation des sous-fichiers de pages
+// Importation des sous-fichiers de pages`
+@use "./layout/layout";
+
+@use "./components/header";
+@use "./components/footer";
+
 @use "./pages/home";
+@use "./pages/encyclopedia";
