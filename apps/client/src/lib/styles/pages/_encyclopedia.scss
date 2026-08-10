@@ -4,17 +4,17 @@ $neon-pink: #ec4899;
 
 $slot-height: 140px;
 
-// --- STRUCTURE DE MISE EN PAGE GLOBALE (STICKY FOOTER ET FOND CLAIR) 🚀 ---
+// --- STRUCTURE DE MISE EN PAGE GLOBALE (STICKY FOOTER ET FOND CLAIR) ---
 .app-layout-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f5f4f0 !important; // Force l'arrière-plan clair neutre global 🚀
+  background-color: #f5f4f0 !important; // Arrière-plan clair neutre global 🚀
 }
 
 .app-main-content {
   flex: 1 0 auto;
-  background-color: #f5f4f0 !important; // Force l'arrière-plan clair neutre du contenu principal 🚀
+  background-color: #f5f4f0 !important;
 }
 
 // --- HEADER GLOBAL DE L'APPLICATION (NAVBAR SOMBRE EN CONTRASTE) ---
@@ -89,10 +89,10 @@ $slot-height: 140px;
   }
 }
 
-// --- DESIGN DE L'ENCYCLOPÉDIE ENTIÈREMENT CLAIR, OUVERT ET ÉLARGIE 🚀 ---
-.encyclopedia-page-container {
-  background-color: #f5f4f0 !important; // Force l'effacement de l'ancien fond sombre 🚀
-  // Élargi à "max-w-7xl" (1280px) pour occuper plus de largeur d'écran 🚀
+// --- DESIGN DE L'ENCYCLOPÉDIE ET DES DÉTAILS (UNIFIÉS À 1280px DE LARGEUR) 🚀 ---
+.encyclopedia-page-container, .technology-detail-page-container {
+  background-color: #f5f4f0 !important; // Arrière-plan clair de page
+  // Élargi à max-w-7xl (1280px) pour l'encyclopédie ET la page de détails ! 🚀
   @apply flex flex-col w-full max-w-7xl mx-auto p-6 text-[#1d2327] text-left relative z-10;
 
   .encyclopedia-header-top {
@@ -138,12 +138,12 @@ $slot-height: 140px;
     @apply p-4 bg-red-50 border border-red-200 text-red-600 rounded-none py-12 text-center;
   }
 
-  // Grille élargie à 4 colonnes sur les résolutions d'ordinateurs (Desktop) 🚀
+  // Grille ouverte sur toute la page à 4 colonnes (cartes affinées) 🚀
   .encyclopedia-grid-open {
     @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full;
   }
 
-  // --- LES CARTES (Conserve l'identité sombre RandomStack sur fond clair de page) 🚀 ---
+  // --- LES CARTES ---
   .tech-detail-card {
     @apply bg-slate-900 border border-[#c3c4c7] aspect-[4/3] relative overflow-hidden rounded-none p-0 flex flex-col justify-end;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
@@ -194,17 +194,53 @@ $slot-height: 140px;
       @apply opacity-100 pointer-events-auto;
     }
   }
-}
 
-// --- LA PAGE DE DÉTAILS SOUS MODÈLE ÉDITORIAL "CAT" ---
-.detail-layout-card {
-  @apply text-left flex flex-col gap-6;
+  // --- SYSTEM DE PAGINATION DESIGN WP-ADMIN ---
+  .pagination-container {
+    @apply flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#c3c4c7] pt-4 mt-4 text-xs w-full;
 
+    .pagination-info {
+      @apply text-slate-500 font-bold;
+    }
+
+    .pagination-actions {
+      @apply flex gap-2 w-full sm:w-auto;
+    }
+
+    .page-btn {
+      @apply w-full sm:w-auto py-2 px-4 bg-[#f6f8fa] border border-[#c3c4c7] hover:bg-[#e0e0e0] rounded text-[10px] text-slate-600 font-black uppercase transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+  }
+
+  // --- LA FICHE DE DÉTAILS SÉMANTIQUE ÉLARGIE (SANS CHÂSSIS BLANC) 🚀 ---
+  // Prend automatiquement la largeur max-w-7xl (1280px) du parent !
+  .detail-layout-card {
+    @apply w-full flex flex-col gap-6 relative;
+  }
+
+  // Fil d'Ariane
+  .breadcrumb-nav {
+    @apply flex flex-wrap items-center gap-2 text-[9px] font-black text-slate-500 uppercase tracking-widest border-b border-[#c3c4c7]/40 pb-4 mb-2;
+
+    a {
+      @apply text-slate-400 hover:text-[#2271b1] transition-colors duration-150;
+    }
+
+    .separator {
+      @apply text-slate-300;
+    }
+
+    .current {
+      @apply text-[#1d2327];
+    }
+  }
+
+  // LIGNE 1 : IMAGE (GAUCHE) & TABLEAU (DROITE) CÔTE-À-CÔTE ÉLARGIS 🚀
   .detail-top-section {
-    @apply flex flex-col sm:flex-row gap-6 border-b border-[#c3c4c7]/60 pb-6;
+    @apply flex flex-col sm:flex-row gap-8 border-b border-[#c3c4c7]/60 pb-6;
 
     .detail-image-box {
-      @apply w-full sm:w-64 h-64 bg-[#f6f8fa] border border-[#c3c4c7] flex items-center justify-center overflow-hidden shadow-sm;
+      @apply w-full sm:w-64 h-64 bg-white border border-[#c3c4c7] flex items-center justify-center overflow-hidden shadow-sm shrink-0;
 
       img {
         @apply w-full h-full object-cover;
@@ -212,10 +248,10 @@ $slot-height: 140px;
     }
 
     .detail-meta-table {
-      @apply flex-1 flex flex-col text-left;
+      @apply flex-1 flex flex-col text-left min-w-0;
 
       .tech-title {
-        @apply text-3xl sm:text-4xl font-extrabold text-[#1d2327] tracking-tight mb-4 pb-2 border-b-2 border-slate-900;
+        @apply text-3xl font-extrabold text-[#1d2327] tracking-tight mb-4 pb-2 border-b-2 border-slate-900 truncate;
         font-family: 'Georgia', serif;
       }
 
@@ -224,7 +260,7 @@ $slot-height: 140px;
       }
 
       .meta-row {
-        @apply flex justify-between items-center py-2 border-b border-dashed border-[#c3c4c7]/40 text-xs font-semibold;
+        @apply flex justify-between items-center py-2.5 border-b border-dashed border-[#c3c4c7]/40 text-xs font-semibold;
 
         .meta-label {
           @apply text-slate-400 font-bold uppercase tracking-wider;
@@ -235,12 +271,13 @@ $slot-height: 140px;
         }
 
         .meta-badge-tag {
-          @apply px-2.5 py-0.5 rounded-none text-[8px] font-extrabold uppercase bg-transparent border border-[#dfa72d]/80 text-[#dfa72d];
+          @apply px-2.5 py-0.5 rounded-none text-[8px] font-extrabold uppercase bg-transparent border border-slate-800 text-slate-600;
         }
       }
     }
   }
 
+  // LIGNE 2 : DESCRIPTION DU BAS ENTIÈREMENT DÉPLOYÉE
   .detail-bottom-section {
     @apply flex flex-col gap-3 text-left;
 
@@ -250,14 +287,6 @@ $slot-height: 140px;
 
     .tech-long-description {
       @apply text-sm text-slate-600 font-medium leading-relaxed;
-    }
-  }
-
-  .detail-footer {
-    @apply border-t border-[#c3c4c7] pt-6 flex justify-start;
-
-    .back-btn {
-      @apply py-2 px-4 bg-transparent border-2 border-slate-800 hover:border-[#dfa72d] text-[10px] font-bold text-slate-600 hover:text-[#dfa72d] uppercase tracking-wider rounded-none transition-all duration-150 cursor-pointer;
     }
   }
 }

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { StackService } from '#services'
-import type { Technology } from '@randomstack/commons'
+import {ref, onMounted} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {StackService} from '#services'
+import type {Technology} from '@randomstack/commons'
 
 const route = useRoute()
 const router = useRouter()
@@ -33,15 +33,24 @@ onMounted(async () => {
       {{ error }}
     </div>
 
-    <!-- LE LAYOUT ÉDITORIAL UNIFIÉ INSPIRÉ DE LA MAQUETTE 🚀 -->
-    <div v-else class="detail-layout-card max-w-4xl w-full">
+    <!-- LE LAYOUT ÉDITORIAL UNIFIÉ ET CENTRÉ (MÊME LARGEUR QUE LA HOME) 🚀 -->
+    <div v-else class="detail-layout-card">
 
-      <!-- NIVEAU 1 : IMAGE (À GAUCHE) ET TABLEAU DE DONNÉES (À DROITE) CÔTE-À-CÔTE 🚀 -->
+      <!-- FIL D'ARIANE (BREADCRUMB) COMMUNE ET SÉMANTIQUE 🚀 -->
+      <nav class="breadcrumb-nav">
+        <router-link to="/">Lobby</router-link>
+        <span class="separator">/</span>
+        <router-link to="/encyclopedia">Encyclopédie</router-link>
+        <span class="separator">/</span>
+        <span class="current">{{ tech?.name }}</span>
+      </nav>
+
+      <!-- NIVEAU 1 : IMAGE (À GAUCHE) ET TABLEAU (À DROITE) CÔTE-À-CÔTE -->
       <div class="detail-top-section">
 
         <!-- Boîte d'image à gauche -->
         <div class="detail-image-box shrink-0">
-          <img v-if="tech?.logo" :src="`http://localhost:4000${tech.logo}`" />
+          <img v-if="tech?.logo" :src="`http://localhost:4000${tech.logo}`"/>
           <span v-else class="text-3xl font-black text-slate-600 uppercase">{{ tech?.name.substring(0, 2) }}</span>
         </div>
 
@@ -73,20 +82,13 @@ onMounted(async () => {
 
       </div>
 
-      <!-- NIVEAU 2 : DESCRIPTION GLOBALE EN DESSOUS 🚀 -->
+      <!-- NIVEAU 2 : DESCRIPTION DU BAS EN DESSOUS -->
       <div class="detail-bottom-section">
         <h2 class="section-heading">Description & Caractéristiques</h2>
         <p class="tech-long-description">
           {{ tech?.description }}
         </p>
       </div>
-
-      <!-- Actions de pied de page -->
-      <footer class="detail-footer">
-        <button @click="router.back()" class="back-btn">
-          ← Retourner à l'Encyclopédie
-        </button>
-      </footer>
 
     </div>
   </div>
