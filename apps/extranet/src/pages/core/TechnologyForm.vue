@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import {ref, onMounted, computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import {TechnologyService} from '#services'
-// Importation propre de la Sidebar et du nouveau ParagraphManager ! 🚀
+
 import {Sidebar, ParagraphManager} from '#components'
-import {
-  FormDataUtils,
-  TechnologyFilter,
-  type Technology,
-  type Category,
-  type SaveTechnologyInput
-} from '@randomstack/commons'
+
+import {TechnologyService} from '#services'
+import {FormDataUtils, TechnologyFilter} from '@randomstack/commons'
+
+import type {Technology, Category, EditTechnologyFormBean} from '@randomstack/commons'
 
 const route = useRoute()
 const router = useRouter()
@@ -22,7 +19,7 @@ const loading = ref(false)
 const errorMsg = ref<string | null>(null)
 
 // 1. LE FORMBEAN UNIQUE AVEC TOUS LES NOUVEAUX CHAMPS DU CAHIER DES CHARGES 🚀
-const formBean = ref<SaveTechnologyInput | null>(null)
+const formBean = ref<EditTechnologyFormBean | null>(null)
 
 // Variables de contrôle d'autocomplétion des langages
 const allTechnologies = ref<Technology[]>([])
