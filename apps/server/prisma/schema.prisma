@@ -22,14 +22,34 @@ enum Role {
 }
 
 model Technology {
-  id          String   @id @default(uuid())
-  name        String   @unique
+  id          String            @id @default(uuid())
+  name        String            @unique
+  slug        String            @unique // Format: {nom-de-la-techno}-uuid
   language    String
   logo        String?
   usage       String
-  description String
-  categories    Category[]
-  createdAt   DateTime @default(now())
+  categories  Category[]
+  isActive    Boolean           @default(true) // Disponible uniquement au tirage ou non
+  createdAt   DateTime          @default(now())
+
+  // Relation 1-à-1 : detail.id est la clé primaire ET la clé étrangère référençant l'ID de Technology 🚀
+  detail      TechnologyDetail?
+}
+
+// 2. Modèle de détails d'une technologie (Lourd)
+model TechnologyDetail {
+  id           String     @id // Clé primaire identique à Technology.id (sélecteur partagé) 🚀
+  technology   Technology @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  websiteUrl   String?
+  docsUrl      String?
+  creator      String?
+  foundedAt    String?    // Date/Année de création de la techno (ex: "2013")
+  versions     Json?      // JSON stockant { stable: { num: "...", date: "..." }, latest: { num: "...", date: "..." } }
+  userCount    Int?       // Nombre d'utilisateurs (ex: étoiles GitHub)
+  projectCount Int?       // Nombre de projets
+  history      String[]   // Tableau sémantique de paragraphes
+  description  String?    @db.Text // Rendu nullable avec un "?" 🚀
 }
 
 model SavedStack {

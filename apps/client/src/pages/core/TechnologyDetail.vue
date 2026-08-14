@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {ref, onMounted} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {StackService} from '#services'
-import type {Technology} from '@randomstack/commons'
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { StackService } from '#services'
+import type { Technology } from '@randomstack/commons'
 
 const route = useRoute()
 const router = useRouter()
@@ -12,9 +12,9 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 
 onMounted(async () => {
-  const id = route.params['id'] as string
+  const slug = route.params['slug'] as string
   try {
-    tech.value = await StackService.get<Technology>(`/api/fetch-technology/${id}`)
+    tech.value = await StackService.fetchTechnologyBySlug(slug)
   } catch {
     error.value = "Impossible de charger les détails de cette technologie."
   } finally {
@@ -33,10 +33,9 @@ onMounted(async () => {
       {{ error }}
     </div>
 
-    <!-- LE LAYOUT ÉDITORIAL UNIFIÉ ET CENTRÉ (MÊME LARGEUR QUE LA HOME) 🚀 -->
     <div v-else class="detail-layout-card">
 
-      <!-- FIL D'ARIANE (BREADCRUMB) COMMUNE ET SÉMANTIQUE 🚀 -->
+      <!-- FIL D'ARIANE -->
       <nav class="breadcrumb-nav">
         <router-link to="/">Lobby</router-link>
         <span class="separator">/</span>
@@ -45,22 +44,21 @@ onMounted(async () => {
         <span class="current">{{ tech?.name }}</span>
       </nav>
 
-      <!-- NIVEAU 1 : IMAGE (À GAUCHE) ET TABLEAU (À DROITE) CÔTE-À-CÔTE -->
+      <!-- NIVEAU 1 : IMAGE (GAUCHE) & TABLEAU (DROITE) -->
       <div class="detail-top-section">
 
-        <!-- Boîte d'image à gauche -->
         <div class="detail-image-box shrink-0">
-          <img v-if="tech?.logo" :src="`http://localhost:4000${tech.logo}`"/>
-          <span v-else class="text-3xl font-black text-slate-600 uppercase">{{ tech?.name.substring(0, 2) }}</span>
+          <img v-if="tech?.logo" :src="`http://localhost:4000${tech.logo}`" />
+          <span class="text-3xl font-black text-slate-600 uppercase" v-else>{{ tech?.name.substring(0, 2) }}</span>
         </div>
 
-        <!-- Tableau de métadonnées sémantiques à droite -->
         <div class="detail-meta-table">
           <h1 class="tech-title">{{ tech?.name }}</h1>
 
           <div class="meta-grid">
             <div class="meta-row">
               <span class="meta-label">Catégorie(s)</span>
+              <!-- Affiche le tableau de catégories sur la page de détails 🚀 -->
               <div class="flex flex-wrap gap-1">
                 <span v-for="cat in tech?.categories" :key="cat" class="meta-badge-tag">
                   {{ cat }}
@@ -82,11 +80,11 @@ onMounted(async () => {
 
       </div>
 
-      <!-- NIVEAU 2 : DESCRIPTION DU BAS EN DESSOUS -->
+      <!-- NIVEAU 2 : DESCRIPTION -->
       <div class="detail-bottom-section">
         <h2 class="section-heading">Description & Caractéristiques</h2>
         <p class="tech-long-description">
-          {{ tech?.description }}
+          {{ tech?.detail?.description || 'Aucune description disponible.' }}
         </p>
       </div>
 

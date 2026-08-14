@@ -18,7 +18,7 @@ export default class AdminRoute {
             AuthMiddleware.isAuthenticated,
             AuthMiddleware.permit('ADMIN', 'EDITOR'),
             upload.single('logo'),
-            TechnologyController.save
+            TechnologyController.saveTechnology
         )
 
         return router

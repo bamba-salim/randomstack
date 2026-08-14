@@ -1,11 +1,10 @@
 $primary: #3b82f6;
 $neon-cyan: #06b6d4;
 $neon-pink: #ec4899;
-$gold-accent: #f5f4f0;
+$gold-accent: #dfa72d;
 
 $slot-height: 140px;
 
-// --- BARRE DE NAVIGATION COMMUNE (NAVBAR) 🚀 ---
 .app-header {
   @apply sticky top-0 left-0 right-0 h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-center z-40 px-4 sm:px-6 shrink-0;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -23,7 +22,6 @@ $slot-height: 140px;
     }
   }
 
-  // Navigation Ordinateur
   .desktop-navigation {
     @apply hidden sm:flex items-center gap-4 text-xs font-bold uppercase tracking-wider;
 
@@ -40,12 +38,10 @@ $slot-height: 140px;
     }
   }
 
-  // Menu burger mobile 📱
   .mobile-menu-toggle {
     @apply flex items-center justify-center p-2 text-slate-400 hover:text-slate-100 text-xl font-bold cursor-pointer sm:hidden;
   }
 
-  // Tiroir de navigation mobile
   .mobile-nav-overlay {
     @apply fixed inset-0 bg-black/75 z-40 sm:hidden;
   }

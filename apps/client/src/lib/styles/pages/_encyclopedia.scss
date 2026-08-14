@@ -1,98 +1,8 @@
-$primary: #3b82f6;
-$neon-cyan: #06b6d4;
-$neon-pink: #ec4899;
+@use '../layout/variables';
 
-$slot-height: 140px;
-
-// --- STRUCTURE DE MISE EN PAGE GLOBALE (STICKY FOOTER ET FOND CLAIR) ---
-.app-layout-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: #f5f4f0 !important; // Arrière-plan clair neutre global 🚀
-}
-
-.app-main-content {
-  flex: 1 0 auto;
+// --- DESIGN DE L'ENCYCLOPÉDIE OUVERT ET CLAIR (SANS CARD-WRAPPER) ---
+.encyclopedia-page-container {
   background-color: #f5f4f0 !important;
-}
-
-// --- HEADER GLOBAL DE L'APPLICATION (NAVBAR SOMBRE EN CONTRASTE) ---
-.app-header {
-  @apply sticky top-0 left-0 right-0 h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-center z-40 px-4 sm:px-6 shrink-0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-
-  .header-container {
-    @apply flex items-center justify-between w-full max-w-5xl;
-  }
-
-  .logo-area {
-    .logo-text {
-      @apply text-base font-black tracking-widest text-slate-100 uppercase;
-      background: linear-gradient(to right, $neon-cyan, $primary, $neon-pink);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-  }
-
-  .desktop-navigation {
-    @apply hidden sm:flex items-center gap-4 text-xs font-bold uppercase tracking-wider;
-
-    .nav-item {
-      @apply text-slate-400 hover:text-slate-100 transition-colors duration-150;
-
-      &.active {
-        @apply text-cyan-400;
-      }
-
-      &.disabled {
-        @apply text-slate-600 hover:text-slate-600 cursor-not-allowed;
-      }
-    }
-  }
-
-  .mobile-menu-toggle {
-    @apply flex items-center justify-center p-2 text-slate-400 hover:text-slate-100 text-xl font-bold cursor-pointer sm:hidden;
-  }
-
-  .mobile-nav-overlay {
-    @apply fixed inset-0 bg-black/75 z-40 sm:hidden;
-  }
-
-  .mobile-navigation {
-    @apply fixed top-0 left-0 h-screen w-64 bg-slate-900 border-r border-slate-800 p-6 flex flex-col gap-4 z-50 transition-transform duration-300 sm:hidden;
-
-    .mobile-nav-item {
-      @apply w-full text-left py-3 border-b border-slate-800/40 text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-100 transition-colors;
-
-      &.active {
-        @apply text-cyan-400 border-cyan-500/20;
-      }
-
-      &.disabled {
-        @apply text-slate-600 hover:text-slate-600 cursor-not-allowed border-transparent;
-      }
-    }
-  }
-}
-
-// --- STICKY FOOTER GLOBAL ---
-.app-footer {
-  @apply bg-slate-950 border-t border-slate-900 py-6 px-4 flex justify-center shrink-0;
-
-  .footer-container {
-    @apply flex flex-col sm:flex-row items-center justify-between w-full max-w-5xl gap-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest;
-  }
-
-  .footer-link {
-    @apply text-slate-600 hover:text-slate-400 transition-colors duration-150;
-  }
-}
-
-// --- DESIGN DE L'ENCYCLOPÉDIE ET DES DÉTAILS (UNIFIÉS À 1280px DE LARGEUR) 🚀 ---
-.encyclopedia-page-container, .technology-detail-page-container {
-  background-color: #f5f4f0 !important; // Arrière-plan clair de page
-  // Élargi à max-w-7xl (1280px) pour l'encyclopédie ET la page de détails ! 🚀
   @apply flex flex-col w-full max-w-7xl mx-auto p-6 text-[#1d2327] text-left relative z-10;
 
   .encyclopedia-header-top {
@@ -108,7 +18,7 @@ $slot-height: 140px;
     }
   }
 
-  // Barre de filtres horizontale
+  // Barre de filtres horizontale disposée EN HAUT
   .filter-row-top {
     @apply flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-8 w-full;
 
@@ -138,155 +48,79 @@ $slot-height: 140px;
     @apply p-4 bg-red-50 border border-red-200 text-red-600 rounded-none py-12 text-center;
   }
 
-  // Grille ouverte sur toute la page à 4 colonnes (cartes affinées) 🚀
+  // Grille ouverte sur toute la page à 4 colonnes (cartes affinées)
   .encyclopedia-grid-open {
     @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full;
   }
 
-  // --- LES CARTES ---
+  // --- LE RETOUR DE LA CARTE SOMBRE AVEC TEXTE SUPERPOSÉ ET FLOU DE SURVOL 🚀 ---
+  // --- LA CARTE ÉDITORIALE CLAIRE ET GÉANTE DE LA MAQUETTE DRIBBBLE 🚀 ---
+  // --- LA CARTE ÉDITORIALE CLAIRE À COMPORTEMENT DE SURVOL NOIR 🚀 ---
   .tech-detail-card {
-    @apply bg-slate-900 border border-[#c3c4c7] aspect-[4/3] relative overflow-hidden rounded-none p-0 flex flex-col justify-end;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    // Le fond par défaut de la carte est blanc immaculé (Garantit la visibilité de tout logo) 🚀
+    @apply bg-white border border-slate-200 aspect-[4/3] relative overflow-hidden rounded-none p-0 flex flex-col justify-end cursor-pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
 
+    &:hover {
+      @apply border-slate-400 transform -translate-y-0.5;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    // L'encart de l'image ou de repli
     .card-bg-image {
-      @apply absolute inset-0 w-full h-full z-0 bg-slate-950 flex items-center justify-center;
+      @apply absolute inset-0 w-full h-full z-0 bg-slate-50 flex items-center justify-center;
+      // Fond de repli gris très doux
 
       .initials-bg {
-        @apply text-4xl font-black text-slate-700 uppercase select-none;
+        @apply text-5xl font-black text-slate-200 uppercase select-none;
+        // Initiales claires
       }
     }
 
+    // Le masque de dégradé de lecture noir très transparent 🚀
     .card-overlay {
       @apply absolute inset-0 z-10 flex flex-col justify-end p-4 transition-all duration-300;
-      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+      // Dégradé NOIR et très transparent (0.6 à transparent) 🚀
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.2) 50%, transparent 100%);
 
       .overlay-default-content {
         @apply flex flex-col items-start text-left transition-all duration-300;
 
         .name {
           @apply text-base font-black text-white tracking-wide mt-1;
+          // L'écriture repasse en blanc 🚀
           font-family: 'Georgia', serif;
         }
 
         .lang-badge {
-          @apply text-[9px] font-mono font-bold text-slate-400 uppercase tracking-wider;
+          @apply text-[9px] font-mono font-bold text-slate-300 uppercase tracking-wider;
+          // Texte clair 🚀
         }
 
+        // Badges multiples noirs et discrets par-dessus le dégradé sombre
         .meta-badge {
-          @apply px-2 py-0.5 rounded-none text-[8px] font-black uppercase bg-transparent border border-cyan-400 text-cyan-400;
+          @apply px-2 py-0.5 rounded-none text-[8px] font-black uppercase bg-black/40 border border-slate-700 text-slate-100;
         }
       }
 
+      // Le volet descriptif de survol qui s'affiche en NOIR ÉPURÉ 🚀
       .overlay-hover-content {
-        @apply absolute inset-0 bg-[#0f1410]/95 flex flex-col justify-center items-start text-left p-5 opacity-0 transition-opacity duration-300 pointer-events-none;
+        @apply absolute inset-0 bg-slate-950/95 flex flex-col justify-center items-start text-left p-5 opacity-0 transition-opacity duration-300 pointer-events-none;
 
         .desc {
           @apply text-xs text-slate-300 font-medium leading-relaxed mb-4 line-clamp-3;
+          // Texte clair sur fond noir
         }
 
         .view-more-btn {
-          @apply text-[10px] font-black uppercase tracking-widest text-[#dfa72d];
+          @apply text-[10px] font-black uppercase tracking-widest text-cyan-400;
+          // Lien d'arcade cyan
         }
       }
     }
 
     &:hover .card-overlay .overlay-hover-content {
       @apply opacity-100 pointer-events-auto;
-    }
-  }
-
-  // --- SYSTEM DE PAGINATION DESIGN WP-ADMIN ---
-  .pagination-container {
-    @apply flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#c3c4c7] pt-4 mt-4 text-xs w-full;
-
-    .pagination-info {
-      @apply text-slate-500 font-bold;
-    }
-
-    .pagination-actions {
-      @apply flex gap-2 w-full sm:w-auto;
-    }
-
-    .page-btn {
-      @apply w-full sm:w-auto py-2 px-4 bg-[#f6f8fa] border border-[#c3c4c7] hover:bg-[#e0e0e0] rounded text-[10px] text-slate-600 font-black uppercase transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
-    }
-  }
-
-  // --- LA FICHE DE DÉTAILS SÉMANTIQUE ÉLARGIE (SANS CHÂSSIS BLANC) 🚀 ---
-  // Prend automatiquement la largeur max-w-7xl (1280px) du parent !
-  .detail-layout-card {
-    @apply w-full flex flex-col gap-6 relative;
-  }
-
-  // Fil d'Ariane
-  .breadcrumb-nav {
-    @apply flex flex-wrap items-center gap-2 text-[9px] font-black text-slate-500 uppercase tracking-widest border-b border-[#c3c4c7]/40 pb-4 mb-2;
-
-    a {
-      @apply text-slate-400 hover:text-[#2271b1] transition-colors duration-150;
-    }
-
-    .separator {
-      @apply text-slate-300;
-    }
-
-    .current {
-      @apply text-[#1d2327];
-    }
-  }
-
-  // LIGNE 1 : IMAGE (GAUCHE) & TABLEAU (DROITE) CÔTE-À-CÔTE ÉLARGIS 🚀
-  .detail-top-section {
-    @apply flex flex-col sm:flex-row gap-8 border-b border-[#c3c4c7]/60 pb-6;
-
-    .detail-image-box {
-      @apply w-full sm:w-64 h-64 bg-white border border-[#c3c4c7] flex items-center justify-center overflow-hidden shadow-sm shrink-0;
-
-      img {
-        @apply w-full h-full object-cover;
-      }
-    }
-
-    .detail-meta-table {
-      @apply flex-1 flex flex-col text-left min-w-0;
-
-      .tech-title {
-        @apply text-3xl font-extrabold text-[#1d2327] tracking-tight mb-4 pb-2 border-b-2 border-slate-900 truncate;
-        font-family: 'Georgia', serif;
-      }
-
-      .meta-grid {
-        @apply flex flex-col gap-3;
-      }
-
-      .meta-row {
-        @apply flex justify-between items-center py-2.5 border-b border-dashed border-[#c3c4c7]/40 text-xs font-semibold;
-
-        .meta-label {
-          @apply text-slate-400 font-bold uppercase tracking-wider;
-        }
-
-        .meta-value {
-          @apply text-[#1d2327] font-black;
-        }
-
-        .meta-badge-tag {
-          @apply px-2.5 py-0.5 rounded-none text-[8px] font-extrabold uppercase bg-transparent border border-slate-800 text-slate-600;
-        }
-      }
-    }
-  }
-
-  // LIGNE 2 : DESCRIPTION DU BAS ENTIÈREMENT DÉPLOYÉE
-  .detail-bottom-section {
-    @apply flex flex-col gap-3 text-left;
-
-    .section-heading {
-      @apply text-xs font-black text-slate-400 uppercase tracking-widest;
-    }
-
-    .tech-long-description {
-      @apply text-sm text-slate-600 font-medium leading-relaxed;
     }
   }
 }

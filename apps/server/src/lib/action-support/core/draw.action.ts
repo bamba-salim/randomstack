@@ -10,6 +10,8 @@ export default class DrawAction {
             return filtered[randomIndex] || null
         }
 
+
+
         return {
             // Le client peut être une techno Web, Mobile ou Desktop
             clientLayer: getByCategory(['FRONTEND', 'MOBILE', 'DESKTOP']),

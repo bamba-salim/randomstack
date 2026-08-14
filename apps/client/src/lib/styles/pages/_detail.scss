@@ -1,0 +1,85 @@
+@use '../layout/variables';
+
+// --- LA PAGE DE DÉTAILS SÉMANTIQUE ÉLARGIE ET OUVERTE (SANS CHÂSSIS BLANC) 🚀 ---
+.technology-detail-page-container {
+  @apply flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 w-full relative z-10;
+  background-color: #f5f4f0 !important;
+
+  // L'enveloppe est transparente et de même largeur de boitier (max-w-xl)
+  .detail-layout-card {
+    @apply w-full max-w-7xl flex flex-col gap-6 relative; // Partage la même largeur de 1280px ! 🚀
+  }
+
+  // Fil d'Ariane
+  .breadcrumb-nav {
+    @apply flex flex-wrap items-center gap-2 text-[9px] font-black text-slate-500 uppercase tracking-widest border-b border-[#c3c4c7]/40 pb-4 mb-2;
+
+    a {
+      @apply text-slate-400 hover:text-[#2271b1] transition-colors duration-150;
+    }
+
+    .separator {
+      @apply text-slate-300;
+    }
+
+    .current {
+      @apply text-[#1d2327];
+    }
+  }
+
+  // LIGNE 1 : IMAGE (GAUCHE) & TABLEAU (DROITE) CÔTE-À-CÔTE ÉLARGIS
+  .detail-top-section {
+    @apply flex flex-col sm:flex-row gap-8 border-b border-[#c3c4c7]/60 pb-6;
+
+    .detail-image-box {
+      @apply w-full sm:w-64 h-64 bg-white border border-[#c3c4c7] flex items-center justify-center overflow-hidden shadow-sm shrink-0;
+
+      img {
+        @apply w-full h-full object-cover;
+      }
+    }
+
+    .detail-meta-table {
+      @apply flex-1 flex flex-col text-left min-w-0;
+
+      .tech-title {
+        @apply text-3xl font-extrabold text-[#1d2327] tracking-tight mb-4 pb-2 border-b-2 border-slate-900 truncate;
+        font-family: 'Georgia', serif;
+      }
+
+      .meta-grid {
+        @apply flex flex-col gap-3;
+      }
+
+      .meta-row {
+        @apply flex justify-between items-center py-2.5 border-b border-dashed border-[#c3c4c7]/40 text-xs font-semibold;
+
+        .meta-label {
+          @apply text-slate-400 font-bold uppercase tracking-wider;
+        }
+
+        .meta-value {
+          @apply text-[#1d2327] font-black;
+        }
+
+        // Tag de catégorie noir et gris neutre, sans or
+        .meta-badge-tag {
+          @apply px-2.5 py-0.5 rounded-none text-[8px] font-extrabold uppercase bg-transparent border border-slate-800 text-slate-600;
+        }
+      }
+    }
+  }
+
+  // LIGNE 2 : DESCRIPTION DU BAS ENTIÈREMENT DÉPLOYÉE
+  .detail-bottom-section {
+    @apply flex flex-col gap-3 text-left;
+
+    .section-heading {
+      @apply text-xs font-black text-slate-400 uppercase tracking-widest;
+    }
+
+    .tech-long-description {
+      @apply text-sm text-slate-600 font-medium leading-relaxed;
+    }
+  }
+}

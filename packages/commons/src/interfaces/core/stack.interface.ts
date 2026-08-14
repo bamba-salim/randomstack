@@ -13,14 +13,6 @@ export interface DrawResponse {
     history: DrawnStack[]
 }
 
-export interface RawExcelTech {
-    Langage: string
-    Framework: string
-    Utilisation: string
-    Description: string
-}
-
-
 export interface SaveStackDTO {
     shareCode: string
     projectType: Category

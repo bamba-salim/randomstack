@@ -30,7 +30,7 @@ const router = createRouter({
                     component: Encyclopedia
                 },
                 {
-                    path: 'technology/:id',
+                    path: 'technology/:slug',
                     name: 'technology-detail',
                     component: TechnologyDetail
                 }

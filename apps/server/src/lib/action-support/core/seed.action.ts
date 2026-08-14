@@ -1,4 +1,5 @@
 import {UserModel, TechnologyModel} from '#models'
+import {TechnologyMapper} from '#mappers'
 import {PasswordUtils, FileUtils} from '#utils'
 
 import type {Category, RawExcelTech} from '@randomstack/commons'
@@ -42,7 +43,7 @@ export default class SeedAction {
     }
 
     private static async injectTechnologies() {
-        const techCount = await TechnologyModel.count()
+        const techCount = await TechnologyModel.countTechnologies()
         if (techCount === 0) {
 
             let technologies = FileUtils.readJSON<RawExcelTech[]>('technologies.json')
@@ -58,7 +59,10 @@ export default class SeedAction {
 
             for (const tech of technologies) {
                 const categories = this.determineCategories(tech.Utilisation)
-                await TechnologyModel.insertTechnology(tech, categories)
+                const targetId = crypto.randomUUID()
+                const techno = TechnologyMapper.toSaveFromExcel(tech, categories, targetId)
+
+                await TechnologyModel.createTechnology(techno)
             }
             console.log(`[Seed] ✅ Ingestion réussie : ${technologies.length} technologies importées de l'Excel.`)
 

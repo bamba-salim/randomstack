@@ -51,6 +51,7 @@ const changePage = (page: number) => {
 const loadData = async () => {
   try {
     technologies.value = await TechnologyService.fetchAll()
+    console.log(technologies.value)
   } catch (err: any) {
     error.value = "Impossible de se connecter à l'API d'administration."
   } finally {

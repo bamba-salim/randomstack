@@ -1,11 +1,11 @@
-// --- STRUCTURE DE MISE EN PAGE GLOBALE (STICKY FOOTER) 🚀 ---
+// --- STRUCTURE DE MISE EN PAGE GLOBALE (STICKY FOOTER ET FOND CLAIR) ---
 .app-layout-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f5f4f0; // Arrière-plan beige-sable clair neutre par défaut 🚀
+  background-color: #f5f4f0 !important; // Fond saphir clair neutre global 🚀
 }
 
 .app-main-content {
-  flex: 1 0 auto; // Force la zone de contenu à pousser le footer vers le bas 🚀
+  flex: 1 0 auto;
 }

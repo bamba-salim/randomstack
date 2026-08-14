@@ -17,11 +17,13 @@ export default class StackController {
         try {
             const {locks, currentStack, blacklist} = req.body
 
-            const allTechs = await TechnologyModel.findAll()
+
+            const allTechs = await TechnologyModel.fetchTechnologies()
 
             // 1. Filtrage par la Blacklist (exclure les IDs d'une liste) 🚀
             const blacklistedIds = Array.isArray(blacklist) ? blacklist : []
             const allowedTechs = allTechs.filter(t => !blacklistedIds.includes(t.id))
+
 
             // 2. Tirage aléatoire uniquement sur les technologies autorisées 🚀
             const newDraw = DrawAction.run(allowedTechs)

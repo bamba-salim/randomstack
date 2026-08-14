@@ -5,6 +5,9 @@
 
 @use "./components/header";
 @use "./components/footer";
+@use "./components/pagination";
 
 @use "./pages/home";
 @use "./pages/encyclopedia";
+@use "./pages/detail";
+

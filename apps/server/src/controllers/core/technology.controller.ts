@@ -1,45 +1,44 @@
 import type {Request, Response} from 'express'
+import crypto from 'crypto'
 import {TechnologyModel} from '#models'
 import {FileUtils} from '#utils'
 import {TechnologyMapper} from '#mappers'
-import {Category} from '@prisma/client'
 
 export default class TechnologyController {
 
-    // 1. Lister toutes les technologies 🚀
-    static async getAll(_req: Request, res: Response): Promise<void> {
+    static async fetchTechnologies(_req: Request, res: Response): Promise<void> { // Verbeux 🚀
         try {
-            const techs = await TechnologyModel.findAll()
+            const techs = await TechnologyModel.fetchTechnologies()
             res.json(techs)
         } catch {
             res.status(500).json({error: 'Erreur lors du chargement des technologies.'})
         }
     }
 
-    // 2. Récupérer une technologie par son ID 🚀
-    static async getById(req: Request, res: Response): Promise<void> {
+    static async fetchTechnologyById(req: Request, res: Response): Promise<void> { // Verbeux 🚀
         try {
             const {id} = req.params
-            const tech = await TechnologyModel.findById(id)
+            const tech = await TechnologyModel.fetchTechnologyById(id)
             if (!tech) {
                 res.status(404).json({error: 'Technologie introuvable.'})
                 return
             }
-            res.json(tech)
+            const flatFormBean = TechnologyMapper.fromDBToClientFormBean(tech)
+            res.json(flatFormBean)
         } catch {
             res.status(500).json({error: 'Erreur lors de la récupération de la technologie.'})
         }
     }
 
-    // Point d'entrée d'écriture unique (Si ID => Edit, si absent => Create) 🚀
-    static async save(req: Request, res: Response): Promise<void> {
+    static async saveTechnology(req: Request, res: Response): Promise<void> { // Verbeux 🚀
         try {
             const {id} = req.params
             const targetId = id || crypto.randomUUID()
+
             let logoUrl = null
 
             if (id) {
-                const existingTech = await TechnologyModel.findById(id)
+                const existingTech = await TechnologyModel.fetchTechnologyById(id)
                 if (!existingTech) {
                     res.status(404).json({error: 'Technologie introuvable.'})
                     return
@@ -54,15 +53,13 @@ export default class TechnologyController {
                 }
             }
 
-            //TODO: mapper dto and mapper
-            // Utilisation de la couche de transformation de données 🚀
-            const saveDTO = TechnologyMapper.toSaveDTO(req.body, logoUrl, targetId)
+            const saveDTO = TechnologyMapper.toSaveTechnologyDTO(req.body, logoUrl, targetId)
 
             let result
             if (id) {
-                result = await TechnologyModel.update(saveDTO)
+                result = await TechnologyModel.updateTechnology(id, saveDTO)
             } else {
-                result = await TechnologyModel.create(saveDTO)
+                result = await TechnologyModel.createTechnology(saveDTO)
             }
 
             res.json({success: true, technology: result})
@@ -71,4 +68,19 @@ export default class TechnologyController {
             res.status(500).json({error: 'Erreur lors de la sauvegarde.'})
         }
     }
+
+    static async fetchTechnologyBySlug(req: Request, res: Response): Promise<void> {
+        try {
+            const {slug} = req.params
+            const tech = await TechnologyModel.fetchTechnologyBySlug(slug) // Interroge le modèle statique 🚀
+            if (!tech) {
+                res.status(404).json({error: 'Technologie introuvable.'})
+                return
+            }
+            res.json(tech)
+        } catch {
+            res.status(500).json({error: 'Erreur lors de la récupération de la technologie.'})
+        }
+    }
+
 }
