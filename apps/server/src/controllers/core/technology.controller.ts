@@ -3,6 +3,7 @@ import crypto from 'crypto'
 import {TechnologyModel} from '#models'
 import {FileUtils} from '#utils'
 import {TechnologyMapper} from '#mappers'
+import type {EditTechnology} from "@randomstack/commons";
 
 export default class TechnologyController {
 
@@ -53,7 +54,7 @@ export default class TechnologyController {
                 }
             }
 
-            const saveDTO = TechnologyMapper.toSaveTechnologyDTO(req.body, logoUrl, targetId)
+            const saveDTO = <EditTechnology>TechnologyMapper.toSaveTechnologyDTO(req.body, logoUrl, targetId)
 
             let result
             if (id) {

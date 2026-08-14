@@ -1,7 +1,7 @@
 import crypto from 'crypto'
 
-import type {Category, EditTechnology, EditTechnologyFormBean} from '@randomstack/commons'
-
+import {type Category, type EditTechnology, type EditTechnologyFormBean} from '@randomstack/commons'
+import {StrUtils} from '#utils'
 
 export default class TechnologyMapper {
 
@@ -18,7 +18,8 @@ export default class TechnologyMapper {
             foundedAt: '',
             userCount: null,
             projectCount: null,
-            logo: null
+            logo: null,
+            history: []
         }
     }
 
@@ -36,42 +37,21 @@ export default class TechnologyMapper {
             foundedAt: tech.detail?.foundedAt || '',
             userCount: tech.detail?.userCount || null,
             projectCount: tech.detail?.projectCount || null,
-            logo: tech.logo || null
+            logo: tech.logo || null,
+            history: tech.detail?.history || []
         }
     }
 
     static toSaveTechnologyDTO(rawBody: any, logoUrl: string | null, targetId: string): EditTechnology {
-        let categoriesList: Category[] = []
-        const rawCategories = rawBody.categories
-
-        if (Array.isArray(rawCategories)) {
-            categoriesList = rawCategories as Category[]
-        } else if (typeof rawCategories === 'string' && rawCategories.trim() !== '') {
-            categoriesList = rawCategories
-                .split(',')
-                .map(c => c.trim())
-                .filter(Boolean) as Category[]
-        }
-
-        if (categoriesList.length === 0) {
-            categoriesList = ['FRONTEND']
-        }
-
-        const kebabName = String(rawBody.name || '')
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)/g, '')
-        const slug = `${kebabName}-${targetId}`
-
         return {
             technology: {
                 id: targetId,
                 name: String(rawBody.name || '').trim(),
-                slug,
+                slug: StrUtils.slugify(rawBody.name, targetId),
                 language: String(rawBody.language || '').trim(),
                 logo: logoUrl,
                 usage: String(rawBody.usage || '').trim(),
-                categories: categoriesList
+                categories: Array.isArray(rawBody.categories) ? rawBody.categories : []
             },
             detail: {
                 description: String(rawBody.description || '').trim(),

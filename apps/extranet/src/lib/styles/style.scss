@@ -1,8 +1,12 @@
 @use "tailwindcss";
 
-@use "pages/login";
-@use "pages/dashboard";
+@use "layout/layout";
 
-body {
-  font-family: 'Inter', sans-serif;
-}
+@use "components/sidebar";
+@use "components/table";
+@use "components/pagination";
+
+@use "components/paragraph-manager";
+
+@use "pages/login";
+@use "pages/technology-form";

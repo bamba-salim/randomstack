@@ -1,0 +1,53 @@
+$neon-cyan: #06b6d4;
+$neon-pink: #ec4899;
+
+// --- BOUTON BURGER (Mobile uniquement) 📱 ---
+.mobile-burger-btn {
+  @apply fixed top-4 left-4 z-50 flex items-center justify-center py-2 px-3 bg-[#2271b1] text-white font-black text-[11px] uppercase tracking-wider rounded border border-[#135e96] shadow-md sm:hidden cursor-pointer;
+}
+
+.mobile-sidebar-overlay {
+  @apply fixed inset-0 bg-black/60 z-40 sm:hidden;
+}
+
+// --- LA BARRE LATÉRALE RESPONSIVE (SIDEBAR) 🚀 ---
+.admin-sidebar {
+  // Masquée à gauche sur mobile, fixe à partir des écrans sm: 📱
+  @apply fixed sm:sticky top-0 left-0 h-screen w-64 bg-[#2271b1] p-6 flex flex-col gap-6 text-white shrink-0 z-40 transition-transform duration-300 -translate-x-full sm:translate-x-0;
+
+  &.mobile-open {
+    @apply translate-x-0 shadow-2xl; // Coulisse de gauche à droite sur clic burger mobile
+  }
+
+  .sidebar-logo {
+    @apply flex flex-col;
+
+    .logo-main {
+      @apply text-sm font-black tracking-widest text-white uppercase;
+    }
+
+    .logo-sub {
+      @apply text-[9px] font-bold text-blue-200 uppercase tracking-widest mt-1;
+    }
+  }
+
+  .sidebar-nav {
+    @apply flex flex-col gap-2 mt-4 text-xs font-semibold h-full;
+
+    .nav-link {
+      @apply px-4 py-3 border border-transparent rounded transition-all duration-150 text-blue-100 hover:bg-[#135e96] hover:text-white;
+
+      &.active {
+        @apply bg-[#135e96] text-white border-[#135e96];
+      }
+
+      &.disabled {
+        @apply text-blue-300/60 hover:text-blue-300 rounded cursor-not-allowed hover:bg-transparent;
+      }
+    }
+
+    .logout-btn {
+      @apply px-4 py-3 text-red-200 hover:bg-red-950/20 border border-transparent hover:border-red-950/40 rounded text-left font-bold mt-auto cursor-pointer;
+    }
+  }
+}

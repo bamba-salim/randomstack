@@ -1,9 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { TechnologyService } from '#services'
-import { Sidebar } from '#components'
-import { FormDataUtils, TechnologyFilter, type Technology, type Category } from '@randomstack/commons'
+import {ref, onMounted, computed} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {TechnologyService} from '#services'
+// Importation propre de la Sidebar et du nouveau ParagraphManager ! 🚀
+import {Sidebar, ParagraphManager} from '#components'
+import {
+  FormDataUtils,
+  TechnologyFilter,
+  type Technology,
+  type Category,
+  type SaveTechnologyInput
+} from '@randomstack/commons'
 
 const route = useRoute()
 const router = useRouter()
@@ -14,68 +21,54 @@ const techId = ref<string | undefined>(undefined)
 const loading = ref(false)
 const errorMsg = ref<string | null>(null)
 
-// Variables de formulaire
-const formName = ref('')
-const formLanguage = ref('') // Cette variable contiendra TOUJOURS la valeur finale envoyée à l'API 🚀
-const formCategories = ref<Category[]>(['FRONTEND'])
-const formUsage = ref('')
-const formDescription = ref('')
-const formFile = ref<File | null>(null)
+// 1. LE FORMBEAN UNIQUE AVEC TOUS LES NOUVEAUX CHAMPS DU CAHIER DES CHARGES 🚀
+const formBean = ref<SaveTechnologyInput | null>(null)
+
+// Variables de contrôle d'autocomplétion des langages
+const allTechnologies = ref<Technology[]>([])
+const selectedLanguageDropdown = ref('')
+const isCustomLanguage = ref(false)
+
 const previewUrl = ref<string | null>(null)
 
-// --- GESTION DE LA LISTE DÉROULANTE INTERACTIVE DES LANGAGES 🚀 ---
-const allTechnologies = ref<Technology[]>([])
-const selectedLanguageDropdown = ref('') // Stocke la valeur choisie dans le select
-const isCustomLanguage = ref(false)       // Détermine s'il faut afficher l'input text libre
-
-// Extraction dynamique des langages uniques de la BDD
 const uniqueLanguages = computed(() => {
   return TechnologyFilter.getUniqueLanguages(allTechnologies.value)
 })
 
-// Détecte le choix de l'utilisateur dans la liste déroulante 🚀
 const handleLanguageSelect = () => {
+  if (!formBean.value) return
   if (selectedLanguageDropdown.value === '__NEW__') {
     isCustomLanguage.value = true
-    formLanguage.value = '' // On vide pour laisser l'utilisateur taper son nouveau langage
+    formBean.value.language = ''
   } else {
-    formLanguage.value = selectedLanguageDropdown.value
+    formBean.value.language = selectedLanguageDropdown.value
   }
 }
 
-// Annuler la saisie libre et revenir à la liste déroulante 🚀
 const cancelCustomLanguage = () => {
+  if (!formBean.value) return
   isCustomLanguage.value = false
-  // On se repositionne sur le premier langage disponible ou sur vide
   selectedLanguageDropdown.value = uniqueLanguages.value[0] || ''
-  formLanguage.value = selectedLanguageDropdown.value
+  formBean.value.language = selectedLanguageDropdown.value
 }
 
 const handleFileChange = (e: Event) => {
   const files = (e.target as HTMLInputElement).files
-  if (files && files.length > 0) {
+  if (files && files.length > 0 && formBean.value) {
     const file = files[0]!
-    formFile.value = file
+    formBean.value.logo = file
     previewUrl.value = URL.createObjectURL(file)
   }
 }
 
 const handleSave = async () => {
-  if (loading.value) return
+  if (!formBean.value || loading.value) return
   errorMsg.value = null
   loading.value = true
 
   try {
-    const payload = {
-      name: formName.value,
-      language: formLanguage.value, // Envoie la valeur finale (issue de la liste ou de la saisie libre) 🚀
-      categories: formCategories.value,
-      usage: formUsage.value,
-      description: formDescription.value,
-      logo: formFile.value
-    }
 
-    const formData = FormDataUtils.toFormData(payload)
+    const formData = FormDataUtils.toFormData(formBean.value)
     await TechnologyService.save(formData, techId.value)
     router.push('/dashboard')
   } catch (err: any) {
@@ -89,101 +82,82 @@ onMounted(async () => {
   try {
     allTechnologies.value = await TechnologyService.fetchAll()
   } catch {
-    console.warn("Impossible de charger la liste d'auto-complétion des langages.")
+    console.warn("Impossible de pré-charger la liste des langages.")
   }
 
-  if (route.params['id']) {
-    isEditMode.value = true
-    techId.value = route.params['id'] as string
+  loading.value = true
+  try {
+    if (route.params['id']) {
+      isEditMode.value = true
+      techId.value = route.params['id'] as string
 
-    loading.value = true
-    try {
-      const tech = await TechnologyService.fetchById(techId.value)
-      formName.value = tech.name
+      const flatFormBean = await TechnologyService.fetchById(techId.value)
+      formBean.value = flatFormBean
 
-      // On affecte la valeur chargée aux deux variables de contrôle 🚀
-      formLanguage.value = tech.language
-      selectedLanguageDropdown.value = tech.language
+      selectedLanguageDropdown.value = flatFormBean.language
       isCustomLanguage.value = false
 
-      formCategories.value = Array.isArray(tech.categories) ? tech.categories : []
-      formUsage.value = tech.usage
-      formDescription.value = tech.description
-      if (tech.logo) {
-        previewUrl.value = `http://localhost:4000${tech.logo}`
+      if (flatFormBean.logo) {
+        previewUrl.value = `http://localhost:4000${flatFormBean.logo}`
       }
-    } catch {
-      errorMsg.value = "Impossible de charger la technologie."
-    } finally {
-      loading.value = false
+    } else {
+      isEditMode.value = false
+      const initialFormBean = await TechnologyService.fetchInitialForm()
+      formBean.value = initialFormBean
     }
+  } catch {
+    errorMsg.value = "Impossible d'initialiser le formulaire."
+  } finally {
+    loading.value = false
   }
 })
 </script>
 
 <template>
+
   <header class="main-header">
     <div>
       <h1 class="header-title">
-        {{ isEditMode ? `Édition : ${formName}` : 'Ajouter une Technologie' }}
+        {{ isEditMode ? `Édition : ${formBean?.name}` : 'Ajouter une Technologie' }}
       </h1>
       <p class="header-sub">Formulaire d'écriture d'arcade sémantique</p>
     </div>
   </header>
 
-  <div v-if="loading && isEditMode" class="loading-text">
-    Chargement de la technologie...
+  <div v-if="loading && !formBean" class="loading-text">
+    Initialisation du formulaire...
   </div>
 
   <div v-else-if="errorMsg" class="error-box">
     {{ errorMsg }}
   </div>
 
-  <form v-else @submit.prevent="handleSave" class="form-page-container">
+  <!-- Le formulaire ne s'affiche qu'une fois le FormBean initialisé par l'API 🚀 -->
+  <form v-else-if="formBean" @submit.prevent="handleSave" class="form-page-container">
 
     <div class="form-grid">
       <div class="form-group">
         <label class="form-label">Nom du Framework / Outil</label>
-        <input v-model="formName" type="text" required class="form-input" placeholder="Ex: Svelte"/>
+        <input v-model="formBean.name" type="text" required class="form-input" placeholder="Ex: Svelte"/>
       </div>
+
       <div class="form-group">
         <label class="form-label">Langage principal</label>
-
-        <!-- CAS A : Liste déroulante classique avec tous les langages préchargés -->
         <div v-if="!isCustomLanguage" class="flex gap-2">
-          <select
-              v-model="selectedLanguageDropdown"
-              @change="handleLanguageSelect"
-              required
-              class="form-select flex-1"
-          >
+          <select v-model="selectedLanguageDropdown" @change="handleLanguageSelect" required class="form-select flex-1">
             <option value="" disabled>-- Sélectionner un langage --</option>
-
-            <!-- L'option de création libre est déplacée tout en haut de la liste 🚀 -->
             <option value="__NEW__" class="text-blue-600 font-extrabold">+ Ajouter un autre langage...</option>
-
-            <!-- Boucle sur les langages existants juste en dessous 🚀 -->
             <option v-for="lang in uniqueLanguages" :key="lang" :value="lang">
               {{ lang }}
             </option>
           </select>
         </div>
 
-        <!-- CAS B : Champ de saisie libre s'activant si l'utilisateur choisit d'ajouter un nouveau langage -->
-        <div v-else class="flex gap-2">
-          <input
-              v-model="formLanguage"
-              type="text"
-              required
-              class="form-input flex-1"
-              placeholder="Écrivez le nom du nouveau langage..."
-          />
-          <button
-              type="button"
-              @click="cancelCustomLanguage"
-              class="cancel-btn"
-              style="margin: 0; padding: 0.625rem 1rem;"
-          >
+        <div class="flex gap-2" v-else>
+          <input v-model="formBean.language" type="text" required class="form-input flex-1"
+                 placeholder="Écrivez le nom..."/>
+          <button type="button" @click="cancelCustomLanguage" class="cancel-btn"
+                  style="margin: 0; padding: 0.625rem 1rem;">
             Annuler
           </button>
         </div>
@@ -191,7 +165,6 @@ onMounted(async () => {
     </div>
 
     <div class="form-grid">
-      <!-- Remplacement du Select par des Checkboxes Multi-sélection sémantiques 🚀 -->
       <div class="form-group col-span-2">
         <label class="form-label">Catégories techniques associées (Multi-choix)</label>
         <div class="flex flex-wrap gap-2.5 mt-2">
@@ -200,13 +173,8 @@ onMounted(async () => {
               :key="cat"
               class="flex items-center gap-2 px-3 py-2 bg-[#f0f0f1] border border-[#c3c4c7] hover:bg-[#e0e0e0] rounded text-xs font-semibold text-[#1d2327] cursor-pointer select-none transition-colors duration-150"
           >
-            <input
-                type="checkbox"
-                :value="cat"
-                v-model="formCategories"
-                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
-
-            />
+            <input type="checkbox" :value="cat" v-model="formBean.categories"
+                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"/>
             <span>{{ cat }}</span>
           </label>
         </div>
@@ -214,16 +182,56 @@ onMounted(async () => {
 
       <div class="form-group col-span-2">
         <label class="form-label">Usage résumé (Utilisation)</label>
-        <input v-model="formUsage" type="text" required class="form-input" placeholder="Ex: Frontend Web"/>
+        <input v-model="formBean.usage" type="text" required class="form-input" placeholder="Ex: Frontend Web"/>
       </div>
     </div>
 
     <div class="form-group col-span-2">
       <label class="form-label">Description d'introduction</label>
-      <textarea v-model="formDescription" required class="form-textarea"
+      <textarea v-model="formBean.description" required class="form-textarea"
                 placeholder="Entrez une courte explication..."></textarea>
     </div>
 
+    <!-- 2. INTÉGRATION DE NOTRE NOUVELLE BOÎTE DE PARAGRAPHES DRAG & DROP UNIFIÉE 🚀 -->
+    <div class="form-group col-span-2">
+      <ParagraphManager v-model="formBean.history"/>
+    </div>
+
+    <!-- 3. LES NOUVEAUX CHAMPS DU CAHIER DES CHARGES (OPTIONNELS) 🚀 -->
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Site Web officiel</label>
+        <input v-model="formBean.websiteUrl" type="url" class="form-input" placeholder="Ex: https://svelte.dev"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Lien vers la Documentation</label>
+        <input v-model="formBean.docsUrl" type="url" class="form-input" placeholder="Ex: https://svelte.dev/docs"/>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Créateur / Auteur</label>
+        <input v-model="formBean.creator" type="text" class="form-input" placeholder="Ex: Rich Harris"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Année de création</label>
+        <input v-model="formBean.foundedAt" type="text" class="form-input" placeholder="Ex: 2016"/>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Nombre d'utilisateurs (Étoiles GitHub/GitLab)</label>
+        <input v-model.number="formBean.userCount" type="number" class="form-input" placeholder="Ex: 75000"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nombre de projets recensés</label>
+        <input v-model.number="formBean.projectCount" type="number" class="form-input" placeholder="Ex: 120000"/>
+      </div>
+    </div>
+
+    <!-- ZONE DE LOGO / ILLUSTRATION -->
     <div class="form-group col-span-2">
       <label class="form-label">Logo / Illustration</label>
       <div class="file-upload-zone">

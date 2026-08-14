@@ -1,0 +1,65 @@
+// --- BARRE DE FILTRES RESPONSIVE ET MULTI-CRITÈRES 🚀 ---
+.filter-bar-wrap {
+  @apply flex flex-col sm:flex-row items-center gap-3 w-full mb-4 text-left;
+
+  .filter-input, .filter-select {
+    @apply w-full sm:w-auto p-2.5 bg-white border border-[#8c8f94] text-[#2c3338] text-xs rounded shadow-inner focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] outline-none transition-all duration-100;
+  }
+
+  .filter-input {
+    @apply sm:flex-1 sm:max-w-xs;
+  }
+
+  .filter-select {
+    @apply sm:min-w-[150px];
+  }
+}
+
+// --- LE TABLEAU D'ADMINISTRATION EXTRANET 🚀 ---
+.table-container {
+  @apply border border-[#c3c4c7] rounded overflow-x-auto shadow-sm w-full;
+}
+
+.admin-table {
+  @apply w-full text-left border-collapse text-xs min-w-[600px]; // Force un scroll horizontal propre sur mobile 📱
+
+  thead {
+    @apply bg-[#f6f8fa] border-b border-[#c3c4c7] text-[10px] font-black text-slate-500 uppercase tracking-widest;
+  }
+
+  th {
+    @apply p-4;
+  }
+
+  tbody {
+    @apply divide-y divide-[#c3c4c7]/60 font-medium;
+  }
+
+  tr {
+    @apply hover:bg-[#f6f8fa] transition-colors;
+  }
+
+  td {
+    @apply p-4;
+
+    &.tech-name {
+      @apply font-bold text-[#1d2327];
+    }
+
+    &.tech-lang {
+      @apply text-slate-500 font-mono;
+    }
+
+    &.tech-desc {
+      @apply text-slate-500 max-w-xs truncate;
+    }
+  }
+
+  .category-badge {
+    @apply px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase bg-[#f6f8fa] text-slate-600 border border-[#c3c4c7];
+  }
+
+  .edit-btn {
+    @apply px-3 py-1.5 bg-[#f6f8fa] border border-[#c3c4c7] hover:bg-[#e0e0e0] rounded text-[10px] text-slate-600 font-bold transition-colors duration-150 cursor-pointer;
+  }
+}

@@ -1,0 +1,16 @@
+// --- SYSTEM DE PAGINATION DESIGN WP-ADMIN 🚀 ---
+.pagination-container {
+  @apply flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#c3c4c7] pt-4 mt-4 text-xs w-full;
+
+  .pagination-info {
+    @apply text-slate-500 font-bold;
+  }
+
+  .pagination-actions {
+    @apply flex gap-2 w-full sm:w-auto;
+  }
+
+  .page-btn {
+    @apply w-full sm:w-auto py-2 px-4 bg-[#f6f8fa] border border-[#c3c4c7] hover:bg-[#e0e0e0] rounded text-[10px] text-slate-600 font-black uppercase transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+}

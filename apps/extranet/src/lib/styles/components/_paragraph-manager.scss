@@ -1,0 +1,46 @@
+.paragraph-manager-container {
+  @apply flex flex-col gap-3 text-left w-full mt-2;
+
+  .form-label {
+    @apply text-[9px] font-black text-slate-500 uppercase tracking-widest pl-1;
+  }
+
+  .paragraphs-list {
+    @apply flex flex-col gap-3;
+  }
+
+  // Chaque ligne de paragraphe déplaçable
+  .paragraph-item {
+    @apply flex items-center gap-3 p-3 bg-white border border-[#c3c4c7] rounded shadow-sm transition-all duration-200;
+
+    &.dragging {
+      @apply opacity-40 border-dashed border-[#2271b1]; // Floute l'élément en cours de déplacement 🚀
+    }
+
+    .drag-handle {
+      @apply text-slate-400 font-bold cursor-grab active:cursor-grabbing px-2 py-4 hover:text-[#2271b1] transition-colors select-none;
+    }
+
+    .item-index {
+      @apply text-[10px] font-black text-slate-400 font-mono select-none shrink-0;
+    }
+
+    .form-textarea {
+      @apply flex-1 p-2.5 bg-[#f6f8fa] border border-[#c3c4c7] text-[#2c3338] text-xs rounded shadow-inner focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] outline-none h-20 resize-none transition-all duration-100;
+    }
+
+    .delete-para-btn {
+      @apply w-7 h-7 flex items-center justify-center border border-[#c3c4c7] hover:border-red-600 rounded bg-[#f6f8fa] hover:bg-red-50 text-slate-500 hover:text-red-600 text-xs font-bold transition-all duration-150 cursor-pointer shrink-0;
+    }
+  }
+
+  .empty-paragraphs {
+    @apply text-center text-slate-400 italic text-xs py-8 border border-dashed border-[#c3c4c7] rounded;
+    font-family: 'Georgia', serif;
+  }
+
+  // Bouton d'ajout sémantique
+  .add-para-btn {
+    @apply self-start py-2 px-4 bg-white hover:bg-[#f6f8fa] border border-[#c3c4c7] hover:border-blue-600 text-[10px] font-black uppercase text-slate-600 hover:text-blue-600 rounded transition-all duration-150 cursor-pointer;
+  }
+}
