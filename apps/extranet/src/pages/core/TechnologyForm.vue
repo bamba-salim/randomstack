@@ -2,7 +2,7 @@
 import {ref, onMounted, computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 
-import {Sidebar, ParagraphManager} from '#components'
+import {Sidebar, ParagraphManager, BaseInput, BaseToggle} from '#components'
 
 import {TechnologyService} from '#services'
 import {FormDataUtils, TechnologyFilter} from '@randomstack/commons'
@@ -77,6 +77,7 @@ const handleSave = async () => {
 
 onMounted(async () => {
   try {
+    // TODO: get only categories or langages
     allTechnologies.value = await TechnologyService.fetchAll()
   } catch {
     console.warn("Impossible de pré-charger la liste des langages.")
@@ -84,30 +85,26 @@ onMounted(async () => {
 
   loading.value = true
   try {
-    if (route.params['id']) {
-      isEditMode.value = true
-      techId.value = route.params['id'] as string
+    isEditMode.value = true
+    techId.value = route.params['id'] as string
 
-      const flatFormBean = await TechnologyService.fetchById(techId.value)
-      formBean.value = flatFormBean
+    const flatFormBean = await TechnologyService.fetchTechnologyFormData(techId.value)
+    formBean.value = flatFormBean
 
-      selectedLanguageDropdown.value = flatFormBean.language
-      isCustomLanguage.value = false
+    selectedLanguageDropdown.value = flatFormBean.language
+    isCustomLanguage.value = false
 
-      if (flatFormBean.logo) {
-        previewUrl.value = `http://localhost:4000${flatFormBean.logo}`
-      }
-    } else {
-      isEditMode.value = false
-      const initialFormBean = await TechnologyService.fetchInitialForm()
-      formBean.value = initialFormBean
+    if (flatFormBean.logo) {
+      previewUrl.value = flatFormBean.logo
     }
+
   } catch {
     errorMsg.value = "Impossible d'initialiser le formulaire."
   } finally {
     loading.value = false
   }
 })
+
 </script>
 
 <template>
@@ -132,12 +129,15 @@ onMounted(async () => {
   <!-- Le formulaire ne s'affiche qu'une fois le FormBean initialisé par l'API 🚀 -->
   <form v-else-if="formBean" @submit.prevent="handleSave" class="form-page-container">
 
-    <div class="form-grid">
-      <div class="form-group">
-        <label class="form-label">Nom du Framework / Outil</label>
-        <input v-model="formBean.name" type="text" required class="form-input" placeholder="Ex: Svelte"/>
-      </div>
+    <div class="form-group">
+      <BaseToggle v-model="formBean.isActive" label="Disponible au tirage au sort"/>
+    </div>
 
+    <div class="form-grid">
+      <!-- NAME -->
+      <BaseInput v-model="formBean.name" label="Nom du Framework / Outil" required placeholder="Ex: Svelte"/>
+
+      <!-- LANGAGE -->
       <div class="form-group">
         <label class="form-label">Langage principal</label>
         <div v-if="!isCustomLanguage" class="flex gap-2">
@@ -162,6 +162,7 @@ onMounted(async () => {
     </div>
 
     <div class="form-grid">
+      <!-- CATEGORIES -->
       <div class="form-group col-span-2">
         <label class="form-label">Catégories techniques associées (Multi-choix)</label>
         <div class="flex flex-wrap gap-2.5 mt-2">
@@ -177,55 +178,65 @@ onMounted(async () => {
         </div>
       </div>
 
-      <div class="form-group col-span-2">
-        <label class="form-label">Usage résumé (Utilisation)</label>
-        <input v-model="formBean.usage" type="text" required class="form-input" placeholder="Ex: Frontend Web"/>
-      </div>
+      <!-- USAGE -->
+      <BaseInput v-model="formBean.usage" label="Utilisation" required placeholder="Ex: Frontend Web"
+                 className="col-span-2"/>
     </div>
 
+    <!-- DESCRIPTION -->
     <div class="form-group col-span-2">
       <label class="form-label">Description d'introduction</label>
       <textarea v-model="formBean.description" required class="form-textarea"
                 placeholder="Entrez une courte explication..."></textarea>
     </div>
 
-    <!-- 2. INTÉGRATION DE NOTRE NOUVELLE BOÎTE DE PARAGRAPHES DRAG & DROP UNIFIÉE 🚀 -->
+    <!-- HISTORY -->
     <div class="form-group col-span-2">
       <ParagraphManager v-model="formBean.history"/>
     </div>
 
     <!-- 3. LES NOUVEAUX CHAMPS DU CAHIER DES CHARGES (OPTIONNELS) 🚀 -->
     <div class="form-grid">
-      <div class="form-group">
-        <label class="form-label">Site Web officiel</label>
-        <input v-model="formBean.websiteUrl" type="url" class="form-input" placeholder="Ex: https://svelte.dev"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Lien vers la Documentation</label>
-        <input v-model="formBean.docsUrl" type="url" class="form-input" placeholder="Ex: https://svelte.dev/docs"/>
-      </div>
+      <!-- WEBSITE -->
+      <BaseInput v-model="formBean.websiteUrl" label="Site Web officiel" type="url"
+                 placeholder="Ex: https://svelte.dev"/>
+
+      <!-- DOCUMENTATION -->
+      <BaseInput v-model="formBean.docsUrl" label="Lien vers la Documentation" type="url"
+                 placeholder="Ex: https://svelte.dev/docs"/>
+
     </div>
 
     <div class="form-grid">
-      <div class="form-group">
-        <label class="form-label">Créateur / Auteur</label>
-        <input v-model="formBean.creator" type="text" class="form-input" placeholder="Ex: Rich Harris"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Année de création</label>
-        <input v-model="formBean.foundedAt" type="text" class="form-input" placeholder="Ex: 2016"/>
-      </div>
+
+      <!-- CREATOR -->
+      <BaseInput v-model="formBean.creator" label="Créateur / Auteur" placeholder="Ex: Rich Harris"/>
+
+      <!-- YEAR -->
+      <BaseInput v-model="formBean.foundedAt" label="Année de création" placeholder="Ex: 2016"/>
+
     </div>
 
     <div class="form-grid">
-      <div class="form-group">
-        <label class="form-label">Nombre d'utilisateurs (Étoiles GitHub/GitLab)</label>
-        <input v-model.number="formBean.userCount" type="number" class="form-input" placeholder="Ex: 75000"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Nombre de projets recensés</label>
-        <input v-model.number="formBean.projectCount" type="number" class="form-input" placeholder="Ex: 120000"/>
-      </div>
+      <!-- USERS COUNT -->
+      <BaseInput v-model.number="formBean.userCount" type="number" label="Nombre d'utilisateurs (Étoiles GitHub/GitLab)"
+                 placeholder="Ex: 75000"/>
+
+      <!-- PROJECT COUNT -->
+      <BaseInput v-model.number="formBean.projectCount" type="number" label="Nombre de projets recensés"
+                 placeholder="Ex: 120000"/>
+
+    </div>
+
+    <div class="form-grid">
+      <BaseInput v-model="formBean.versions.stable.num" label="Version Stable (Numéro)" placeholder="Ex: v4.0.0"/>
+      <BaseInput v-model="formBean.versions.stable.date" label="Date de sortie (Stable)" placeholder="Ex: 15/01/2026"/>
+    </div>
+
+    <div class="form-grid">
+      <BaseInput v-model="formBean.versions.latest.num" label="Dernière Version (Numéro)" placeholder="Ex: v4.1.2"/>
+      <BaseInput v-model="formBean.versions.latest.date" label="Date de sortie (Dernière)"
+                 placeholder="Ex: 01/02/2026"/>
     </div>
 
     <!-- ZONE DE LOGO / ILLUSTRATION -->

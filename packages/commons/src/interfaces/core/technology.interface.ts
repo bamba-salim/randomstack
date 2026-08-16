@@ -7,7 +7,7 @@ export interface TechnologyDetail {
     docsUrl: string | null
     creator: string | null
     foundedAt: string | null
-    versions: any | null // Stockera { stable: { num: string, date: string }, latest: { num: string, date: string } }
+    versions: TechnoLogyVersion | null // Stockera { stable: { num: string, date: string }, latest: { num: string, date: string } }
     userCount: number | null
     projectCount: number | null
     history: string[]
@@ -22,6 +22,7 @@ export interface Technology {
     logo: string | null
     usage: string
     categories: Category[]
+    isActive:boolean
     createdAt?: string | Date
     detail?: TechnologyDetail | null // Jointure vers la table de détails 🚀
 }
@@ -36,4 +37,9 @@ export interface RawExcelTech {
     Framework: string
     Utilisation: string
     Description: string
+}
+
+export interface TechnoLogyVersion {
+    stable: { num: string, date: string }
+    latest: { num: string, date: string }
 }

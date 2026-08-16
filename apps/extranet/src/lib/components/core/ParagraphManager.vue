@@ -57,7 +57,7 @@ const handleDrop = (index: number) => {
 
 <template>
   <div class="paragraph-manager-container">
-    <label class="form-label">Histoire & Paragraphes (Glisser-Déposer pour réordonner) 🚀</label>
+    <label class="form-label">Histoire</label>
 
     <div class="paragraphs-list">
       <div

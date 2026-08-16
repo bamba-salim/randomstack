@@ -26,7 +26,7 @@ export default class TechnologyModel {
 
     static async createTechnology(payload: EditTechnology) { // Nom explicite et verbeux 🚀
 
-        const { id: _, ...detailWithoutId } = payload.detail
+        const {id: _, ...detailWithoutId} = payload.detail
 
         return await Database.client.technology.create({
 
@@ -41,7 +41,9 @@ export default class TechnologyModel {
         })
     }
 
-    static async updateTechnology(id: string, payload: EditTechnology) { // Nom sémantique 🚀
+    static async updateTechnology(_id: string, payload: EditTechnology) { // Nom sémantique 🚀
+
+        const {id} = payload.technology
         const {id: _, slug: __, ...technologyData} = payload.technology
 
         return await Database.client.technology.update({

@@ -3,7 +3,7 @@ import crypto from 'crypto'
 import {TechnologyModel} from '#models'
 import {FileUtils} from '#utils'
 import {TechnologyMapper} from '#mappers'
-import type {EditTechnology} from "@randomstack/commons";
+import type {EditTechnology, EditTechnologyFormBean} from "@randomstack/commons";
 
 export default class TechnologyController {
 
@@ -26,6 +26,29 @@ export default class TechnologyController {
             }
             const flatFormBean = TechnologyMapper.fromDBToClientFormBean(tech)
             res.json(flatFormBean)
+        } catch {
+            res.status(500).json({error: 'Erreur lors de la récupération de la technologie.'})
+        }
+    }
+
+    static async fetchEditTechnologyInitialData(req: Request, res: Response): Promise<void> {
+
+        try {
+            let flatFormBean = TechnologyMapper.getInitialFormBean()
+
+            const {id} = req.params
+
+            if (id) {
+                const tech = await TechnologyModel.fetchTechnologyById(id)
+                if (!tech) {
+                    res.status(404).json({error: 'Technologie introuvable.'})
+                    return
+                }
+                flatFormBean = TechnologyMapper.fromDBToClientFormBean(tech)
+            }
+
+            res.json(flatFormBean)
+
         } catch {
             res.status(500).json({error: 'Erreur lors de la récupération de la technologie.'})
         }
@@ -54,13 +77,14 @@ export default class TechnologyController {
                 }
             }
 
-            const saveDTO = <EditTechnology>TechnologyMapper.toSaveTechnologyDTO(req.body, logoUrl, targetId)
+            const editDTO = <EditTechnology>TechnologyMapper.toSaveTechnologyDTO(req.body, logoUrl, targetId)
+
 
             let result
             if (id) {
-                result = await TechnologyModel.updateTechnology(id, saveDTO)
+                result = await TechnologyModel.updateTechnology(id, editDTO)
             } else {
-                result = await TechnologyModel.createTechnology(saveDTO)
+                result = await TechnologyModel.createTechnology(editDTO)
             }
 
             res.json({success: true, technology: result})

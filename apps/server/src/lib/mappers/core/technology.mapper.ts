@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 
-import {type Category, type EditTechnology, type EditTechnologyFormBean} from '@randomstack/commons'
+import type {Category, EditTechnology, EditTechnologyFormBean, TechnoLogyVersion} from '@randomstack/commons'
 import {StrUtils} from '#utils'
 
 export default class TechnologyMapper {
@@ -11,17 +11,22 @@ export default class TechnologyMapper {
             language: '',
             categories: ['FRONTEND'],
             usage: '',
-            description: '',
+            logo: null,
+            isActive: false,
+
             websiteUrl: '',
             docsUrl: '',
             creator: '',
             foundedAt: '',
+            versions: {stable: {num: '', date: ''}, latest: {num: '', date: ''}},
             userCount: null,
             projectCount: null,
-            logo: null,
-            history: []
+            history: [],
+
+            description: ''
         }
     }
+
 
     static fromDBToClientFormBean(tech: PrismaTech & { detail: PrismaDetail | null }): EditTechnologyFormBean {
         return {
@@ -30,19 +35,41 @@ export default class TechnologyMapper {
             language: tech.language,
             categories: tech.categories as any,
             usage: tech.usage,
-            description: tech.detail?.description || '',
+            logo: tech.logo ? `http://localhost:4000${tech.logo}` : null,
+            isActive: tech.isActive,
+
             websiteUrl: tech.detail?.websiteUrl || '',
             docsUrl: tech.detail?.docsUrl || '',
             creator: tech.detail?.creator || '',
             foundedAt: tech.detail?.foundedAt || '',
+            versions: tech.detail?.versions || {stable: {num: '', date: ''}, latest: {num: '', date: ''}},
             userCount: tech.detail?.userCount || null,
             projectCount: tech.detail?.projectCount || null,
-            logo: tech.logo || null,
-            history: tech.detail?.history || []
+            history: tech.detail?.history || [],
+
+            description: tech.detail?.description || '',
+
         }
     }
 
+
     static toSaveTechnologyDTO(rawBody: any, logoUrl: string | null, targetId: string): EditTechnology {
+
+
+        let versionsObj: TechnoLogyVersion | null = null
+        if (typeof rawBody.versions === 'string' && rawBody.versions.trim() !== '') {
+            try {
+                versionsObj = JSON.parse(rawBody.versions)
+            } catch {
+                versionsObj = null
+            }
+        } else if (rawBody.versions && typeof rawBody.versions === 'object') {
+            versionsObj = rawBody.versions
+        }
+
+
+        const rawCategories = rawBody.categories
+
         return {
             technology: {
                 id: targetId,
@@ -51,7 +78,8 @@ export default class TechnologyMapper {
                 language: String(rawBody.language || '').trim(),
                 logo: logoUrl,
                 usage: String(rawBody.usage || '').trim(),
-                categories: Array.isArray(rawBody.categories) ? rawBody.categories : []
+                categories: Array.isArray(rawCategories) ? rawCategories : (typeof rawCategories === 'string' && rawCategories.trim() !== '' ? rawCategories.split(',').map(c => c.trim()).filter(Boolean) : ['FRONTEND']),
+                isActive: rawBody.isActive === 'true' || rawBody.isActive === true
             },
             detail: {
                 description: String(rawBody.description || '').trim(),
@@ -62,7 +90,7 @@ export default class TechnologyMapper {
                 userCount: rawBody.userCount ? Number(rawBody.userCount) : null,
                 projectCount: rawBody.projectCount ? Number(rawBody.projectCount) : null,
                 history: Array.isArray(rawBody.history) ? rawBody.history : [],
-                versions: rawBody.versions || null
+                versions: versionsObj
             }
         }
     }

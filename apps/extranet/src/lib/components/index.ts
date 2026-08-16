@@ -1,3 +1,5 @@
 export {default as Sidebar} from './core/Sidebar.vue'
 export {default as TechnologyTable} from './core/TechnologyTable.vue'
-export { default as ParagraphManager } from './core/ParagraphManager.vue' // <-- AJOUTÉ 🚀
+export {default as ParagraphManager} from './core/ParagraphManager.vue'
+export {default as BaseInput} from './core/BaseInput.vue'
+export {default as BaseToggle} from './core/BaseToggle.vue'

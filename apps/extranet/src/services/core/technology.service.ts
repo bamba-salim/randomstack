@@ -13,6 +13,10 @@ export default class TechnologyService extends ApiClient {
         return await this.get<Technology>(`/api/fetch-technology/${id}`) // Route RPC 🚀
     }
 
+    static async fetchTechnologyFormData(id?: string): Promise<{ success: boolean }> {
+        return await this.get<{ success: boolean }>(`/api/admin/fetch-technology-form-data${id ? `/${id}` : ''}`)
+    }
+
     // Utilisation de la méthode générique postForm de la classe mère ApiClient 🚀
     static async save(formData: FormData, id?: string): Promise<{ success: boolean; technology: Technology }> {
         const endpoint = id ? `/api/admin/save-technology/${id}` : '/api/admin/save-technology'

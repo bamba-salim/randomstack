@@ -1,11 +1,5 @@
-import type {Category} from "../types";
-import type {TechnoLogyVersion} from "../interfaces";
-
-
-export interface LoginFormBean {
-    email: string
-    password: string
-}
+import type {Category} from "../../types";
+import type {TechnoLogyVersion} from "../../interfaces";
 
 export interface EditTechnologyFormBean {
 

@@ -21,6 +21,10 @@ export default class AdminRoute {
             TechnologyController.saveTechnology
         )
 
+        router.get('/fetch-technology-form-data/:id?',
+            AuthMiddleware.isAuthenticated,
+            AuthMiddleware.permit('ADMIN', 'EDITOR'),
+            TechnologyController.fetchEditTechnologyInitialData)
         return router
     }
 }

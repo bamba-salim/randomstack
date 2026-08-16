@@ -1,22 +1,10 @@
-import type { Technology, Category } from '../../types'
+import type {Technology, Category} from '../../types'
+import type {FilterResult, FilterOptions} from '../../interfaces'
 
-export interface FilterOptions {
-    searchQuery: string
-    selectedLanguage: string
-    selectedCategory: string
-    currentPage: number
-    itemsPerPage: number
-}
-
-export interface FilterResult {
-    paginatedItems: Technology[]
-    totalPages: number
-    totalItemsCount: number
-}
 
 export default class TechnologyFilter {
     static run(techs: Technology[], options: FilterOptions): FilterResult {
-        const { searchQuery, selectedLanguage, selectedCategory, currentPage, itemsPerPage } = options
+        const {searchQuery, selectedLanguage, selectedCategory, currentPage, itemsPerPage} = options
 
         let result = techs
 
@@ -44,7 +32,9 @@ export default class TechnologyFilter {
                 t.name.toLowerCase().includes(q) ||
                 t.language.toLowerCase().includes(q) ||
                 t.usage.toLowerCase().includes(q) ||
-                t.description.toLowerCase().includes(q)
+                t.detail.description.toLowerCase().includes(q) ||
+                t.detail.history.join(',').toLowerCase().includes(q) ||
+                t.categories.join(',').toLowerCase().includes(q)
             )
         }
 
