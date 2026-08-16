@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { StackService, type DrawnStack, type ClientTechnology } from '#services'
-import { DraftScript } from '#scripts' // Importation du script statique 🚀
+import {ref, onMounted, computed} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {StackService, type DrawnStack, type ClientTechnology} from '#services'
+import {DraftScript} from '#scripts' // Importation du script statique 🚀
 
 const route = useRoute()
 const router = useRouter()
@@ -42,11 +42,18 @@ const shareLinkUrl = computed(() => {
 
 // Tri réactif de la blacklist par catégorie
 const groupedTechnologies = computed(() => {
-  return {
-    CLIENT: allTechnologies.value.filter(t => ['FRONTEND', 'MOBILE', 'DESKTOP'].includes(t.category)),
-    SERVER: allTechnologies.value.filter(t => t.category === 'BACKEND'),
-    DATABASE: allTechnologies.value.filter(t => t.category === 'DATABASE')
+  console.log(allTechnologies.value)
+
+  const res = {
+    CLIENT: allTechnologies.value.filter(t => Array.isArray(t.categories) && t.categories.some(cat => ['FRONTEND', 'MOBILE', 'DESKTOP'].includes(cat))),
+
+    SERVER: allTechnologies.value.filter(t => Array.isArray(t.categories) && t.categories.includes('BACKEND')),
+
+    DATABASE: allTechnologies.value.filter(t => Array.isArray(t.categories) && t.categories.includes('DATABASE'))
   }
+
+  console.log(res)
+  return res
 })
 
 const toggleBlacklist = (techId: string) => {
@@ -155,13 +162,16 @@ const copyShareLink = () => {
   const fullUrl = `${window.location.origin}/draft/${shareCodeGenerated.value}`
   navigator.clipboard.writeText(fullUrl).then(() => {
     copiedSuccess.value = true
-    setTimeout(() => { copiedSuccess.value = false }, 2000)
+    setTimeout(() => {
+      copiedSuccess.value = false
+    }, 2000)
   })
 }
 
 onMounted(async () => {
   try {
     allTechnologies.value = await StackService.fetchAllTechnologies()
+
 
     // CHARGEMENT AUTOMATIQUE D'UN CODE DE PARTAGE DANS L'URL 🚀
     const shareCode = route.params['shareCode'] as string | undefined
@@ -257,14 +267,17 @@ onMounted(async () => {
                 @click="clientLocked = !clientLocked"
                 :class="['lock-btn', { 'locked': clientLocked }]"
             >
-              {{ clientLocked ? '🔒' : '🔓' }} <span class="hidden sm:inline">{{ clientLocked ? 'Bloqué' : 'Libre' }}</span>
+              {{ clientLocked ? '🔒' : '🔓' }} <span class="hidden sm:inline">{{
+                clientLocked ? 'Bloqué' : 'Libre'
+              }}</span>
             </button>
             <span class="reel-label">CLIENT</span>
             <div class="reel-window">
               <div :class="['reel-strip', { 'spinning': isSpinning && !clientLocked }]">
                 <div v-for="tech in clientReel" :key="tech.id" class="reel-item">
                   <div class="tech-logo-placeholder">
-                    <img v-if="tech.logo" :src="`http://localhost:4000${tech.logo}`" class="w-full h-full object-cover" />
+                    <img v-if="tech.logo" :src="`http://localhost:4000${tech.logo}`"
+                         class="w-full h-full object-cover"/>
                     <span v-else>{{ tech.name.substring(0, 2) }}</span>
                   </div>
                   <div class="tech-details">
@@ -285,14 +298,17 @@ onMounted(async () => {
                 @click="serverLocked = !serverLocked"
                 :class="['lock-btn', { 'locked': serverLocked }]"
             >
-              {{ serverLocked ? '🔒' : '🔓' }} <span class="hidden sm:inline">{{ serverLocked ? 'Bloqué' : 'Libre' }}</span>
+              {{ serverLocked ? '🔒' : '🔓' }} <span class="hidden sm:inline">{{
+                serverLocked ? 'Bloqué' : 'Libre'
+              }}</span>
             </button>
             <span class="reel-label">SERVEUR</span>
             <div class="reel-window">
               <div :class="['reel-strip', 'delay-server', { 'spinning': isSpinning && !serverLocked }]">
                 <div v-for="tech in serverReel" :key="tech.id" class="reel-item">
                   <div class="tech-logo-placeholder">
-                    <img v-if="tech.logo" :src="`http://localhost:4000${tech.logo}`" class="w-full h-full object-cover" />
+                    <img v-if="tech.logo" :src="`http://localhost:4000${tech.logo}`"
+                         class="w-full h-full object-cover"/>
                     <span v-else>{{ tech.name.substring(0, 2) }}</span>
                   </div>
                   <div class="tech-details">
@@ -313,14 +329,17 @@ onMounted(async () => {
                 @click="databaseLocked = !databaseLocked"
                 :class="['lock-btn', { 'locked': databaseLocked }]"
             >
-              {{ databaseLocked ? '🔒' : '🔓' }} <span class="hidden sm:inline">{{ databaseLocked ? 'Bloqué' : 'Libre' }}</span>
+              {{ databaseLocked ? '🔒' : '🔓' }} <span class="hidden sm:inline">{{
+                databaseLocked ? 'Bloqué' : 'Libre'
+              }}</span>
             </button>
             <span class="reel-label">DONNÉES</span>
             <div class="reel-window">
               <div :class="['reel-strip', 'delay-database', { 'spinning': isSpinning && !databaseLocked }]">
                 <div v-for="tech in databaseReel" :key="tech.id" class="reel-item">
                   <div class="tech-logo-placeholder">
-                    <img v-if="tech.logo" :src="`http://localhost:4000${tech.logo}`" class="w-full h-full object-cover" />
+                    <img v-if="tech.logo" :src="`http://localhost:4000${tech.logo}`"
+                         class="w-full h-full object-cover"/>
                     <span v-else>{{ tech.name.substring(0, 2) }}</span>
                   </div>
                   <div class="tech-details">
@@ -481,7 +500,8 @@ onMounted(async () => {
         <div class="share-modal-card" @click.stop>
           <span class="modal-icon">🔗</span>
           <h3 class="modal-title">Lien de partage généré !</h3>
-          <p class="modal-info">Ce lien de partage restera valide pendant 7 jours avant d'être supprimé automatiquement par la maintenance BDD.</p>
+          <p class="modal-info">Ce lien de partage restera valide pendant 7 jours avant d'être supprimé automatiquement
+            par la maintenance BDD.</p>
 
           <div class="link-copy-box">
             <input

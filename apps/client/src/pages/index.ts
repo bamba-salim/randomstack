@@ -25,6 +25,11 @@ const router = createRouter({
             component: AppLayout, // 3. ENCYCLOPÉDIE & PAGES FUTURES : Enveloppées dans le Layout 🚀
             children: [
                 {
+                    path: '/',
+                    name: 'home',
+                    component: Home // 1. LOBBY : Standalone en dehors du Layout global 🚀
+                },
+                {
                     path: 'encyclopedia',
                     name: 'encyclopedia',
                     component: Encyclopedia

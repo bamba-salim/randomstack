@@ -55,4 +55,5 @@ export default class StackService extends ApiClient {
     static async fetchTechnologyBySlug(slug: string): Promise<Technology> {
         return await this.get<Technology>(`/api/fetch-technology-by-slug/${slug}`)
     }
+
 }

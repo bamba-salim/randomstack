@@ -1,5 +1,6 @@
 @use "tailwindcss";
 
+
 // Importation des sous-fichiers de pages`
 @use "./layout/layout";
 
@@ -8,6 +9,7 @@
 @use "./components/pagination";
 
 @use "./pages/home";
+@use "./pages/draft";
 @use "./pages/encyclopedia";
 @use "./pages/detail";
 

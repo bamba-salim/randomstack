@@ -1,13 +1,18 @@
-@use '../layout/variables';
+$primary: #3b82f6;
+$neon-cyan: #06b6d4;
+$neon-pink: #ec4899;
+$gold-accent: #dfa72d;
 
-// --- LA PAGE DE DÉTAILS SÉMANTIQUE ÉLARGIE ET OUVERTE (SANS CHÂSSIS BLANC) 🚀 ---
+
+$slot-height: 140px;
+
+// --- LA PAGE DE DÉTAILS SÉMANTIQUE ÉLARGIE ET OUVERTE (SANS CHÂSSIS BLANC) ---
 .technology-detail-page-container {
   @apply flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 w-full relative z-10;
   background-color: #f5f4f0 !important;
 
-  // L'enveloppe est transparente et de même largeur de boitier (max-w-xl)
   .detail-layout-card {
-    @apply w-full max-w-7xl flex flex-col gap-6 relative; // Partage la même largeur de 1280px ! 🚀
+    @apply w-full max-w-7xl flex flex-col gap-6 relative z-10;
   }
 
   // Fil d'Ariane
@@ -62,7 +67,6 @@
           @apply text-[#1d2327] font-black;
         }
 
-        // Tag de catégorie noir et gris neutre, sans or
         .meta-badge-tag {
           @apply px-2.5 py-0.5 rounded-none text-[8px] font-extrabold uppercase bg-transparent border border-slate-800 text-slate-600;
         }
@@ -70,9 +74,34 @@
     }
   }
 
+  // TABLEAU DE VERSIONS STYLE ÉDITORIAL 🚀
+  .detail-versions-section {
+    @apply flex flex-col gap-3 text-left w-full border-b border-[#c3c4c7]/60 pb-6;
+
+    .versions-table-wrap {
+      @apply border border-[#c3c4c7] rounded overflow-hidden w-full max-w-lg;
+    }
+
+    .versions-table {
+      @apply w-full text-left border-collapse text-xs;
+
+      thead {
+        @apply bg-[#f6f8fa] border-b border-[#c3c4c7] text-[9px] font-black text-slate-500 uppercase tracking-widest;
+      }
+
+      th, td {
+        @apply p-3;
+      }
+
+      tbody {
+        @apply divide-y divide-[#c3c4c7]/40;
+      }
+    }
+  }
+
   // LIGNE 2 : DESCRIPTION DU BAS ENTIÈREMENT DÉPLOYÉE
   .detail-bottom-section {
-    @apply flex flex-col gap-3 text-left;
+    @apply flex flex-col gap-3 text-left w-full border-b border-[#c3c4c7]/60 pb-6;
 
     .section-heading {
       @apply text-xs font-black text-slate-400 uppercase tracking-widest;
@@ -80,6 +109,37 @@
 
     .tech-long-description {
       @apply text-sm text-slate-600 font-medium leading-relaxed;
+    }
+
+    // Paragraphes de l'histoire défilants et aérés 🚀
+    .tech-history-section {
+      @apply flex flex-col gap-1;
+
+      .history-paragraphs {
+        @apply flex flex-col gap-4;
+      }
+
+      .history-paragraph {
+        @apply text-xs text-slate-500 font-medium leading-relaxed;
+        text-indent: 1.5rem; // Petit retrait d'alinéa sémantique Wikipédia 🚀
+      }
+    }
+  }
+
+  // BOUTONS DE LIENS DE RESSOURCES UTILES 🚀
+  .detail-links-section {
+    @apply flex flex-col gap-3 text-left w-full pb-4;
+
+    .links-grid {
+      @apply flex flex-col sm:flex-row gap-3 mt-1;
+    }
+
+    .resource-link-btn {
+      @apply w-full sm:w-auto text-center py-2.5 px-4 bg-white border border-[#c3c4c7] hover:border-[#2271b1] text-xs font-bold text-slate-600 hover:text-[#2271b1] rounded transition-all duration-150 cursor-pointer;
+
+      &.doc-btn {
+        @apply bg-[#2271b1] hover:bg-[#135e96] border-[#2271b1] hover:border-[#135e96] text-white hover:text-white;
+      }
     }
   }
 }
