@@ -1,4 +1,5 @@
 import type {Technology} from "./technology.interface";
+import type {Post} from "./post.interface";
 
 export interface FilterOptions {
     searchQuery: string
@@ -10,6 +11,20 @@ export interface FilterOptions {
 
 export interface FilterResult {
     paginatedItems: Technology[]
+    totalPages: number
+    totalItemsCount: number
+}
+
+export interface PostFilterOptions {
+    searchQuery: string
+    selectedStatus: string
+    selectedTag: string
+    currentPage: number
+    itemsPerPage: number
+}
+
+export interface PostFilterResult {
+    paginatedItems: Post[]
     totalPages: number
     totalItemsCount: number
 }

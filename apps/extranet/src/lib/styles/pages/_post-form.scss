@@ -1,0 +1,57 @@
+// --- FEUILLE DE STYLE SÉMANTIQUE UNIQUE DU FORMULAIRE D'ARTICLES ---
+.form-page-container {
+  @apply flex flex-col gap-6 text-left max-w-2xl;
+
+  .form-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
+  }
+
+  .form-group {
+    @apply flex flex-col gap-1.5;
+
+    &.col-span-2 {
+      @apply sm:col-span-2;
+    }
+
+    .form-label {
+      @apply text-xs font-bold text-[#1d2327];
+    }
+
+    .form-input, .form-select, .form-textarea {
+      @apply w-full p-2.5 bg-white border border-[#8c8f94] text-[#2c3338] text-sm rounded shadow-inner focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] outline-none transition-all duration-100;
+    }
+
+    .form-textarea {
+      @apply h-32 resize-none;
+    }
+  }
+
+  // Zone d'upload d'images
+  .file-upload-zone {
+    @apply flex items-center gap-4 p-4 bg-[#f0f0f1] border border-[#c3c4c7] rounded;
+
+    .current-logo-preview {
+      @apply w-16 h-14 bg-white border border-[#c3c4c7] flex items-center justify-center text-slate-400 font-extrabold text-xs overflow-hidden shadow-sm;
+
+      img {
+        @apply w-full h-full object-cover;
+      }
+    }
+
+    .file-input {
+      @apply text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-[#8c8f94] file:text-xs file:font-bold file:bg-[#f0f0f1] file:text-slate-700 hover:file:bg-[#e0e0e0] file:cursor-pointer;
+    }
+  }
+
+  .form-actions {
+    @apply flex flex-wrap items-center gap-3 border-t border-[#c3c4c7] pt-6 mt-4 w-full;
+
+    .cancel-btn {
+      @apply py-2.5 px-4 bg-white border border-[#c3c4c7] hover:bg-[#f6f8fa] text-xs font-bold text-slate-600 rounded cursor-pointer transition-colors duration-150 text-center;
+    }
+
+    .save-btn {
+      @apply py-2.5 px-5 bg-[#2271b1] hover:bg-[#135e96] border border-[#2271b1] text-xs font-bold text-white rounded cursor-pointer transition-colors duration-150 shadow-sm text-center shrink-0;
+    }
+  }
+}

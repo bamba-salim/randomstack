@@ -1,0 +1,21 @@
+// --- TABLEAU D'ADMINISTRATION DU BLOG (EXCLUSIVEMENT DÉCOUPLÉ) 🚀 ---
+.admin-table {
+  .category-badge {
+    // Statuts sémantiques colorés de l'Extranet 🚀
+    &.draft {
+      @apply bg-slate-950 text-slate-400 border border-slate-800;
+    }
+    &.published {
+      @apply bg-emerald-950/20 text-emerald-400 border border-emerald-900/60;
+    }
+    &.scheduled {
+      @apply bg-purple-950/20 text-purple-400 border border-purple-900/60;
+    }
+    &.archived {
+      @apply bg-amber-950/20 text-amber-400 border border-amber-900/60;
+    }
+    &.deleted {
+      @apply bg-red-950/20 text-red-400 border border-red-900/60;
+    }
+  }
+}

@@ -1,1 +1,2 @@
-export {default as StackService} from "./core/stack.service.ts"
+export {default as StackService} from "./core/stack.service"
+export {default as PostService} from "./core/post.service"

@@ -1,5 +1,6 @@
 datasource db {
   provider = "postgresql"
+  // L'URL de connexion est lue depuis apps/server/prisma.config.ts en Prisma v7 🚀
 }
 
 generator client {
@@ -21,6 +22,15 @@ enum Role {
   ADMIN
 }
 
+// 1. Statuts de publication enrichis pour le Soft Delete 🚀
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  SCHEDULED
+  DELETED     // Statut Corbeille pour suppression temporaire ou purge automatique 🚀
+}
+
 model Technology {
   id          String            @id @default(uuid())
   name        String            @unique
@@ -32,13 +42,13 @@ model Technology {
   isActive    Boolean           @default(true) // Disponible uniquement au tirage ou non
   createdAt   DateTime          @default(now())
 
-  // Relation 1-à-1 : detail.id est la clé primaire ET la clé étrangère référençant l'ID de Technology 🚀
+  // Relation 1-à-1 : detail.id est la clé primaire ET la clé étrangère référençant l'ID de Technology
   detail      TechnologyDetail?
 }
 
-// 2. Modèle de détails d'une technologie (Lourd)
+// Modèle de détails d'une technologie (Lourd)
 model TechnologyDetail {
-  id           String     @id // Clé primaire identique à Technology.id (sélecteur partagé) 🚀
+  id           String     @id // Clé primaire identique à Technology.id (sélecteur partagé)
   technology   Technology @relation(fields: [id], references: [id], onDelete: Cascade)
 
   websiteUrl   String?
@@ -49,23 +59,25 @@ model TechnologyDetail {
   userCount    Int?       // Nombre d'utilisateurs (ex: étoiles GitHub)
   projectCount Int?       // Nombre de projets
   history      String[]   // Tableau sémantique de paragraphes
-  description  String?    @db.Text // Rendu nullable avec un "?" 🚀
+  description  String?    @db.Text // Rendu nullable avec un "?"
 }
 
 model SavedStack {
-  id          String   @id @default(uuid())
-  shareCode   String   @unique
+  id          String      @id @default(uuid())
+  shareCode   String      @unique
   projectType Category
   frontendId  String
   backendId   String
   databaseId  String
   ormId       String?
   expiresAt   DateTime
-  createdAt   DateTime @default(now())
+  createdAt   DateTime    @default(now())
+
   userId      String?
-  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// Modèle User lié bidirectionnellement aux commentaires 🚀
 model User {
   id           String       @id @default(uuid())
   email        String       @unique
@@ -74,15 +86,39 @@ model User {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   savedStacks  SavedStack[]
+  comments     Comment[]    // Lien de relation obligatoire avec les commentaires 🚀
 }
 
+// Modèle Post enrichi des tags, de la sécurité de publication et des commentaires 🚀
 model Post {
+  id                 String     @id @default(uuid())
+  title              String
+  slug               String     @unique
+  summary            String     @db.Text
+  content            Json
+  imageUrl           String?
+  status             PostStatus @default(DRAFT)
+  tags               String[]   // Tableau de tags sémantiques 🚀
+  hasBeenPublished   Boolean    @default(false) // Drapeau historique anti-replanification 🚀
+  authorIds          String[]
+  publishAt          DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  comments           Comment[]  // Lien de relation obligatoire avec les commentaires 🚀
+
+  @@index([slug]) // Index de performance pour charger les articles instantanément via le slug
+}
+
+// Nouveau modèle de Commentaires V2.5/V3 🚀
+model Comment {
   id        String   @id @default(uuid())
-  title     String
-  slug      String   @unique
-  content   String   @db.Text
-  imageUrl  String?
-  published Boolean  @default(false)
+  content   String   @db.Text // Texte uniquement
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 }

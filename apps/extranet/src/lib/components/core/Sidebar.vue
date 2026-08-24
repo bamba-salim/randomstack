@@ -42,6 +42,13 @@ const handleLogout = async () => {
       >
         📦 Gérer les Technologies
       </router-link>
+
+      <router-link
+          to="/posts"
+          :class="['nav-link', { 'active': route.path === '/posts' || route.path.startsWith('/edit-post') }]"
+      >
+        📰 Gérer les Actualités
+      </router-link>
       <a href="#" class="nav-link disabled">👥 Utilisateurs (V3)</a>
       <a href="#" class="nav-link disabled">📊 Statistiques (V4)</a>
 
