@@ -31,6 +31,13 @@ enum PostStatus {
   DELETED     // Statut Corbeille pour suppression temporaire ou purge automatique 🚀
 }
 
+enum FileType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+  OTHER
+}
+
 model Technology {
   id          String            @id @default(uuid())
   name        String            @unique
@@ -96,7 +103,6 @@ model Post {
   slug               String     @unique
   summary            String     @db.Text
   content            Json
-  imageUrl           String?
   status             PostStatus @default(DRAFT)
   tags               String[]   // Tableau de tags sémantiques 🚀
   hasBeenPublished   Boolean    @default(false) // Drapeau historique anti-replanification 🚀
@@ -106,6 +112,8 @@ model Post {
   updatedAt          DateTime   @updatedAt
   comments           Comment[]  // Lien de relation obligatoire avec les commentaires 🚀
 
+  imageId            String?
+  image              File?      @relation(fields: [imageId], references: [id], onDelete: SetNull)
   @@index([slug]) // Index de performance pour charger les articles instantanément via le slug
 }
 
@@ -121,4 +129,18 @@ model Comment {
 
   postId    String
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model File {
+  id          String   @id @default(uuid())
+  type        FileType @default(IMAGE)
+  category    String   // ex: "technology", "post"
+  extension   String   // ex: ".png", ".jpg"
+  mimeType    String
+  size        Int
+  altText     String?  // Texte alternatif pour l'accessibilité et le SEO 🚀
+  createdAt   DateTime @default(now())
+
+  // Relations inverses
+  posts        Post[]
 }
