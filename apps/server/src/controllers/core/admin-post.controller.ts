@@ -1,58 +1,56 @@
-import type {Request, Response} from 'express'
+import type { Request, Response } from 'express'
 import crypto from 'crypto'
-import {PostModel} from '#models'
-import {FileUtils} from '#utils'
-import {PostMapper} from '#mappers'
+import { PostModel } from '#models'
+import { FileAction } from '#action-support'
+import { PostMapper } from '#mappers'
+import type { FILE_TYPE , TABLE} from '@randomstack/commons'
 
 export default class AdminPostController {
-    // Initialisation et hydratation unifiée du FormBean depuis le serveur 🚀
+
     static async fetchEditPostInitialData(req: Request, res: Response): Promise<void> {
         try {
             let flatFormBean = PostMapper.getInitialFormBean()
-            const {id} = req.params
+            const { id } = req.params
 
             if (id) {
                 const post = await PostModel.fetchPostById(id)
                 if (!post) {
-                    res.status(404).json({error: 'Article introuvable.'})
+                    res.status(404).json({ error: 'Article introuvable.' })
                     return
                 }
-                flatFormBean = PostMapper.fromDBToClientFormBean(post) // Corrigé de "tech" à "post" 🚀
+                flatFormBean = PostMapper.fromDBToClientFormBean(post)
             }
 
             res.json(flatFormBean)
         } catch {
-            res.status(500).json({error: "Erreur lors de l'initialisation du formulaire."})
+            res.status(500).json({ error: "Erreur lors de l'initialisation du formulaire." })
         }
     }
 
-    // Sauvegarder un article (Création ou Édition) 🚀
     static async savePost(req: Request, res: Response): Promise<void> {
         try {
-            const {id} = req.params
+            const { id } = req.params
             const targetId = id || crypto.randomUUID()
-            const {status: reqStatus} = req.body
+            const { status: reqStatus } = req.body
 
-            let imageUrl = null
+            let imageId: string | null = null
             let finalStatus = reqStatus
             let hasBeenPublishedFlag = false
 
             if (id) {
                 const existingPost = await PostModel.fetchPostById(id)
                 if (!existingPost) {
-                    res.status(404).json({error: 'Article introuvable.'})
+                    res.status(404).json({ error: 'Article introuvable.' })
                     return
                 }
-                imageUrl = existingPost.imageUrl
+                imageId = existingPost.imageId
                 hasBeenPublishedFlag = existingPost.hasBeenPublished
 
-                // RÈGLE A : Si l'article a déjà été en ligne, interdiction de le replanifier ! 🔒
                 if (hasBeenPublishedFlag && reqStatus === 'SCHEDULED') {
-                    res.status(400).json({error: "Un article qui a déjà été publié en ligne ne peut plus être planifié pour une date ultérieure."})
+                    res.status(400).json({ error: "Un article déjà publié ne peut plus être planifié." })
                     return
                 }
 
-                // RÈGLE B : Si l'article est PUBLISHED et qu'on l'édite sans cliquer sur "Publier" à nouveau, il repasse en brouillon (DRAFT) 🚀
                 if (existingPost.status === 'PUBLISHED' && reqStatus !== 'PUBLISHED') {
                     finalStatus = 'DRAFT'
                 }
@@ -62,10 +60,15 @@ export default class AdminPostController {
                 hasBeenPublishedFlag = true
             }
 
+            // Gestion de l'image via FileAction 🚀
             if (req.file) {
-                const savedPath = FileUtils.saveUpload(req.file.buffer, req.file.originalname, 'post', targetId)
-                if (savedPath) {
-                    imageUrl = savedPath
+                const savedFile = await FileAction.savePostImage(req.file)
+                if (savedFile) {
+                    // Nettoyage de l'ancienne image si elle existait 🗑️
+                    if (id && imageId) {
+                        await FileAction.delete(imageId)
+                    }
+                    imageId = savedFile.id
                 }
             }
 
@@ -73,28 +76,47 @@ export default class AdminPostController {
                 ...req.body,
                 status: finalStatus,
                 hasBeenPublished: hasBeenPublishedFlag
-            }, imageUrl, targetId)
+            }, imageId, targetId)
 
-            let result
-            if (id) {
-                result = await PostModel.updatePost(id, saveDTO)
-            } else {
-                result = await PostModel.createPost(saveDTO)
-            }
+            const result = id
+                ? await PostModel.updatePost(id, saveDTO)
+                : await PostModel.createPost(saveDTO)
 
-            res.json({success: true, post: result})
+            res.json({ success: true, post: result })
         } catch (error: any) {
             console.error("[AdminPostController] Échec de la sauvegarde :", error.message || error)
-            res.status(500).json({error: "Erreur lors de la sauvegarde de l'article."})
+            res.status(500).json({ error: "Erreur lors de la sauvegarde de l'article." })
         }
     }
 
-    static async fetchPosts(_req: Request, res: Response){
+    static async fetchPosts(_req: Request, res: Response): Promise<void> {
         try {
-            const posts = await PostModel.fetchPosts()
-
-        }catch (error: any) {
-
+            const posts = await PostModel.fetchAllPosts()
+            res.json(posts)
+        } catch (error: any) {
+            console.error("[AdminPostController] Erreur fetchAll :", error)
+            res.status(500).json({ error: "Impossible de récupérer les articles." })
         }
+    }
+
+    static async deletePost(req: Request, res: Response): Promise<void> {
+        try {
+            const { id } = req.params
+            const existing = await PostModel.fetchPostById(id)
+            if (!existing) {
+                res.status(404).json({ error: 'Article introuvable.' })
+                return
+            }
+
+            await PostModel.softDeletePost(id)
+            res.json({ success: true })
+        } catch (error: any) {
+            console.error("[AdminPostController] Échec deletePost :", error)
+            res.status(500).json({ error: "Erreur lors de la suppression." })
+        }
+    }
+
+    private static async saveImagePost() {
+
     }
 }

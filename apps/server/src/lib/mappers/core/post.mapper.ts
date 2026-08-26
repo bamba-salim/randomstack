@@ -1,9 +1,8 @@
-import type {PostStatus} from '@prisma/client'
-import type {EditPost, EditPostFormBean} from '@randomstack/commons'
+import type {EditPost, EditPostFormBean, FileType, EditFile, PostStatus, Table, FILE_TYPE, TABLE} from '@randomstack/commons'
 
 export default class PostMapper {
     // Convertit req.body brut en DTO d'écriture propre avec slug immuable 🚀
-    static toSavePostDTO(rawBody: any, imageUrl: string | null, targetId: string): EditPost {
+    static toSavePostDTO(rawBody: any, imageId: string | null, targetId: string): EditPost {
         const kebabTitle = String(rawBody.title || '')
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
@@ -37,7 +36,7 @@ export default class PostMapper {
                 slug,
                 summary: String(rawBody.summary || '').trim(),
                 content: contentBlocks,
-                imageUrl,
+                imageId: imageId,
                 status: (rawBody.status as PostStatus) || 'DRAFT',
                 tags: tagsList,
                 authorIds: Array.isArray(rawBody.authorIds) ? rawBody.authorIds : [],
@@ -76,6 +75,21 @@ export default class PostMapper {
             publishAt: null,
             hasBeenPublished: false,
             logo: null
+        }
+    }
+
+
+    static toSavePostImage(targetId, type, ext, mimeType, size, altText): EditFile {
+        return {
+            file: {
+                id: targetId,
+                type: FILE_TYPE.IMAGE,
+                category: TABLE.POST,
+                extension: ext,
+                mimeType: mimeType,
+                size: size,
+                altText: altText | null,
+            }
         }
     }
 }

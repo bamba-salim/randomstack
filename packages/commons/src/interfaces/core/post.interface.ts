@@ -15,7 +15,7 @@ export interface Post {
     slug: string
     summary: string
     content: PostContentBlock[]
-    imageUrl: string | null
+    imageId: string | null
     status: PostStatus
     tags: string[]
     hasBeenPublished: boolean
@@ -36,11 +36,10 @@ export interface EditPostFormBean {
     title: string
     summary: string
     content: PostContentBlock[]
-    imageUrl?: string | null
+    imageId?: string | null
     status: PostStatus
     tags: string[]
     authorIds: string[]
     publishAt?: string | null
     hasBeenPublished?: boolean
-    logo?: any // File pour le téléversement de l'image principale
 }

@@ -50,4 +50,23 @@ export default class FileUtils {
             return null
         }
     }
+
+    // 4. Suppression physique d'un fichier 🗑️
+    static deleteFile(relativeFilePath: string): boolean {
+        try {
+            // Nettoyage du chemin (enlève le slash initial si présent)
+            const cleanedPath = relativeFilePath.replace(/^\//, '')
+            const fullPath = path.resolve(process.cwd(), cleanedPath)
+
+            if (fs.existsSync(fullPath)) {
+                fs.unlinkSync(fullPath)
+                console.log(`[FileUtils] 🗑️ Fichier supprimé du disque : ${fullPath}`)
+                return true
+            }
+            return false
+        } catch (error: any) {
+            console.error(`[FileUtils] Échec de la suppression physique du fichier (${relativeFilePath}) :`, error.message || error)
+            return false
+        }
+    }
 }
