@@ -29,6 +29,8 @@ export default class AdminPostController {
 
     static async savePost(req: Request, res: Response): Promise<void> {
         try {
+
+            console.log('body',req.body)
             const { id } = req.params
             const targetId = id || crypto.randomUUID()
             const { status: reqStatus } = req.body
