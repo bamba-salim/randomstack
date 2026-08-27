@@ -57,7 +57,7 @@ $slot-height: 140px;
       }
 
       .meta-row {
-        @apply flex justify-between items-center py-2.5 border-b border-dashed border-[#c3c4c7]/40 text-xs font-semibold;
+        @apply flex justify-between items-center py-2.5 border-b border-dashed border-[#c3c4c7]/40 text-base font-semibold;
 
         .meta-label {
           @apply text-slate-400 font-bold uppercase tracking-wider;
@@ -108,7 +108,7 @@ $slot-height: 140px;
     }
 
     .tech-long-description {
-      @apply text-sm text-slate-600 font-medium leading-relaxed;
+      @apply text-lg text-slate-600 font-medium leading-relaxed;
     }
 
     // Paragraphes de l'histoire défilants et aérés 🚀
@@ -120,7 +120,7 @@ $slot-height: 140px;
       }
 
       .history-paragraph {
-        @apply text-xs text-slate-500 font-medium leading-relaxed;
+        @apply text-lg text-slate-500 font-medium leading-relaxed;
         text-indent: 1.5rem; // Petit retrait d'alinéa sémantique Wikipédia 🚀
       }
     }

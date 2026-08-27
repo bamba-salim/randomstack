@@ -1,4 +1,4 @@
-import ApiClient from './api.client.js'
+import ApiClient from '../api.client'
 import type { Post } from '@randomstack/commons'
 
 export default class PostService extends ApiClient {
