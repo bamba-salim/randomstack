@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import multer from 'multer'
-import {TechnologyController, AdminPostController} from '#controllers'
+import {TechnologyController, AdminPostController, FileController   } from '#controllers'
 import {AuthMiddleware} from '#middlewares'
 
 const upload = multer({
@@ -45,6 +45,13 @@ export default class AdminRoute {
             AdminPostController.savePost
         )
 
+        router.post(
+            '/upload-file',
+            AuthMiddleware.isAuthenticated,
+            AuthMiddleware.permit('ADMIN', 'EDITOR'),
+            upload.single('file'),
+            FileController.upload
+        )
 
         return router
     }

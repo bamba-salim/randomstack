@@ -4,11 +4,11 @@ import {AuthService} from '#services'
 
 import AdminLayout from './layout/AdminLayout.vue'
 
-import Login from './core/Login.vue'
-import Dashboard from './core/Dashboard.vue'
-import TechnologyForm from './core/TechnologyForm.vue'
-import PostForm from './core/PostForm.vue'
-import PostList from './core/PostList.vue'
+import Login from './core/LoginPage.vue'
+import Dashboard from './core/DashboardPage.vue'
+import TechnologyForm from './core/EditTechnologyPage.vue'
+import PostForm from './core/EditPostPage.vue'
+import PostList from './core/PostListPage.vue'
 
 
 const router = createRouter({

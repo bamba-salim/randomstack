@@ -5,11 +5,11 @@
 
 .admin-main {
   // S'adapte au mobile en se décalant et en réduisant les marges 📱
-  @apply flex-1 p-6 sm:p-8 flex flex-col bg-white border border-[#c3c4c7] m-4 sm:m-6 rounded shadow-sm max-w-5xl mx-auto w-full mt-16 sm:mt-6;
+  @apply flex-1 p-6 sm:p-8 flex flex-col bg-white border border-[#c3c4c7] m-4 sm:m-6 rounded shadow-sm max-w-full mx-auto w-full mt-16 sm:mt-6;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 
   .main-header, .form-header-box {
-    @apply flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#c3c4c7] pb-6 mb-8;
+    @apply flex flex-col sm:flex-row sm:items-center  justify-between gap-4 border-b border-[#c3c4c7] pb-6 mb-8;
 
     .header-title {
       @apply text-xl sm:text-2xl font-extrabold tracking-tight text-[#1d2327];

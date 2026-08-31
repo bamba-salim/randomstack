@@ -37,6 +37,7 @@ export interface EditPostFormBean {
     summary: string
     content: PostContentBlock[]
     imageId?: string | null
+    imageUrl: string | null
     status: PostStatus
     tags: string[]
     authorIds: string[]

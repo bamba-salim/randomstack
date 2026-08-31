@@ -8,8 +8,7 @@ export default class PostService extends ApiClient {
     }
 
     static async fetchAll(): Promise<Post[]> {
-        const posts =  await this.get<Post[]>('/api/fetch-posts')
-        console.log(posts)
+        const posts =  await this.get<Post[]>('/api/admin/fetch-posts')
         return posts
     }
 

@@ -1,7 +1,16 @@
 import { Database } from '#db'
-import type { EditPost } from '@randomstack/commons'
+
+import type { EditPost  } from '@randomstack/commons'
 
 export default class PostModel {
+
+    static async fetchAllPosts(): Promise<number> {
+        return await Database.client.post.findMany({
+            where: { status: {
+                not: 'DELETED'
+                } }
+        })
+    }
 
     static async fetchPublishedPost(){
         return await Database.client.post.findMany({

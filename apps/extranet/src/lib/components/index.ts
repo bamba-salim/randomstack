@@ -1,7 +1,13 @@
-export {default as Sidebar} from './core/Sidebar.vue'
-export {default as TechnologyTable} from './core/TechnologyTable.vue'
-export {default as ParagraphManager} from './core/ParagraphManager.vue'
-export {default as BaseInput} from './core/BaseInput.vue'
-export {default as BaseToggle} from './core/BaseToggle.vue'
-export {default as PostBlockManager} from './core/PostBlockManager.vue'
-export {default as PostTable} from './core/PostTable.vue'
+// COMMONS
+export {default as Sidebar} from './core/commons/Sidebar.vue'
+export {default as BaseInput} from './core/commons/BaseInput.vue'
+export {default as BaseToggle} from './core/commons/BaseToggle.vue'
+
+// STACK
+export {default as TechnologyTable} from './core/stack/TechnologyTable.vue'
+export {default as ParagraphManager} from './core/stack/ParagraphManager.vue'
+
+// BLOG
+export {default as PostContentManager} from './core/blog/PostContentManager.vue'
+export {default as PostContent} from './core/blog/PostContent.vue'
+export {default as PostTable} from './core/blog/PostTable.vue'

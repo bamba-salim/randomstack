@@ -1,0 +1,10 @@
+.form-page-container {
+  @apply flex flex-col gap-6 text-left w-full max-w-full;
+
+  .form-grid { @apply grid grid-cols-1 md:grid-cols-2 gap-4; }
+  .form-group { @apply flex flex-col gap-1.5; }
+  .form-input { @apply w-full p-3 border border-[#8c8f94] text-sm; }
+  .form-actions { @apply flex gap-3 pt-6; }
+  .save-btn { @apply py-2 px-6 bg-[#2271b1] text-white font-bold text-xs; }
+  .cancel-btn { @apply py-2 px-6 bg-white border border-[#c3c4c7] text-xs; }
+}
