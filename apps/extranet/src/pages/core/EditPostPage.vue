@@ -38,7 +38,10 @@ const handleSave = async (status: string) => {
 onMounted(async () => {
   loading.value = true
   try {
-    const id = route.params['id'] as string
+
+    const {id} = route.params
+    isEditMode.value = !!id
+    postId.value = id
 
     formBean.value = await PostService.fetchPostFormData(id)
   } catch {
@@ -61,7 +64,8 @@ onMounted(async () => {
 
     <div class="form-group col-span-2">
       <label class="form-label">Résumé court</label>
-      <textarea v-model="formBean.summary" required class="form-textarea" placeholder="Ecrivez un court résumé..."></textarea>
+      <textarea v-model="formBean.summary" required class="form-textarea"
+                placeholder="Ecrivez un court résumé..."></textarea>
     </div>
 
     <PostContentManager v-model="formBean.content"/>
