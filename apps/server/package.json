@@ -15,6 +15,10 @@
       "development": "./src/lib/db/index.ts",
       "default": "./dist/lib/db/index.js"
     },
+    "#interfaces": {
+      "development": "./src/lib/interfaces/index.ts",
+      "default": "./dist/lib/interfaces/index.js"
+    },
     "#middlewares": {
       "development": "./src/lib/middlewares/index.ts",
       "default": "./dist/lib/middlewares/index.js"

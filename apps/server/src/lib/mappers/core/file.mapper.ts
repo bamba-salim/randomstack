@@ -1,16 +1,17 @@
-import type {FILE_TYPE, TABLE} from "@randomstack/commons";
+import type {Table, FileType} from "@randomstack/commons";
 
 export default class FileMapper {
-    static toSaveFileDTO(id: string, type: FILE_TYPE, category: TABLE, ext: string, mimeType: string, size: number, altText: string | null){
+    static toSaveFileDTO(id: string, type: FileType, category: Table, ext: string, mimeType: string, size: number, altText: string | null) {
+
         return {
             file: {
-                id: targetId,
-                type: FILE_TYPE.IMAGE,
-                category: TABLE.POST,
+                id: id,
+                type: type.toUpperCase(),
+                category: category.toUpperCase(),
                 extension: ext,
                 mimeType: mimeType,
                 size: size,
-                altText: altText | null,
+                altText: altText,
             }
         }
     }

@@ -1,7 +1,7 @@
 import {Database} from "#db";
-import type {FileType, EditFile} from "@randomstack/commons";
+import type {EditFile} from "@randomstack/commons";
 
-export default class File {
+export default class FileModel {
 
     static async getFileById(id: string){
         return await Database.client.file.findUnique({where: {id}})

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { FileService } from '#services'
-import { type PostContentBlock, type BlockType } from '@randomstack/commons'
+import {ref} from 'vue'
+import {FileService} from '#services'
+import {type PostContentBlock, type BlockType, FILE_TYPE, TABLE, BLOCK_TYPE} from '@randomstack/commons'
 
-const block = defineModel<PostContentBlock>({ required: true })
+const block = defineModel<PostContentBlock>({required: true})
 const props = defineProps<{ isNested?: boolean }>()
 
 // État local pour le Drag & Drop des colonnes 🚀
@@ -11,18 +11,19 @@ const draggedCol = ref<'left' | 'right' | null>(null)
 const uniqueId = ref(Math.random().toString(36).substring(2, 9))
 
 const update = (key: string, value: any) => {
-  block.value = { ...block.value, [key]: value }
+  block.value = {...block.value, [key]: value}
 }
 
+
 const updateNestedType = (col: 'left' | 'right', type: BlockType) => {
-  block.value = { ...block.value, [col]: { type, value: '' } }
+  block.value = {...block.value, [col]: {type, value: ''}}
 }
 
 const updateNestedValue = (col: 'left' | 'right', key: string, value: any) => {
   if (block.value[col]) {
     block.value[col]![key as keyof PostContentBlock] = value
     // Force la mise à jour réactive
-    block.value = { ...block.value }
+    block.value = {...block.value}
   }
 }
 
@@ -38,8 +39,10 @@ const insertTag = (start: string, end: string) => {
 const handleImageUpload = async (event: Event, col?: 'left' | 'right') => {
   const file = (event.target as HTMLInputElement).files?.[0]
   if (!file) return
+
   try {
-    const { url } = await FileService.uploadFile(file, 'image', 'post')
+    const {url} = await FileService.uploadFile(file, FILE_TYPE.IMAGE, TABLE.POST)
+
     if (col) {
       updateNestedValue(col, 'value', url)
     } else {
@@ -48,6 +51,8 @@ const handleImageUpload = async (event: Event, col?: 'left' | 'right') => {
   } catch {
     alert("Erreur lors de l'upload de l'image.")
   }
+
+  console.log(col)
 }
 
 // --- LOGIQUE DE PERMUTATION DES COLONNES (SWAP) 🚀 ---
@@ -62,7 +67,7 @@ const handleNestedDrop = (targetCol: 'left' | 'right') => {
   }
 
   const sourceCol = draggedCol.value
-  const newBlock = { ...block.value }
+  const newBlock = {...block.value}
 
   // On permute le contenu des deux colonnes
   const temp = newBlock[sourceCol]
@@ -82,25 +87,33 @@ const handleNestedDrop = (targetCol: 'left' | 'right') => {
       <div class="formatting-toolbar w-25">
         <button type="button" @click="insertTag('<strong>', '</strong>')" class="format-btn font-bold">G</button>
         <button type="button" @click="insertTag('<u>', '</u>')" class="format-btn underline">S</button>
-        <button type="button" @click="insertTag('<a href=\'URL\' target=\'_blank\'>', '</a>')" class="format-btn text-blue-600">Lien</button>
+        <button type="button" @click="insertTag('<a href=\'URL\' target=\'_blank\'>', '</a>')"
+                class="format-btn text-blue-600">Lien
+        </button>
       </div>
-      <textarea :id="`text-${uniqueId}`" :value="block.value" @input="update('value', ($event.target as HTMLTextAreaElement).value)" class="form-textarea" placeholder="Rédigez votre texte ici..."></textarea>
+      <textarea :id="`text-${uniqueId}`" :value="block.value"
+                @input="update('value', ($event.target as HTMLTextAreaElement).value)" class="form-textarea"
+                placeholder="Rédigez votre texte ici..."></textarea>
     </div>
 
     <!-- 2. BLOC CODE -->
     <div v-else-if="block.type === 'CODE'" class="w-full flex gap-2 flex-col">
-      <input :value="block.language" @input="update('language', ($event.target as HTMLInputElement).value)" class="form-input-inline font-mono" placeholder="Langage (ex: javascript)" />
-      <textarea :value="block.value" @input="update('value', ($event.target as HTMLTextAreaElement).value)" class="form-textarea font-mono bg-slate-900 text-emerald-400" placeholder="Collez votre code source..."></textarea>
+      <input :value="block.language" @input="update('language', ($event.target as HTMLInputElement).value)"
+             class="form-input-inline font-mono" placeholder="Langage (ex: javascript)"/>
+      <textarea :value="block.value" @input="update('value', ($event.target as HTMLTextAreaElement).value)"
+                class="form-textarea font-mono bg-slate-900 text-emerald-400"
+                placeholder="Collez votre code source..."></textarea>
     </div>
 
     <!-- 3. BLOC IMAGE (Full-Width) 🚀 -->
     <div v-else-if="block.type === 'IMAGE'" class="w-full">
       <div class="file-upload-zone">
-        <img v-if="block.value" :src="`http://localhost:4000${block.value}`" class="image-preview" />
+        <img v-if="block.value" :src="`http://localhost:4000${block.value}`" class="image-preview"/>
         <span v-else class="empty-image-text">Sélectionnez une image :</span>
 
-        <input type="file" accept="image/*" @change="handleImageUpload($event)" class="file-input w-full" />
-        <input :value="block.caption" @input="update('caption', ($event.target as HTMLInputElement).value)" class="form-input-inline w-full mt-2 !mb-0" placeholder="Légende de la photo (Optionnelle)" />
+        <input type="file" accept="image/*" @change="handleImageUpload($event)" class="file-input w-full"/>
+        <input :value="block.caption" @input="update('caption', ($event.target as HTMLInputElement).value)"
+               class="form-input-inline w-full mt-2 !mb-0" placeholder="Légende de la photo (Optionnelle)"/>
       </div>
     </div>
 
@@ -121,13 +134,15 @@ const handleNestedDrop = (targetCol: 'left' | 'right') => {
             <span class="column-drag-handle">☰</span>
             <span class="column-tag">GAUCHE</span>
           </div>
-          <select :value="block.left?.type" @change="updateNestedType('left', ($event.target as HTMLSelectElement).value as BlockType)" class="form-select-mini">
+          <select :value="block.left?.type"
+                  @change="updateNestedType('left', ($event.target as HTMLSelectElement).value as BlockType)"
+                  class="form-select-mini">
             <option value="TEXT">TEXTE</option>
             <option value="IMAGE">IMAGE</option>
             <option value="CODE">CODE</option>
           </select>
         </div>
-        <PostContent v-if="block.left" v-model="block.left" :is-nested="true" />
+        <PostContent v-if="block.left" v-model="block.left" :is-nested="true"/>
       </div>
 
       <!-- COLONNE DROITE -->
@@ -144,13 +159,15 @@ const handleNestedDrop = (targetCol: 'left' | 'right') => {
             <span class="column-drag-handle">☰</span>
             <span class="column-tag">DROITE</span>
           </div>
-          <select :value="block.right?.type" @change="updateNestedType('right', ($event.target as HTMLSelectElement).value as BlockType)" class="form-select-mini">
+          <select :value="block.right?.type"
+                  @change="updateNestedType('right', ($event.target as HTMLSelectElement).value as BlockType)"
+                  class="form-select-mini">
             <option value="TEXT">TEXTE</option>
             <option value="IMAGE">IMAGE</option>
             <option value="CODE">CODE</option>
           </select>
         </div>
-        <PostContent v-if="block.right" v-model="block.right" :is-nested="true" />
+        <PostContent v-if="block.right" v-model="block.right" :is-nested="true"/>
       </div>
 
     </div>

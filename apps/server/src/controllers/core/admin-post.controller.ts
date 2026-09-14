@@ -27,31 +27,41 @@ export default class AdminPostController {
         }
     }
 
+// Sauvegarder un article (Création ou Édition en JSON pur) 🚀
     static async savePost(req: Request, res: Response): Promise<void> {
         try {
-            const {id} = req.params
+            const { id } = req.params
             const targetId = id || crypto.randomUUID()
-            const {status: reqStatus} = req.body
 
-            let imageId: string | null = null
+            // On récupère directement l'ID de la nouvelle image depuis le JSON envoyé par le client ! 🚀
+            const { status: reqStatus, imageId: reqImageId } = req.body
+
+            let imageId: string | null = reqImageId || null
             let finalStatus = reqStatus
-            let hasBeenPublishedFlag = false
+            let hasBeenPublishedFlag = req.body.hasBeenPublished || false
 
             if (id) {
                 const existingPost = await PostModel.fetchPostById(id)
-                console.log(existingPost)
                 if (!existingPost) {
-                    res.status(404).json({error: 'Article introuvable.'})
+                    res.status(404).json({ error: 'Article introuvable.' })
                     return
                 }
-                imageId = existingPost.imageId
+
                 hasBeenPublishedFlag = existingPost.hasBeenPublished
 
+                // NETTOYAGE : Si l'article avait déjà une image de couverture,
+                // ET que l'admin en a uploadé une NOUVELLE (l'ID a changé), on efface l'ancienne ! 🗑️
+                if (existingPost.imageId && existingPost.imageId !== imageId) {
+                    await FileAction.delete(existingPost.imageId)
+                }
+
+                // RÈGLE A : Interdiction de replanifier un article déjà publié
                 if (hasBeenPublishedFlag && reqStatus === 'SCHEDULED') {
-                    res.status(400).json({error: "Un article déjà publié ne peut plus être planifié."})
+                    res.status(400).json({ error: "Un article déjà publié ne peut plus être planifié." })
                     return
                 }
 
+                // RÈGLE B : Rétrograder en brouillon si on modifie sans publier
                 if (existingPost.status === 'PUBLISHED' && reqStatus !== 'PUBLISHED') {
                     finalStatus = 'DRAFT'
                 }
@@ -61,17 +71,7 @@ export default class AdminPostController {
                 hasBeenPublishedFlag = true
             }
 
-            // Gestion de l'image via FileAction 🚀
-            if (req.file) {
-                const savedFile = await FileAction.savePostImage(req.file)
-                if (savedFile) {
-                    // Nettoyage de l'ancienne image si elle existait 🗑️
-                    if (id && imageId) {
-                        await FileAction.delete(imageId)
-                    }
-                    imageId = savedFile.id
-                }
-            }
+            // LE BLOC "if (req.file)" A DISPARU : L'upload a déjà été fait avant la sauvegarde ! 🚀
 
             const saveDTO = PostMapper.toSavePostDTO({
                 ...req.body,
@@ -79,13 +79,14 @@ export default class AdminPostController {
                 hasBeenPublished: hasBeenPublishedFlag
             }, imageId, targetId)
 
+            const result = id
+                ? await PostModel.updatePost(id, saveDTO)
+                : await PostModel.createPost(saveDTO)
 
-            const result = id ? await PostModel.updatePost(id, saveDTO) : await PostModel.createPost(saveDTO)
-
-            res.json({success: true, post: result})
+            res.json({ success: true, post: result })
         } catch (error: any) {
-            console.error("[AdminPostController] Échec de la sauvegarde :", error.message || error)
-            res.status(500).json({error: "Erreur lors de la sauvegarde de l'article."})
+            console.error("[AdminPostController] Échec savePost :", error.message || error)
+            res.status(500).json({ error: "Erreur lors de la sauvegarde de l'article." })
         }
     }
 

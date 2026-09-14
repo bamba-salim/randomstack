@@ -13,8 +13,8 @@ export default class PostService extends ApiClient {
     }
 
     // Écrit en BDD (Création ou Édition) de manière sémantique
-    static async save(formData: FormData, id?: string): Promise<{ success: boolean; post: Post }> {
+    static async save(payload: EditPostFormBean, id?: string): Promise<{ success: boolean; post: Post }> {
         const endpoint = `/api/admin/save-post${id ? `/${id}` : ''}`
-        return await this.postForm<{ success: boolean; post: Post }>(endpoint, formData)
+        return await this.post<{ success: boolean; post: Post }>(endpoint, payload)
     }
 }

@@ -1,5 +1,4 @@
-import type {EditPost, EditPostFormBean, FileType, EditFile, PostStatus, Table, FILE_TYPE, TABLE} from '@randomstack/commons'
-
+import type {EditPost, EditPostFormBean, EditFile, PostStatus, FileType, Table, FILE_TYPE, TABLE, } from '@randomstack/commons'
 export default class PostMapper {
     // Convertit req.body brut en DTO d'écriture propre avec slug immuable 🚀
     static toSavePostDTO(rawBody: any, imageId: string | null, targetId: string): EditPost {

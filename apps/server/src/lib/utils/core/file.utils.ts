@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import type {File} from '@randomstack/commons'
 
 export default class FileUtils {
     // 1. Lecture générique et sécurisée de fichiers JSON (typée) 🚀
@@ -30,25 +31,40 @@ export default class FileUtils {
 
     // 3. Sauvegarde d'images / fichiers téléversés (Prêt pour la V2) 🚀
     // Ajout du paramètre "prefix" pour rendre le nommage totalement générique par table 🚀
-    static saveUpload(fileBuffer: Buffer, originalName: string, prefix: string, itemId: string, subFolder: string = 'uploads'): string | null {
+    static saveUpload(fileBuffer: Buffer, originalName: string, _category: string, _type: string, itemId: string): string | null {
         try {
-            const uploadDir = path.resolve(process.cwd(), 'public', subFolder)
+            const category = _category.toUpperCase()
+            const type = _type.toUpperCase()
+            const uploadDir = path.resolve(process.cwd(), 'public', 'uploads', category, type)
 
             if (!fs.existsSync(uploadDir)) {
-                fs.mkdirSync(uploadDir, { recursive: true })
+                fs.mkdirSync(uploadDir, {recursive: true})
             }
 
             // Nommage dynamique : {table}-{id}.{extension} (ex: technology-uuid.png) 🚀
             const ext = path.extname(originalName).toLowerCase()
-            const uniqueName = `${prefix.toLowerCase()}-${itemId}${ext}`
+            const uniqueName = `${category}-${itemId}${ext}`
             const finalPath = path.join(uploadDir, uniqueName)
 
             fs.writeFileSync(finalPath, fileBuffer)
-            return `/public/${subFolder}/${uniqueName}`
+
+            const uri = `/public/uploads/${category}/${type}/${uniqueName}`
+            console.log('utils upload',uri)
+            return uri
         } catch (error: any) {
             console.error("[FileUtils] Échec de la sauvegarde physique du fichier :", error.message || error)
             return null
         }
+    }
+
+    static getFileUrl(file: File): string | null {
+        if (!file) return null
+
+        console.log('file', file)
+
+        const uri = `/public/uploads/${file.category}/${file.type}/${file.category}-${file.id}${file.extension}`
+        console.log('utils get url', uri)
+        return uri
     }
 
     // 4. Suppression physique d'un fichier 🗑️
