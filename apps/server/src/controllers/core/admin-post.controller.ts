@@ -3,7 +3,7 @@ import crypto from 'crypto'
 import {PostModel} from '#models'
 import {FileAction} from '#action-support'
 import {PostMapper} from '#mappers'
-import type {FILE_TYPE, TABLE} from '@randomstack/commons'
+import {type FILE_TYPE, type PostContentBlock, type TABLE, type BLOCK_TYPE} from '@randomstack/commons'
 
 export default class AdminPostController {
 
@@ -30,11 +30,11 @@ export default class AdminPostController {
 // Sauvegarder un article (Création ou Édition en JSON pur) 🚀
     static async savePost(req: Request, res: Response): Promise<void> {
         try {
-            const { id } = req.params
+            const {id} = req.params
             const targetId = id || crypto.randomUUID()
 
             // On récupère directement l'ID de la nouvelle image depuis le JSON envoyé par le client ! 🚀
-            const { status: reqStatus, imageId: reqImageId } = req.body
+            const {status: reqStatus, imageId: reqImageId} = req.body
 
             let imageId: string | null = reqImageId || null
             let finalStatus = reqStatus
@@ -43,7 +43,7 @@ export default class AdminPostController {
             if (id) {
                 const existingPost = await PostModel.fetchPostById(id)
                 if (!existingPost) {
-                    res.status(404).json({ error: 'Article introuvable.' })
+                    res.status(404).json({error: 'Article introuvable.'})
                     return
                 }
 
@@ -57,7 +57,7 @@ export default class AdminPostController {
 
                 // RÈGLE A : Interdiction de replanifier un article déjà publié
                 if (hasBeenPublishedFlag && reqStatus === 'SCHEDULED') {
-                    res.status(400).json({ error: "Un article déjà publié ne peut plus être planifié." })
+                    res.status(400).json({error: "Un article déjà publié ne peut plus être planifié."})
                     return
                 }
 
@@ -83,10 +83,10 @@ export default class AdminPostController {
                 ? await PostModel.updatePost(id, saveDTO)
                 : await PostModel.createPost(saveDTO)
 
-            res.json({ success: true, post: result })
+            res.json({success: true, post: result})
         } catch (error: any) {
             console.error("[AdminPostController] Échec savePost :", error.message || error)
-            res.status(500).json({ error: "Erreur lors de la sauvegarde de l'article." })
+            res.status(500).json({error: "Erreur lors de la sauvegarde de l'article."})
         }
     }
 
@@ -117,7 +117,24 @@ export default class AdminPostController {
         }
     }
 
-    private static async saveImagePost() {
+    static async fetchPostsContents(req: Request, res: Response): Promise<void> {
+        const contentsPosts: Posts[] = (await PostModel.getPostsContents()).map((post) => post.content)
 
+        const imageContents: PostContentBlock = []
+        contentsPosts.forEach(contents => contents.forEach(content => {
+                if (content.type === 'IMAGE') {
+                    imageContents.push(content)
+                }
+
+                if (content.type === 'DOUBLE_CONTENT') {
+                    if (content.left.type === 'IMAGE') imageContents.push(content.left)
+                    if (content.right.type === 'IMAGE') imageContents.push(content.right)
+                }
+            })
+        )
+
+        res.json({size: imageContents.length, data: imageContents})
     }
+
+
 }

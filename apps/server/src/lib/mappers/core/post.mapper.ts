@@ -11,8 +11,6 @@ export default class PostMapper {
         // Parsing du tableau de blocs JSON complexe de FormData
         let contentBlocks = []
 
-        // console.log(JSON.parse(rawBody?.content))
-
         if (typeof rawBody.content === 'string') {
             try {
                 contentBlocks = JSON.parse(rawBody.content)

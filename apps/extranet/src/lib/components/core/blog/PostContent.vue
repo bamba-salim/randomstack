@@ -41,18 +41,16 @@ const handleImageUpload = async (event: Event, col?: 'left' | 'right') => {
   if (!file) return
 
   try {
-    const {url} = await FileService.uploadFile(file, FILE_TYPE.IMAGE, TABLE.POST)
+    const {idFile} = await FileService.uploadFile(file, FILE_TYPE.IMAGE, TABLE.POST)
 
     if (col) {
-      updateNestedValue(col, 'value', url)
+      updateNestedValue(col, 'value', idFile)
     } else {
-      update('value', url)
+      update('value', idFile)
     }
   } catch {
     alert("Erreur lors de l'upload de l'image.")
   }
-
-  console.log(col)
 }
 
 // --- LOGIQUE DE PERMUTATION DES COLONNES (SWAP) 🚀 ---
@@ -108,12 +106,12 @@ const handleNestedDrop = (targetCol: 'left' | 'right') => {
     <!-- 3. BLOC IMAGE (Full-Width) 🚀 -->
     <div v-else-if="block.type === 'IMAGE'" class="w-full">
       <div class="file-upload-zone">
-        <img v-if="block.value" :src="`http://localhost:4000${block.value}`" class="image-preview"/>
+        <!--  TODO: use get image      -->
+        <img v-if="block.value" :src="`http://localhost:4000/api/files/${block.value}`" class="image-preview"/>
         <span v-else class="empty-image-text">Sélectionnez une image :</span>
 
         <input type="file" accept="image/*" @change="handleImageUpload($event)" class="file-input w-full"/>
-        <input :value="block.caption" @input="update('caption', ($event.target as HTMLInputElement).value)"
-               class="form-input-inline w-full mt-2 !mb-0" placeholder="Légende de la photo (Optionnelle)"/>
+        <input :value="block.caption" @input="update('caption', ($event.target as HTMLInputElement).value)" class="form-input-inline w-full mt-2 !mb-0" placeholder="Légende de la photo (Optionnelle)"/>
       </div>
     </div>
 

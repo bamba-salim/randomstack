@@ -29,6 +29,13 @@ export default class FileAction {
 
     // Reconstitue l'URL publique (Utilisé par les mappers pour le Client) 🚀
     static getUrl(file: File): string | null {
+        const uri = FileUtils.getFileUrl(file)
+        return uri
+    }
+
+    static async getUrlByID(id: string): string | null {
+
+        const file= await FileModel.getFileById(id)
 
         const uri = FileUtils.getFileUrl(file)
         return uri

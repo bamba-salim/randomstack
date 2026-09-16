@@ -1,38 +1,40 @@
-import { Database } from '#db'
+import {Database} from '#db'
 
-import type { EditPost  } from '@randomstack/commons'
+import type {EditPost} from '@randomstack/commons'
 
 export default class PostModel {
 
     static async fetchAllPosts(): Promise<number> {
         return await Database.client.post.findMany({
-            where: { status: {
-                not: 'DELETED'
-                } }
+            where: {
+                status: {
+                    not: 'DELETED'
+                }
+            }
         })
     }
 
-    static async fetchPublishedPost(){
+    static async fetchPublishedPost() {
         return await Database.client.post.findMany({
-            where: { status: 'PUBLISHED' }
+            where: {status: 'PUBLISHED'}
         })
     }
 
     static async fetchPosts() {
         return await Database.client.post.findMany({
-            orderBy: { createdAt: 'desc' }
+            orderBy: {createdAt: 'desc'}
         })
     }
 
     static async fetchPostById(id: string) {
         return await Database.client.post.findUnique({
-            where: { id }
+            where: {id}
         })
     }
 
     static async fetchPostBySlug(slug: string) {
         return await Database.client.post.findUnique({
-            where: { slug }
+            where: {slug}
         })
     }
 
@@ -46,11 +48,17 @@ export default class PostModel {
 
     // Modification : reçoit l'objet du mapper et omet l'id et le slug pour garantir les permaliens 🚀
     static async updatePost(id: string, payload: EditPost) {
-        const { id: _, slug: __, ...postData } = payload.post
+        const {id: _, slug: __, ...postData} = payload.post
 
         return await Database.client.post.update({
-            where: { id },
+            where: {id},
             data: postData as any
+        })
+    }
+
+    static async getPostsContents() {
+        return await Database.client.post.findMany({
+            select: {content: true}
         })
     }
 }

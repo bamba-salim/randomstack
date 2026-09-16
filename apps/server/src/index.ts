@@ -13,7 +13,8 @@ const app = express()
 const ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://localhost:5174',
-    'http://localhost:5175'
+    'http://localhost:5175',
+    '*'
 ]
 
 // Activation de CORS avec partage de credentials pour la session
@@ -33,7 +34,6 @@ app.use(express.json())
 app.use(SessionMiddleware.config)
 
 app.use('/public', express.static(path.resolve(process.cwd(), 'public')))
-
 
 
 // Enregistrement des points d'API

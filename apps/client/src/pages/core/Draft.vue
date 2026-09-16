@@ -42,7 +42,6 @@ const shareLinkUrl = computed(() => {
 
 // Tri réactif de la blacklist par catégorie
 const groupedTechnologies = computed(() => {
-  console.log(allTechnologies.value)
 
   const res = {
     CLIENT: allTechnologies.value.filter(t => Array.isArray(t.categories) && t.categories.some(cat => ['FRONTEND', 'MOBILE', 'DESKTOP'].includes(cat))),
@@ -51,8 +50,6 @@ const groupedTechnologies = computed(() => {
 
     DATABASE: allTechnologies.value.filter(t => Array.isArray(t.categories) && t.categories.includes('DATABASE'))
   }
-
-  console.log(res)
   return res
 })
 

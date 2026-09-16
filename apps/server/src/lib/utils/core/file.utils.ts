@@ -49,7 +49,6 @@ export default class FileUtils {
             fs.writeFileSync(finalPath, fileBuffer)
 
             const uri = `/public/uploads/${category}/${type}/${uniqueName}`
-            console.log('utils upload',uri)
             return uri
         } catch (error: any) {
             console.error("[FileUtils] Échec de la sauvegarde physique du fichier :", error.message || error)
@@ -59,11 +58,9 @@ export default class FileUtils {
 
     static getFileUrl(file: File): string | null {
         if (!file) return null
-
-        console.log('file', file)
-
         const uri = `/public/uploads/${file.category}/${file.type}/${file.category}-${file.id}${file.extension}`
-        console.log('utils get url', uri)
+
+
         return uri
     }
 

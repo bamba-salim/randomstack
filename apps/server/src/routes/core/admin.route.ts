@@ -53,6 +53,11 @@ export default class AdminRoute {
             FileController.upload
         )
 
+        router.get(
+            '/fetch-posts-contents',
+            AdminPostController.fetchPostsContents
+        )
+
         return router
     }
 }
