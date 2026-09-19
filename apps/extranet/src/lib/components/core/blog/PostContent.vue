@@ -106,7 +106,6 @@ const handleNestedDrop = (targetCol: 'left' | 'right') => {
     <!-- 3. BLOC IMAGE (Full-Width) 🚀 -->
     <div v-else-if="block.type === 'IMAGE'" class="w-full">
       <div class="file-upload-zone">
-        <!--  TODO: use get image      -->
         <img v-if="block.value" :src="`http://localhost:4000/api/files/${block.value}`" class="image-preview"/>
         <span v-else class="empty-image-text">Sélectionnez une image :</span>
 

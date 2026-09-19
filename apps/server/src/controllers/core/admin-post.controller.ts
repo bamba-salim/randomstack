@@ -3,7 +3,7 @@ import crypto from 'crypto'
 import {PostModel} from '#models'
 import {FileAction} from '#action-support'
 import {PostMapper} from '#mappers'
-import {type FILE_TYPE, type PostContentBlock, type TABLE, type BLOCK_TYPE} from '@randomstack/commons'
+import {type FILE_TYPE, type PostContentBlock, type TABLE, type BLOCK_TYPE, type EditPostFormBean} from '@randomstack/commons'
 
 export default class AdminPostController {
 
@@ -32,14 +32,15 @@ export default class AdminPostController {
         try {
             const {id} = req.params
             const targetId = id || crypto.randomUUID()
+            const formBean = <EditPostFormBean> req.body
 
             // On récupère directement l'ID de la nouvelle image depuis le JSON envoyé par le client ! 🚀
-            const {status: reqStatus, imageId: reqImageId} = req.body
+            const {status: reqStatus} = formBean
 
-            let imageId: string | null = reqImageId || null
             let finalStatus = reqStatus
-            let hasBeenPublishedFlag = req.body.hasBeenPublished || false
+            let hasBeenPublishedFlag = formBean.hasBeenPublished || false
 
+            // Handle status
             if (id) {
                 const existingPost = await PostModel.fetchPostById(id)
                 if (!existingPost) {
@@ -51,10 +52,11 @@ export default class AdminPostController {
 
                 // NETTOYAGE : Si l'article avait déjà une image de couverture,
                 // ET que l'admin en a uploadé une NOUVELLE (l'ID a changé), on efface l'ancienne ! 🗑️
-                if (existingPost.imageId && existingPost.imageId !== imageId) {
+                if (existingPost.imageId && existingPost.imageId !== formBean.imageId) {
                     await FileAction.delete(existingPost.imageId)
                 }
 
+                // TODO: notification modal bouton "publié" et "brouillon"
                 // RÈGLE A : Interdiction de replanifier un article déjà publié
                 if (hasBeenPublishedFlag && reqStatus === 'SCHEDULED') {
                     res.status(400).json({error: "Un article déjà publié ne peut plus être planifié."})
@@ -77,7 +79,7 @@ export default class AdminPostController {
                 ...req.body,
                 status: finalStatus,
                 hasBeenPublished: hasBeenPublishedFlag
-            }, imageId, targetId)
+            }, targetId)
 
             const result = id
                 ? await PostModel.updatePost(id, saveDTO)

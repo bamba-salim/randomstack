@@ -14,22 +14,26 @@ const errorMsg = ref<string | null>(null)
 
 const formBean = ref<EditPostFormBean | null>(null)
 const previewUrl = ref<string | null>(null)
+const imageAltText = ref<string | null>(null)
 
+// --- UPLOAD INSTANTANÉ DE LA COUVERTURE 🚀 ---
 const handleCoverUpload = async (e: Event) => {
+
   const file = (e.target as HTMLInputElement).files?.[0]
+
   if (!file || !formBean.value) return
 
+
   try {
+
     loading.value = true
-    // On upload immédiatement l'image de couverture via le service unifié
-    const {id, url} = await FileService.uploadFile(file, 'IMAGE', 'post')
 
-    // On sauvegarde l'ID et l'URL dans le formBean (le fichier binaire disparaît !)
-    formBean.value.imageId = id
-    formBean.value.imageUrl = url
+    // On appelle l'upload générique (qui renvoie { id, url })
+    const { idFile } = await FileService.uploadFile(file, 'IMAGE', 'POST')
 
-    // Mise à jour de l'aperçu visuel
-    previewUrl.value = `http://localhost:4000${url}`
+    // On affecte directement l'ID à notre FormBean ! 🚀
+    formBean.value.imageId = idFile
+
   } catch (err) {
     alert("Erreur lors de l'upload de l'image de couverture.")
   } finally {
@@ -62,10 +66,6 @@ onMounted(async () => {
 
     formBean.value = await PostService.fetchPostFormData(postId.value)
 
-    // S'il y a déjà une image existante, on l'affiche
-    if (formBean.value.imageUrl) {
-      previewUrl.value = `http://localhost:4000${formBean.value.imageUrl}`
-    }
   } catch {
     errorMsg.value = "Erreur de chargement."
   } finally {

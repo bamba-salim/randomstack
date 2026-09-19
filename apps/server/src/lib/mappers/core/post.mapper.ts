@@ -1,28 +1,37 @@
-import type {EditPost, EditPostFormBean, EditFile, PostStatus, FileType, Table, FILE_TYPE, TABLE, } from '@randomstack/commons'
+import type {
+    EditPost,
+    EditPostFormBean,
+    EditFile,
+    PostStatus,
+    FileType,
+    Table,
+    FILE_TYPE,
+    TABLE,
+} from '@randomstack/commons'
+import {StrUtils} from "#utils"
+
 export default class PostMapper {
     // Convertit req.body brut en DTO d'écriture propre avec slug immuable 🚀
-    static toSavePostDTO(rawBody: any, imageId: string | null, targetId: string): EditPost {
-        const kebabTitle = String(rawBody.title || '')
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)/g, '')
-        const slug = `${kebabTitle}-${targetId}`
+    static toSavePostDTO(formBean: EditPostFormBean, idPost: string): EditPost {
+        const slug = StrUtils.slugify(formBean.title, idPost)
 
         // Parsing du tableau de blocs JSON complexe de FormData
         let contentBlocks = []
 
-        if (typeof rawBody.content === 'string') {
+        if (typeof formBean.content === 'string') {
             try {
-                contentBlocks = JSON.parse(rawBody.content)
+                contentBlocks = JSON.parse(formBean.content)
             } catch {
                 contentBlocks = []
             }
-        } else if (Array.isArray(rawBody.content)) {
-            contentBlocks = rawBody.content
+        } else if (Array.isArray(formBean.content)) {
+            contentBlocks = formBean.content
         }
 
         let tagsList: string[] = []
-        const rawTags = rawBody.tags
+
+        // TODO: use input for tags use tags from other post
+        const rawTags = formBean.tags
         if (Array.isArray(rawTags)) {
             tagsList = rawTags.map(t => String(t).trim()).filter(Boolean)
         } else if (typeof rawTags === 'string' && rawTags.trim() !== '') {
@@ -31,17 +40,17 @@ export default class PostMapper {
 
         return {
             post: {
-                id: targetId,
-                title: String(rawBody.title || '').trim(),
+                id: idPost,
+                title: String(formBean.title || '').trim(),
                 slug,
-                summary: String(rawBody.summary || '').trim(),
+                summary: String(formBean.summary || '').trim(),
                 content: contentBlocks,
-                imageId: imageId,
-                status: (rawBody.status as PostStatus) || 'DRAFT',
+                imageId: formBean.imageId,
+                status: (formBean.status as PostStatus) || 'DRAFT',
                 tags: tagsList,
-                authorIds: Array.isArray(rawBody.authorIds) ? rawBody.authorIds : [],
-                publishAt: rawBody.publishAt ? new Date(rawBody.publishAt) : null,
-                hasBeenPublished: rawBody.hasBeenPublished === 'true' || rawBody.hasBeenPublished === true
+                authorIds: Array.isArray(formBean.authorIds) ? formBean.authorIds : [],
+                publishAt: formBean.publishAt ? new Date(formBean.publishAt) : null,
+                hasBeenPublished: formBean.hasBeenPublished === 'true' || formBean.hasBeenPublished === true
             }
         }
     }
@@ -53,7 +62,7 @@ export default class PostMapper {
             title: post.title,
             summary: post.summary,
             content: post.content,
-            imageUrl: post.imageUrl,
+            imageId: post.imageId,
             status: post.status,
             tags: post.tags || [],
             authorIds: post.authorIds,
@@ -68,7 +77,7 @@ export default class PostMapper {
             title: '',
             summary: '',
             content: [],
-            imageUrl: null,
+            imageId: null,
             status: 'DRAFT',
             tags: [],
             authorIds: [],
@@ -78,18 +87,4 @@ export default class PostMapper {
         }
     }
 
-
-    static toSavePostImage(targetId, type, ext, mimeType, size, altText): EditFile {
-        return {
-            file: {
-                id: targetId,
-                type: FILE_TYPE.IMAGE,
-                category: TABLE.POST,
-                extension: ext,
-                mimeType: mimeType,
-                size: size,
-                altText: altText | null,
-            }
-        }
-    }
 }
