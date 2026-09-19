@@ -138,5 +138,13 @@ export default class AdminPostController {
         res.json({size: imageContents.length, data: imageContents})
     }
 
+    static async fetchUniqueTags(_req: Request, res: Response): Promise<void> {
+        try {
+            const tags = await PostModel.fetchUniqueTags()
+            res.json(tags)
+        } catch (error) {
+            res.status(500).json({ error: "Erreur lors de la récupération des tags." })
+        }
+    }
 
 }

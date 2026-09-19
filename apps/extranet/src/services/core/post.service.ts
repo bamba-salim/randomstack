@@ -17,4 +17,8 @@ export default class PostService extends ApiClient {
         const endpoint = `/api/admin/save-post${id ? `/${id}` : ''}`
         return await this.post<{ success: boolean; post: Post }>(endpoint, payload)
     }
+
+    static async fetchTags(): Promise<string[]> {
+        return await this.get<string[]>('/api/admin/fetch-tags')
+    }
 }

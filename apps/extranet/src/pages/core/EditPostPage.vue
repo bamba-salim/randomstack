@@ -29,7 +29,7 @@ const handleCoverUpload = async (e: Event) => {
     loading.value = true
 
     // On appelle l'upload générique (qui renvoie { id, url })
-    const { idFile } = await FileService.uploadFile(file, 'IMAGE', 'POST')
+    const {idFile} = await FileService.uploadFile(file, 'IMAGE', 'POST')
 
     // On affecte directement l'ID à notre FormBean ! 🚀
     formBean.value.imageId = idFile
@@ -58,9 +58,54 @@ const handleSave = async (status: string) => {
   }
 }
 
+// --- GESTION DES TAGS (MOTS-CLÉS) 🚀 ---
+const currentTag = ref('')
+const availableTags = ref<string[]>([]) // Stockera les suggestions de la BDD
+
+// Fonction d'ajout d'un tag au tableau
+const addTag = (value: string) => {
+  const cleanTag = value.trim().toLowerCase() // On normalise le tag (minuscules, sans espaces inutiles)
+  if (cleanTag && formBean.value && !formBean.value.tags.includes(cleanTag)) {
+    formBean.value.tags.push(cleanTag)
+  }
+  currentTag.value = '' // On vide l'input
+}
+
+// Intercepte la frappe pour détecter la virgule ou un copier-coller avec virgules 🚀
+const handleTagInput = (e: Event) => {
+  const val = (e.target as HTMLInputElement).value
+  if (val.includes(',')) {
+    // Si l'utilisateur tape une virgule ou colle "tag1, tag2", on sépare et on ajoute !
+    const newTags = val.split(',')
+    newTags.forEach(t => addTag(t))
+  }
+}
+
+// Intercepte la touche "Entrée" pour ajouter le tag sans soumettre le formulaire complet 🚀
+const handleTagEnter = (e: KeyboardEvent) => {
+  e.preventDefault()
+  addTag(currentTag.value)
+}
+
+// Supprime un badge au clic sur la croix ❌
+const removeTag = (index: number) => {
+  if (formBean.value) {
+    formBean.value.tags.splice(index, 1)
+  }
+}
+// --- FIN GESTION DES TAGS ---
+
+
 onMounted(async () => {
   loading.value = true
   try {
+
+    try {
+      availableTags.value = await PostService.fetchTags()
+    } catch {
+      console.warn("Impossible de charger les suggestions de tags.")
+    }
+
     const {id} = route.params
     postId.value = id as string | undefined
 
@@ -102,17 +147,72 @@ onMounted(async () => {
       <div class="form-group col-span-2">
         <label class="form-label">Illustration principale (Optionnelle)</label>
 
+        <!-- Structure flex-col identique au bloc IMAGE 🚀 -->
         <div class="file-upload-zone">
-          <!-- On utilise formBean.imageUrl retourné par le serveur pour l'aperçu -->
-          <img v-if="formBean.imageId" :src="`http://localhost:4000/api/files/${formBean.imageId}`" class="image-preview w-full max-w-sm"/>
+          <img
+              v-if="formBean.imageId"
+              :src="`http://localhost:4000/api/files/${formBean.imageId}`"
+              class="w-full max-h-64 object-contain mb-3 bg-white border border-[#c3c4c7] rounded shadow-sm"
+          />
+          <span v-else class="text-xs text-slate-500 font-bold mb-2 block">Sélectionnez une image de couverture :</span>
 
-          <input type="file" accept="image/*" @change="handleCoverUpload" class="file-input w-full"/>
+          <input
+              type="file"
+              accept="image/*"
+              @change="handleCoverUpload"
+              class="file-input w-full"
+          />
         </div>
       </div>
 
 
       <!-- Constructeur de Blocs -->
       <PostContentManager v-model="formBean.content"/>
+
+      <!-- SYSTÈME DE TAGS AVEC AUTOCOMPLÉTION ET BADGES 🚀 -->
+      <div class="form-group col-span-2 border border-[#c3c4c7] p-4 bg-[#f6f8fa] rounded-none">
+        <label class="form-label">Mots-clés (Tags)</label>
+        <p class="text-[10px] text-slate-500 mb-2">Séparez les tags par une virgule ou appuyez sur Entrée.</p>
+
+        <div class="flex gap-2 mb-3">
+          <input
+              v-model="currentTag"
+              @input="handleTagInput"
+              @keydown.enter="handleTagEnter"
+              list="suggested-tags"
+              type="text"
+              class="form-input flex-1"
+              placeholder="Ex: javascript, tutoriel, news..."
+          />
+          <button type="button" @click="addTag(currentTag)"
+                  class="px-4 py-2 bg-white border border-[#c3c4c7] hover:bg-[#e0e0e0] text-xs font-bold text-slate-600 rounded transition-colors duration-150">
+            Ajouter
+          </button>
+        </div>
+
+        <!-- Datalist native pour les suggestions de tags existants en BDD 🚀 -->
+        <datalist id="suggested-tags">
+          <option v-for="tag in availableTags" :key="tag" :value="tag"></option>
+        </datalist>
+
+        <!-- Zone d'affichage des badges de tags sélectionnés -->
+        <div v-if="formBean.tags.length > 0" class="flex flex-wrap gap-2 pt-2 border-t border-[#c3c4c7]/40">
+            <span
+                v-for="(tag, index) in formBean.tags"
+                :key="index"
+                class="flex items-center gap-1.5 px-2.5 py-1 bg-white border border-[#c3c4c7] rounded-full text-[10px] font-black text-slate-600 uppercase shadow-sm"
+            >
+              #{{ tag }}
+              <button type="button" @click="removeTag(index)"
+                      class="text-slate-400 hover:text-red-500 cursor-pointer font-bold text-xs ml-1 focus:outline-none">
+                ✕
+              </button>
+            </span>
+        </div>
+        <div v-else class="text-xs italic text-slate-400 pt-2 border-t border-[#c3c4c7]/40">
+          Aucun tag sélectionné.
+        </div>
+      </div>
 
 
       <div class="form-actions border-t border-[#c3c4c7] pt-6 mt-4 flex gap-3">

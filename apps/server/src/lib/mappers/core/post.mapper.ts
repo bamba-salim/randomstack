@@ -32,6 +32,7 @@ export default class PostMapper {
 
         // TODO: use input for tags use tags from other post
         const rawTags = formBean.tags
+
         if (Array.isArray(rawTags)) {
             tagsList = rawTags.map(t => String(t).trim()).filter(Boolean)
         } else if (typeof rawTags === 'string' && rawTags.trim() !== '') {

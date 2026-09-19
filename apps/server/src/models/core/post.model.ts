@@ -61,4 +61,14 @@ export default class PostModel {
             select: {content: true}
         })
     }
+
+    static async fetchUniqueTags(): Promise<string[]> {
+        const posts = await Database.client.post.findMany({
+            select: {tags: true} // Ne récupère QUE cette colonne, ignore le contenu lourd !
+        })
+
+        // Aplatit le tableau de tableaux en un seul tableau et supprime les doublons
+        const allTags = posts.flatMap(p => p.tags)
+        return Array.from(new Set(allTags)).sort()
+    }
 }

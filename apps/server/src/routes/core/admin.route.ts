@@ -58,6 +58,11 @@ export default class AdminRoute {
             AdminPostController.fetchPostsContents
         )
 
+        router.get(
+            '/fetch-tags',
+            AdminPostController.fetchUniqueTags
+        )
+
         return router
     }
 }
