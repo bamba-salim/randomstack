@@ -7,4 +7,8 @@ export default class PostService extends ApiClient {
         const query = isPreview ? '?preview=true' : ''
         return await this.get<Post>(`/api/posts/fetch-post/${slug}${query}`)
     }
+
+    static async fetchPublishedPosts(): Promise<Post[]> {
+        return await this.get<Post[]>('/api/posts/fetch-posts')
+    }
 }

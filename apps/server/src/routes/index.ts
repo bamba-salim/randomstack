@@ -11,7 +11,7 @@ export default class AppRouter {
 
         // Routage sémantique
         router.use('/', StackRoute.routes)
-        router.use('/', PostRoute.routes)
+        router.use('/posts', PostRoute.routes)
         router.use('/auth', AuthRoute.routes)
         router.use('/admin', AdminRoute.routes)
         router.use('/files', FileRoute.routes) // <-- AJOUTÉ 🚀

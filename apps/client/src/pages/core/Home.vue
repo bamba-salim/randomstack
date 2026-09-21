@@ -1,32 +1,33 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { PostService } from '#services' // <-- Ton nouveau service 🚀
+import type { Post } from '@randomstack/commons'
 
 const router = useRouter()
+const posts = ref<Post[]>([])
+const loading = ref(true)
+const error = ref<string | null>(null)
 
-// Simulation d'articles de blog (Actualités V2) pour l'affichage publicitaire initial 🚀
-const mockPosts = [
-  {
-    id: 'n1',
-    title: 'Vite v6 est officiellement disponible : performances et nouveautés',
-    excerpt: 'Découvrez comment le compilateur de RANDOMSTACK accélère vos builds de développement de manière spectaculaire.',
-    date: '10 Août 2026',
-    readTime: '3 min de lecture'
-  },
-  {
-    id: 'n2',
-    title: 'Pourquoi Svelte prend d\'assaut le monde du développement frontend',
-    excerpt: 'Une analyse complète des performances comparées avec React et Vue, et pourquoi il figure dans notre machine à sous.',
-    date: '08 Août 2026',
-    readTime: '5 min de lecture'
-  },
-  {
-    id: 'n3',
-    title: 'PostgreSQL vs NoSQL : Comment choisir sa base de données en 2026',
-    excerpt: 'Nos recommandations d\'architectures sémantiques pour concevoir des applications web stables et hautement scalables.',
-    date: '04 Août 2026',
-    readTime: '6 min de lecture'
+// Formatage propre de la date 📅
+const formatDate = (dateString: string | Date) => {
+  return new Date(dateString).toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
+}
+
+onMounted(async () => {
+  try {
+    // 1. Récupération des articles réels depuis Postgres ! 🚀
+    posts.value = await PostService.fetchPublishedPosts()
+  } catch {
+    error.value = "Impossible de récupérer les dernières actualités."
+  } finally {
+    loading.value = false
   }
-]
+})
 </script>
 
 <template>
@@ -37,17 +38,49 @@ const mockPosts = [
       <section class="news-main-section">
         <h2 class="section-title">📰 Dernières Actualités & Guides</h2>
 
-        <div class="news-list mt-4">
-          <article v-for="post in mockPosts" :key="post.id" class="news-card">
+        <div v-if="loading" class="text-xs text-blue-500 font-bold py-6 animate-pulse">
+          Chargement des actualités en temps réel...
+        </div>
+
+        <!-- Erreur -->
+        <div v-else-if="error" class="p-3 bg-red-950/10 border border-red-900/40 text-red-400 rounded-xl text-[11px] mt-4">
+          {{ error }}
+        </div>
+
+        <!-- Liste des Articles -->
+        <div v-else class="news-list mt-4">
+
+          <article
+              v-for="post in posts"
+              :key="post.id"
+              @click="router.push(`/news/${post.slug}`)"
+              class="news-card cursor-pointer"
+          >
+            <!-- Méta-données (Date & Tags) -->
             <div class="post-meta">
-              <span class="date">{{ post.date }}</span>
+              <!-- On utilise la date de publication ou de création -->
+              <span class="date">{{ formatDate(post.publishAt || post.createdAt) }}</span>
               <span class="separator">•</span>
-              <span class="read-time">{{ post.readTime }}</span>
+              <!-- On affiche le premier tag comme catégorie (optionnel) -->
+              <span v-if="post.tags && post.tags.length > 0" class="text-[#2271b1]">#{{ post.tags[0] }}</span>
             </div>
+
+            <!-- Image de couverture 🚀 -->
+            <div v-if="post.imageId" class="w-full h-40 bg-slate-50 border border-[#c3c4c7] rounded-xl overflow-hidden mb-3">
+              <img :src="`http://localhost:4000/api/files/${post.imageId}`" class="w-full h-full object-cover" />
+            </div>
+
+            <!-- Titre et Extrait -->
             <h3 class="post-title">{{ post.title }}</h3>
-            <p class="post-excerpt">{{ post.excerpt }}</p>
+            <p class="post-excerpt">{{ post.summary }}</p>
             <span class="read-more-link">Lire l'article →</span>
           </article>
+
+          <!-- État vide -->
+          <p v-if="posts.length === 0" class="text-xs text-slate-500 italic mt-6 text-center">
+            Aucun article n'a encore été publié.
+          </p>
+
         </div>
       </section>
 
@@ -77,7 +110,7 @@ const mockPosts = [
             <span class="btn-icon">📖</span>
             <div class="btn-content">
               <span class="main-label">Consulter l'Encyclopédie</span>
-              <span class="sub-label">Découvrez 67 technologies</span>
+              <span class="sub-label">Découvrez les outils</span>
             </div>
           </button>
 
