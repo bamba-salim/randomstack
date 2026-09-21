@@ -53,7 +53,7 @@ onMounted(async () => {
           <article
               v-for="post in posts"
               :key="post.id"
-              @click="router.push(`/news/${post.slug}`)"
+              @click="router.push(`/post/${post.slug}`)"
               class="news-card cursor-pointer"
           >
             <!-- Méta-données (Date & Tags) -->

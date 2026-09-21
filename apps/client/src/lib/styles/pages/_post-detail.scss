@@ -1,0 +1,29 @@
+.post-content-body {
+
+  .blog-text-paragraph {
+    @apply text-[15px] sm:text-base text-[#3c434a] leading-relaxed;
+
+    // Style automatique des balises HTML injectées par v-html
+    strong { @apply font-extrabold text-[#1d2327]; }
+    u { @apply underline decoration-[#2271b1] decoration-2 underline-offset-2; }
+    a { @apply text-[#2271b1] font-bold hover:text-[#135e96] transition-colors; }
+  }
+
+  .blog-image-block {
+    @apply flex flex-col items-center my-4 bg-[#f6f8fa] border border-[#c3c4c7] p-2;
+    img { @apply w-full h-auto object-contain max-h-[400px]; }
+    figcaption { @apply text-[10px] text-slate-500 italic mt-2 text-center; }
+  }
+
+  .blog-code-block {
+    @apply bg-slate-900 border border-slate-800 rounded-none overflow-hidden my-4;
+    .code-header { @apply bg-slate-950 text-slate-400 text-[10px] font-black uppercase tracking-widest px-4 py-2 border-b border-slate-800; }
+    pre { @apply p-4 overflow-x-auto; }
+    code { @apply text-xs text-emerald-400 font-mono leading-relaxed; }
+  }
+
+  .blog-double-column {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6 my-4;
+    .column { @apply flex flex-col gap-4 min-w-0; }
+  }
+}

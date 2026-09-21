@@ -1,11 +1,12 @@
 import {createRouter, createWebHistory} from 'vue-router'
 
-// Imports relatifs directs pour contourner le cycle d'initialisation 🚀
+import {AppLayout} from '#components'
+
 import Home from './core/Home.vue'
 import Draft from './core/Draft.vue'
 import Encyclopedia from './core/Encyclopedia.vue'
 import TechnologyDetail from './core/TechnologyDetail.vue'
-import {AppLayout} from '#components'
+import PostDetail from './core/PostDetail.vue'
 
 const router = createRouter({
     history: createWebHistory(),
@@ -38,6 +39,11 @@ const router = createRouter({
                     path: 'technology/:slug',
                     name: 'technology-detail',
                     component: TechnologyDetail
+                },
+                {
+                    path: 'post/:slug',
+                    name: 'post',
+                    component: PostDetail
                 }
             ]
         },
