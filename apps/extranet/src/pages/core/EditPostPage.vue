@@ -2,7 +2,7 @@
 import {ref, onMounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {PostService, FileService} from '#services' // <-- IMPORT FileService 🚀
-import {Sidebar, PostContentManager, BaseInput} from '#components'
+import {Sidebar, PostContentManager, BaseInput, BaseToggle} from '#components'
 import type {EditPostFormBean} from '@randomstack/commons'
 
 const route = useRoute()
@@ -132,8 +132,10 @@ onMounted(async () => {
     </div>
 
     <form v-else-if="formBean" @submit.prevent class="form-page-container">
-      <BaseInput v-model="formBean.title" label="Titre" required/>
-
+      <div class="form-group mb-2">
+        <BaseToggle v-model="formBean.isFeatured" label="🌟 Épingler cet article à la une" />
+      </div>
+        <BaseInput v-model="formBean.title" label="Titre" required />
       <div class="form-group col-span-2 flex ">
         <label class="form-label">Résumé court</label>
         <textarea
@@ -167,6 +169,7 @@ onMounted(async () => {
 
 
       <!-- Constructeur de Blocs -->
+
       <PostContentManager v-model="formBean.content"/>
 
       <!-- SYSTÈME DE TAGS AVEC AUTOCOMPLÉTION ET BADGES 🚀 -->

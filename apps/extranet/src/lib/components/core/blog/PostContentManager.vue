@@ -48,7 +48,19 @@ const handleDrop = (index: number) => {
       <button type="button" @click="addBlock('TEXT')" class="add-palette-btn">+ Texte</button>
       <button type="button" @click="addBlock('IMAGE')" class="add-palette-btn">+ Image</button>
       <button type="button" @click="addBlock('CODE')" class="add-palette-btn">+ Code</button>
-      <button type="button" @click="addBlock('DOUBLE_CONTENT')" class="add-palette-btn double-btn">+ Double Colonne</button>
+      <!-- Titraille 🚀 -->
+      <button type="button" @click="addBlock('H2')" class="add-palette-btn font-bold">+ Titre H2</button>
+      <button type="button" @click="addBlock('H3')" class="add-palette-btn font-bold">+ Titre H3</button>
+
+      <!-- Listes & Éditorial 🚀 -->
+      <button type="button" @click="addBlock('LIST_UL')" class="add-palette-btn">+ Liste Puces</button>
+      <button type="button" @click="addBlock('LIST_OL')" class="add-palette-btn">+ Liste Num.</button>
+      <button type="button" @click="addBlock('QUOTE')" class="add-palette-btn italic">+ Citation</button>
+
+      <!-- TODO: add restrict use -->
+      <button type="button" @click="addBlock('NDLR')" class="add-palette-btn bg-amber-50 text-amber-600 border-amber-200">+ NDLR</button>
+      <button type="button" @click="addBlock('DOUBLE_CONTENT')" class="add-palette-btn double-btn">+ 2 Colonne</button>
+
     </div>
   </div>
 </template>

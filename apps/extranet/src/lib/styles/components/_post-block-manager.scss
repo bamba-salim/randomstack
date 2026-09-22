@@ -33,8 +33,17 @@
 
   // --- Éléments de formulaire partagés ---
   .formatting-toolbar {
-    @apply flex items-center gap-1 bg-[#f0f0f1] border border-[#c3c4c7] p-1 rounded inline-flex;
-    .format-btn { @apply w-8 h-6 flex items-center justify-center text-xs font-normal text-slate-600 hover:bg-white rounded transition-colors cursor-pointer; }
+    // w-fit permet à la barre grise de s'étirer pour englober tous ses enfants
+    @apply flex flex-wrap items-center gap-1 mb-2 bg-[#f0f0f1] border border-[#c3c4c7] p-1 rounded w-fit max-w-full;
+
+    .format-btn {
+      // FINI le "w-8" ! On utilise "px-2.5" pour que le bouton s'adapte au texte 🚀
+      @apply px-2.5 h-7 flex items-center justify-center text-[10px] font-bold text-slate-600 hover:bg-white hover:text-[#2271b1] rounded transition-colors cursor-pointer;
+    }
+
+    .toolbar-separator {
+      @apply w-px h-4 bg-[#c3c4c7] mx-1;
+    }
   }
 
   .form-textarea {

@@ -36,6 +36,34 @@ const insertTag = (start: string, end: string) => {
   setTimeout(() => el.focus(), 0)
 }
 
+const insertList = (listType: 'ul' | 'ol') => {
+  const el = document.getElementById(`text-${uniqueId.value}`) as HTMLTextAreaElement
+  if (!el) return
+
+  const val = el.value
+  const start = el.selectionStart
+  const end = el.selectionEnd
+  const selectedText = val.substring(start, end)
+
+  let replacement = ''
+
+  if (selectedText.trim() === '') {
+    replacement = `<${listType}>\n  <li>Élément 1</li>\n  <li>Élément 2</li>\n</${listType}>\n`
+  } else {
+    const lines = selectedText.split('\n').filter(line => line.trim() !== '')
+    const listItems = lines.map(line => `  <li>${line}</li>`).join('\n')
+    replacement = `<${listType}>\n${listItems}\n</${listType}>`
+  }
+
+  const newVal = val.substring(0, start) + replacement + val.substring(end)
+  update('value', newVal)
+
+  setTimeout(() => {
+    el.focus()
+    el.setSelectionRange(start, start + replacement.length)
+  }, 0)
+}
+
 const handleImageUpload = async (event: Event, col?: 'left' | 'right') => {
   const file = (event.target as HTMLInputElement).files?.[0]
   if (!file) return
@@ -82,16 +110,45 @@ const handleNestedDrop = (targetCol: 'left' | 'right') => {
 
     <!-- 1. BLOC TEXTE -->
     <div v-if="block.type === 'TEXT'" class="w-full flex flex-col gap-2">
-      <div class="formatting-toolbar w-25">
-        <button type="button" @click="insertTag('<strong>', '</strong>')" class="format-btn font-bold">G</button>
-        <button type="button" @click="insertTag('<u>', '</u>')" class="format-btn underline">S</button>
-        <button type="button" @click="insertTag('<a href=\'URL\' target=\'_blank\'>', '</a>')"
-                class="format-btn text-blue-600">Lien
-        </button>
+      <div class="formatting-toolbar w-auto">
+        <button type="button" @click="insertTag('<strong>', '</strong>')" class="format-btn font-black" title="Gras">G</button>
+        <button type="button" @click="insertTag('<u>', '</u>')" class="format-btn underline" title="Souligné">S</button>
+        <button type="button" @click="insertTag('<i>', '</i>')" class="format-btn italic" title="Italique">I</button>
+        <button type="button" @click="insertTag('<a href=\'URL\' target=\'_blank\'>', '</a>')" class="format-btn text-blue-600">Lien</button>
+
+        <!-- Nouveaux boutons de listes 🚀 -->
+        <span class="w-px h-4 bg-slate-300 mx-1"></span> <!-- Séparateur visuel -->
+        <button type="button" @click="insertList('ul')" class="format-btn font-bold" title="Liste à puces">• Liste</button>
+        <button type="button" @click="insertList('ol')" class="format-btn font-bold" title="Liste numérotée">1. Liste</button>
       </div>
       <textarea :id="`text-${uniqueId}`" :value="block.value"
                 @input="update('value', ($event.target as HTMLTextAreaElement).value)" class="form-textarea"
                 placeholder="Rédigez votre texte ici..."></textarea>
+    </div>
+
+    <!-- TITRES (H2 et H3) 🚀 -->
+    <div v-else-if="block.type === 'H2'" class="w-full">
+      <input :value="block.value" @input="update('value', ($event.target as HTMLInputElement).value)" class="form-input-inline text-xl font-black font-serif !mb-0 placeholder:font-normal" placeholder="Gros titre de section (Sera utilisé pour le Sommaire)..." />
+    </div>
+    <div v-else-if="block.type === 'H3'" class="w-full">
+      <input :value="block.value" @input="update('value', ($event.target as HTMLInputElement).value)" class="form-input-inline text-lg font-bold !mb-0 placeholder:font-normal" placeholder="Sous-titre..." />
+    </div>
+
+    <!-- CITATION (QUOTE) 🚀 -->
+    <div v-else-if="block.type === 'QUOTE'" class="w-full border-l-4 border-[#2271b1] bg-[#f0f6fc] p-2 rounded-r">
+      <textarea :value="block.value" @input="update('value', ($event.target as HTMLTextAreaElement).value)" class="form-textarea bg-transparent border-none shadow-none italic font-serif text-slate-700 min-h-[80px]" placeholder="Saisissez une citation marquante..."></textarea>
+    </div>
+
+    <!-- NOTE DE LA RÉDACTION (NDLR) 🚀 -->
+    <div v-else-if="block.type === 'NDLR'" class="w-full border border-amber-300 bg-amber-50 p-2 rounded">
+      <div class="text-[9px] font-black text-amber-500 uppercase tracking-widest mb-1 px-2">Note de la rédaction (Invisible pour les utilisateurs standards)</div>
+      <textarea :value="block.value" @input="update('value', ($event.target as HTMLTextAreaElement).value)" class="form-textarea bg-transparent border-none shadow-none text-amber-900 min-h-[80px]" placeholder="Rédigez la note de la rédaction ici..."></textarea>
+    </div>
+
+    <!-- LISTES (UL / OL) 🚀 -->
+    <div v-else-if="block.type === 'LIST_UL' || block.type === 'LIST_OL'" class="w-full">
+      <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 px-1">Liste {{ block.type === 'LIST_UL' ? 'à puces' : 'numérotée' }} (Un élément par ligne)</div>
+      <textarea :value="block.value" @input="update('value', ($event.target as HTMLTextAreaElement).value)" class="form-textarea leading-relaxed" placeholder="Élément 1&#10;Élément 2&#10;Élément 3..."></textarea>
     </div>
 
     <!-- 2. BLOC CODE -->
@@ -118,10 +175,7 @@ const handleNestedDrop = (targetCol: 'left' | 'right') => {
     <div v-else-if="block.type === 'DOUBLE_CONTENT' && !isNested" class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
 
       <!-- COLONNE GAUCHE -->
-      <div
-          class="nested-column-editor"
-          draggable="true"
-          @dragstart.stop="handleNestedDragStart('left')"
+      <div class="nested-column-editor" draggable="true" @dragstart.stop="handleNestedDragStart('left')"
           @dragover.prevent
           @drop.stop="handleNestedDrop('left')"
           :class="{ 'nested-dragging': draggedCol === 'left' }"
@@ -135,6 +189,12 @@ const handleNestedDrop = (targetCol: 'left' | 'right') => {
                   @change="updateNestedType('left', ($event.target as HTMLSelectElement).value as BlockType)"
                   class="form-select-mini">
             <option value="TEXT">TEXTE</option>
+            <option value="H2">Titre H2</option>
+            <option value="H3">Titre H3</option>
+            <option value="LIST_UL">Liste Puces</option>
+            <option value="LIST_OL">Liste Num.</option>
+            <option value="QUOTE">Citation</option>
+            <option value="NDLR">NDLR</option>
             <option value="IMAGE">IMAGE</option>
             <option value="CODE">CODE</option>
           </select>
