@@ -51,7 +51,8 @@ export default class PostMapper {
                 tags: tagsList,
                 authorIds: Array.isArray(formBean.authorIds) ? formBean.authorIds : [],
                 publishAt: formBean.publishAt ? new Date(formBean.publishAt) : null,
-                hasBeenPublished: formBean.hasBeenPublished === 'true' || formBean.hasBeenPublished === true
+                hasBeenPublished: formBean.hasBeenPublished === 'true' || formBean.hasBeenPublished === true,
+                isFeatured: formBean.isFeatured
             }
         }
     }
@@ -68,7 +69,8 @@ export default class PostMapper {
             tags: post.tags || [],
             authorIds: post.authorIds,
             publishAt: post.publishAt ? new Date(post.publishAt).toISOString() : null,
-            hasBeenPublished: post.hasBeenPublished
+            hasBeenPublished: post.hasBeenPublished,
+            isFeatured: post.isFeatured
         }
     }
 
@@ -84,6 +86,7 @@ export default class PostMapper {
             authorIds: [],
             publishAt: null,
             hasBeenPublished: false,
+            isFeatured: false,
             logo: null
         }
     }

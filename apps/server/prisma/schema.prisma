@@ -28,7 +28,7 @@ enum PostStatus {
   PUBLISHED
   ARCHIVED
   SCHEDULED
-  DELETED     // Statut Corbeille pour suppression temporaire ou purge automatique 🚀
+  DELETED // Statut Corbeille pour suppression temporaire ou purge automatique 🚀
 }
 
 enum FileType {
@@ -39,49 +39,49 @@ enum FileType {
 }
 
 model Technology {
-  id          String            @id @default(uuid())
-  name        String            @unique
-  slug        String            @unique // Format: {nom-de-la-techno}-uuid
-  language    String
-  logo        String?
-  usage       String
-  categories  Category[]
-  isActive    Boolean           @default(true) // Disponible uniquement au tirage ou non
-  createdAt   DateTime          @default(now())
+  id         String     @id @default(uuid())
+  name       String     @unique
+  slug       String     @unique // Format: {nom-de-la-techno}-uuid
+  language   String
+  logo       String?
+  usage      String
+  categories Category[]
+  isActive   Boolean    @default(true) // Disponible uniquement au tirage ou non
+  createdAt  DateTime   @default(now())
 
   // Relation 1-à-1 : detail.id est la clé primaire ET la clé étrangère référençant l'ID de Technology
-  detail      TechnologyDetail?
+  detail TechnologyDetail?
 }
 
 // Modèle de détails d'une technologie (Lourd)
 model TechnologyDetail {
-  id           String     @id // Clé primaire identique à Technology.id (sélecteur partagé)
-  technology   Technology @relation(fields: [id], references: [id], onDelete: Cascade)
+  id         String     @id // Clé primaire identique à Technology.id (sélecteur partagé)
+  technology Technology @relation(fields: [id], references: [id], onDelete: Cascade)
 
   websiteUrl   String?
   docsUrl      String?
   creator      String?
-  foundedAt    String?    // Date/Année de création de la techno (ex: "2013")
-  versions     Json?      // JSON stockant { stable: { num: "...", date: "..." }, latest: { num: "...", date: "..." } }
-  userCount    Int?       // Nombre d'utilisateurs (ex: étoiles GitHub)
-  projectCount Int?       // Nombre de projets
-  history      String[]   // Tableau sémantique de paragraphes
-  description  String?    @db.Text // Rendu nullable avec un "?"
+  foundedAt    String? // Date/Année de création de la techno (ex: "2013")
+  versions     Json? // JSON stockant { stable: { num: "...", date: "..." }, latest: { num: "...", date: "..." } }
+  userCount    Int? // Nombre d'utilisateurs (ex: étoiles GitHub)
+  projectCount Int? // Nombre de projets
+  history      String[] // Tableau sémantique de paragraphes
+  description  String?  @db.Text // Rendu nullable avec un "?"
 }
 
 model SavedStack {
-  id          String      @id @default(uuid())
-  shareCode   String      @unique
+  id          String   @id @default(uuid())
+  shareCode   String   @unique
   projectType Category
   frontendId  String
   backendId   String
   databaseId  String
   ormId       String?
   expiresAt   DateTime
-  createdAt   DateTime    @default(now())
+  createdAt   DateTime @default(now())
 
-  userId      String?
-  user        User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // Modèle User lié bidirectionnellement aux commentaires 🚀
@@ -93,27 +93,29 @@ model User {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   savedStacks  SavedStack[]
-  comments     Comment[]    // Lien de relation obligatoire avec les commentaires 🚀
+  comments     Comment[] // Lien de relation obligatoire avec les commentaires 🚀
 }
 
 // Modèle Post enrichi des tags, de la sécurité de publication et des commentaires 🚀
 model Post {
-  id                 String     @id @default(uuid())
-  title              String
-  slug               String     @unique
-  summary            String     @db.Text
-  content            Json
-  status             PostStatus @default(DRAFT)
-  tags               String[]   // Tableau de tags sémantiques 🚀
-  hasBeenPublished   Boolean    @default(false) // Drapeau historique anti-replanification 🚀
-  authorIds          String[]
-  publishAt          DateTime?
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
-  comments           Comment[]  // Lien de relation obligatoire avec les commentaires 🚀
+  id               String     @id @default(uuid())
+  title            String
+  slug             String     @unique
+  summary          String     @db.Text
+  content          Json
+  status           PostStatus @default(DRAFT)
+  tags             String[]
+  hasBeenPublished Boolean    @default(false)
+  isFeatured       Boolean    @default(false) // <-- NOUVEAU : Article à la une 🌟
+  authorIds        String[]
+  publishAt        DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  comments         Comment[]
 
-  imageId            String?
-  image              File?      @relation(fields: [imageId], references: [id], onDelete: SetNull)
+  imageId String?
+  image   File?   @relation(fields: [imageId], references: [id], onDelete: SetNull)
+
   @@index([slug]) // Index de performance pour charger les articles instantanément via le slug
 }
 
@@ -124,23 +126,23 @@ model Comment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  postId    String
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model File {
-  id          String   @id @default(uuid())
-  type        FileType @default(IMAGE)
-  category    String   // ex: "technology", "post"
-  extension   String   // ex: ".png", ".jpg"
-  mimeType    String
-  size        Int
-  altText     String?  // Texte alternatif pour l'accessibilité et le SEO 🚀
-  createdAt   DateTime @default(now())
+  id        String   @id @default(uuid())
+  type      FileType @default(IMAGE)
+  category  String // ex: "technology", "post"
+  extension String // ex: ".png", ".jpg"
+  mimeType  String
+  size      Int
+  altText   String? // Texte alternatif pour l'accessibilité et le SEO 🚀
+  createdAt DateTime @default(now())
 
   // Relations inverses
-  posts        Post[]
+  posts Post[]
 }

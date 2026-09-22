@@ -40,7 +40,13 @@ export const BLOCK_TYPE = {
     IMAGE: 'IMAGE',
     VIDEO: 'VIDEO',
     CODE: 'CODE',
-    DOUBLE_CONTENT: 'DOUBLE_CONTENT'
+    DOUBLE_CONTENT: 'DOUBLE_CONTENT',
+    H2: 'H2',
+    H3: 'H3',
+    QUOTE: 'QUOTE',
+    NDLR: 'NDLR',
+    LIST_UL: 'LIST_UL',
+    LIST_OL: 'LIST_OL'
 }
 
 export type FileType = typeof FILE_TYPE[keyof typeof FILE_TYPE]

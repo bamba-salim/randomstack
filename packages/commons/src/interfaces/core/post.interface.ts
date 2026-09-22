@@ -19,6 +19,7 @@ export interface Post {
     status: PostStatus
     tags: string[]
     hasBeenPublished: boolean
+    isFeatured: boolean
     authorIds: string[]
     publishAt: string | Date | null
     createdAt: string | Date
@@ -42,4 +43,5 @@ export interface EditPostFormBean {
     authorIds: string[]
     publishAt?: string | null
     hasBeenPublished?: boolean
+    isFeatured: boolean
 }
