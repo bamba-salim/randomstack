@@ -1,14 +1,74 @@
+/* Styles spécifiques aux éléments du corps de l'article (Read-Only) 🚀 */
 .post-content-body {
 
+  // Texte standard : 1.25rem 🚀
   .blog-text-paragraph {
-    @apply text-[15px] sm:text-base text-[#3c434a] leading-relaxed;
+    @apply text-[#3c434a] leading-relaxed;
+    font-size: 1.25rem;
 
-    // Style automatique des balises HTML injectées par v-html
+    ul {
+      @apply list-disc pl-8 my-4 flex flex-col gap-2;
+    }
+    ol {
+      @apply list-decimal pl-8 my-4 flex flex-col gap-2;
+    }
+    li {
+      @apply pl-1;
+      &::marker {
+        @apply text-[#2271b1] font-bold; // Colore les puces/numéros en bleu pour un look premium
+      }
+    }
+
     strong { @apply font-extrabold text-[#1d2327]; }
     u { @apply underline decoration-[#2271b1] decoration-2 underline-offset-2; }
     a { @apply text-[#2271b1] font-bold hover:text-[#135e96] transition-colors; }
+
+
   }
 
+  // Titre H2 : 2rem 🚀
+  .blog-h2 {
+    @apply font-extrabold text-[#1d2327] mt-8 mb-2 tracking-tight;
+    font-size: 2rem;
+    font-family: 'Georgia', serif;
+  }
+
+  // Titre H3 : 1.75rem 🚀
+  .blog-h3 {
+    @apply font-bold text-[#1d2327] mt-6 mb-2 tracking-tight;
+    font-size: 1.75rem;
+    font-family: 'Georgia', serif;
+  }
+
+  // Citation
+  .blog-quote {
+    @apply border-l-4 border-[#2271b1] bg-[#f0f6fc] p-6 italic text-slate-700 font-serif my-4 rounded-r;
+    font-size: 1.25rem;
+  }
+
+  // Note de la rédaction (NDLR)
+  .blog-ndlr {
+    @apply border border-amber-300 bg-amber-50 p-4 my-4 rounded flex flex-col gap-2;
+    .ndlr-badge { @apply text-[10px] font-black text-amber-600 uppercase tracking-widest; }
+    .ndlr-text { @apply text-sm text-amber-900 font-medium leading-relaxed; }
+  }
+
+  // Listes (Puces et Numéros) 🚀
+  .blog-list {
+    @apply flex flex-col gap-2 my-2 pl-6 text-[#3c434a] leading-relaxed;
+    font-size: 1.25rem;
+
+    li {
+      strong { @apply font-extrabold text-[#1d2327]; }
+      u { @apply underline decoration-[#2271b1] decoration-2; }
+      a { @apply text-[#2271b1] font-bold hover:text-[#135e96] transition-colors; }
+    }
+
+    &.ul { @apply list-disc; }
+    &.ol { @apply list-decimal; }
+  }
+
+  // Autres blocs (Image, Code, Double Colonne)
   .blog-image-block {
     @apply flex flex-col items-center my-4 bg-[#f6f8fa] border border-[#c3c4c7] p-2;
     img { @apply w-full h-auto object-contain max-h-[400px]; }

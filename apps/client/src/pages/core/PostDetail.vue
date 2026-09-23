@@ -1,30 +1,23 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { PostService } from '#services'
-import { BlockRenderer } from '#components' // Notre aiguilleur de blocs ! 🚀
+import { BlockRenderer } from '#components'
 import type { Post } from '@randomstack/commons'
 
 const route = useRoute()
-const router = useRouter()
-
 const post = ref<Post | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 
-// Formatage propre de la date
 const formatDate = (dateString: string | Date) => {
   return new Date(dateString).toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
+    day: 'numeric', month: 'long', year: 'numeric'
   })
 }
 
 onMounted(async () => {
   const slug = route.params['slug'] as string
-
-  // Vérifie si on est en mode prévisualisation depuis l'Extranet 🚀
   const isPreview = route.query['preview'] === 'true'
 
   try {
@@ -39,29 +32,26 @@ onMounted(async () => {
 
 <template>
   <div class="technology-detail-page-container">
-    <div v-if="loading" class="loading-state">
-      Chargement de l'article...
-    </div>
+    <div v-if="loading" class="loading-state">Chargement de l'article...</div>
+    <div v-else-if="error" class="error-state">{{ error }}</div>
 
-    <div v-else-if="error" class="error-state">
-      {{ error }}
-    </div>
-
-    <!-- GABARIT DE LECTURE (S'adapte parfaitement au design clair de l'encyclopédie) 🚀 -->
     <article v-else-if="post" class="detail-layout-card max-w-4xl mx-auto !p-8 sm:!p-12">
 
-      <!-- BREADCRUMB (FIL D'ARIANE) -->
+      <!-- BREADCRUMB (FIL D'ARIANE) CORRIGÉ 🚀 -->
       <nav class="breadcrumb-nav">
-        <router-link to="/">Lobby</router-link>
-        <span class="separator">/</span>
-        <span class="current">Actualités</span>
+        <router-link to="/">Blog</router-link>
+
+        <template v-if="post.tags && post.tags.length > 0">
+          <span class="separator">/</span>
+          <span class="current uppercase">{{ post.tags[0] }}</span>
+        </template>
+
         <span class="separator">/</span>
         <span class="current">{{ post.title }}</span>
       </nav>
 
       <!-- EN-TÊTE DE L'ARTICLE -->
       <header class="post-header mb-8 border-b border-[#c3c4c7]/40 pb-8 mt-4">
-        <!-- Tags -->
         <div v-if="post.tags && post.tags.length > 0" class="flex flex-wrap gap-2 mb-4">
           <span v-for="tag in post.tags" :key="tag" class="px-2.5 py-0.5 rounded-none text-[9px] font-extrabold uppercase border border-[#c3c4c7] text-slate-500 bg-[#f6f8fa]">
             #{{ tag }}
@@ -83,14 +73,9 @@ onMounted(async () => {
         <img :src="`http://localhost:4000/api/files/${post.imageId}`" class="w-full h-auto max-h-[500px] object-cover" />
       </figure>
 
-      <!-- CORPS DE L'ARTICLE (GÉNÉRÉ PAR BLOCKS) 🚀 -->
+      <!-- CORPS DE L'ARTICLE 🚀 -->
       <div class="post-content-body flex flex-col gap-6 w-full text-left">
-        <!-- On boucle sur les blocs JSON et l'aiguilleur dessine le HTML correspondant -->
-        <BlockRenderer
-            v-for="(block, index) in post.content"
-            :key="index"
-            :block="block"
-        />
+        <BlockRenderer v-for="(block, index) in post.content" :key="index" :block="block" />
       </div>
 
     </article>
