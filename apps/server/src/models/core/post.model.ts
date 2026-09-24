@@ -71,4 +71,31 @@ export default class PostModel {
         const allTags = posts.flatMap(p => p.tags)
         return Array.from(new Set(allTags)).sort()
     }
+
+    // 1. Cherche l'article explicitement mis en avant par l'admin 🚀
+    static async fetchExplicitFeaturedPost() {
+        return await Database.client.post.findFirst({
+            where: { status: 'PUBLISHED', isFeatured: true },
+            orderBy: { publishAt: 'desc' }
+        })
+    }
+
+    // 2. Cherche l'article publié le plus récent 🚀
+    static async fetchLatestPost() {
+        return await Database.client.post.findFirst({
+            where: { status: 'PUBLISHED' },
+            orderBy: { publishAt: 'desc' }
+        })
+    }
+
+    // 3. Récupère la liste des articles (en excluant l'article à la une) 🚀
+    static async fetchPublishedPosts(excludeId?: string) {
+        return await Database.client.post.findMany({
+            where: {
+                status: 'PUBLISHED',
+                id: excludeId ? { not: excludeId } : undefined
+            },
+            orderBy: { publishAt: 'desc' }
+        })
+    }
 }

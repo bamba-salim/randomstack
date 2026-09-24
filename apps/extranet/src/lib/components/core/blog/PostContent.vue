@@ -220,6 +220,12 @@ const handleNestedDrop = (targetCol: 'left' | 'right') => {
                   @change="updateNestedType('right', ($event.target as HTMLSelectElement).value as BlockType)"
                   class="form-select-mini">
             <option value="TEXT">TEXTE</option>
+            <option value="H2">Titre H2</option>
+            <option value="H3">Titre H3</option>
+            <option value="LIST_UL">Liste Puces</option>
+            <option value="LIST_OL">Liste Num.</option>
+            <option value="QUOTE">Citation</option>
+            <option value="NDLR">NDLR</option>
             <option value="IMAGE">IMAGE</option>
             <option value="CODE">CODE</option>
           </select>

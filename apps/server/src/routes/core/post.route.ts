@@ -12,7 +12,7 @@ export default class PostRoute {
 
         router.get(
             '/fetch-posts',
-            PostController.fetchPosts
+            PostController.fetchPublishedPosts
         )
 
         return router

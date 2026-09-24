@@ -43,7 +43,11 @@ onMounted(async () => {
 
         <template v-if="post.tags && post.tags.length > 0">
           <span class="separator">/</span>
-          <span class="current uppercase">{{ post.tags[0] }}</span>
+
+          <router-link :to="`/${post.tags[0]}`">
+            <span class="current uppercase">{{ post.tags[0] }}</span>
+          </router-link>
+
         </template>
 
         <span class="separator">/</span>
@@ -52,11 +56,6 @@ onMounted(async () => {
 
       <!-- EN-TÊTE DE L'ARTICLE -->
       <header class="post-header mb-8 border-b border-[#c3c4c7]/40 pb-8 mt-4">
-        <div v-if="post.tags && post.tags.length > 0" class="flex flex-wrap gap-2 mb-4">
-          <span v-for="tag in post.tags" :key="tag" class="px-2.5 py-0.5 rounded-none text-[9px] font-extrabold uppercase border border-[#c3c4c7] text-slate-500 bg-[#f6f8fa]">
-            #{{ tag }}
-          </span>
-        </div>
 
         <h1 class="text-3xl sm:text-4xl font-extrabold text-[#1d2327] tracking-tight leading-snug mb-4" style="font-family: 'Georgia', serif;">
           {{ post.title }}
@@ -77,6 +76,23 @@ onMounted(async () => {
       <div class="post-content-body flex flex-col gap-6 w-full text-left">
         <BlockRenderer v-for="(block, index) in post.content" :key="index" :block="block" />
       </div>
+      <hr class="text-[#c3c4c7]" />
+      <div v-if="post.tags && post.tags.length > 0" class="flex flex-wrap gap-2">
+        <router-link
+            v-for="tag in post.tags"
+            :key="tag"
+            :to="`/${tag}`"
+            class="px-2.5 py-0.5 rounded-none text-[1rem] font-extrabold uppercase border border-[#c3c4c7] text-slate-500 bg-[#f6f8fa] hover:bg-white hover:text-[#2271b1] hover:border-[#2271b1] transition-colors duration-150 cursor-pointer"
+        >
+          #{{ tag }}
+        </router-link>
+
+      </div>
+      <hr class="text-[#c3c4c7]" />
+        <h2>recommendation</h2>
+      <hr class="text-[#c3c4c7]" />
+        <h2>COMMENT</h2>
+
 
     </article>
   </div>

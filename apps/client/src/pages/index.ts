@@ -7,6 +7,8 @@ import Draft from './core/Draft.vue'
 import Encyclopedia from './core/Encyclopedia.vue'
 import TechnologyDetail from './core/TechnologyDetail.vue'
 import PostDetail from './core/PostDetail.vue'
+import TagPosts from './core/TagPosts.vue'
+
 
 const router = createRouter({
     history: createWebHistory(),
@@ -28,7 +30,7 @@ const router = createRouter({
                 {
                     path: '/',
                     name: 'home',
-                    component: Home // 1. LOBBY : Standalone en dehors du Layout global 🚀
+                    component: Home
                 },
                 {
                     path: 'encyclopedia',
@@ -41,9 +43,14 @@ const router = createRouter({
                     component: TechnologyDetail
                 },
                 {
-                    path: 'post/:slug',
+                    path: 'blog/:slug',
                     name: 'post',
                     component: PostDetail
+                },
+                {
+                    path: '/:tag',
+                    name: 'tag',
+                    component: TagPosts
                 }
             ]
         },

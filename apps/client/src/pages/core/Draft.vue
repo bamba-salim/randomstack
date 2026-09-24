@@ -346,6 +346,7 @@ onMounted(async () => {
                 </div>
                 <div v-if="databaseReel.length === 0" class="reel-item">
                   <span class="text-slate-600 font-black text-xs">PRÊT</span>
+                  <span class="text-slate-600 font-black text-xs">PRÊT</span>
                 </div>
               </div>
             </div>
