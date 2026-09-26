@@ -52,13 +52,6 @@ export default class PostController {
             // Étape C : On récupère tout le reste du flux via le Modèle
             const otherPosts = await PostModel.fetchPublishedPosts(excludeId)
 
-            otherPosts.forEach(post => {
-                console.log(post.title, post.createdAt)
-            })
-
-
-
-
             // Étape D : On renvoie la structure propre au client Front-end 🚀
             res.json({
                 featured: PostMapper.buildFeaturedPost(featuredPost),

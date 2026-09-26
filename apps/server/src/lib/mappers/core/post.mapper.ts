@@ -17,6 +17,8 @@ export default class PostMapper {
 
         // Parsing du tableau de blocs JSON complexe de FormData
         let contentBlocks = []
+        let finalPublishAt = formBean.publishAt ? new Date(formBean.publishAt) : null
+
 
         if (typeof formBean.content === 'string') {
             try {
@@ -39,6 +41,11 @@ export default class PostMapper {
             tagsList = rawTags.split(',').map(t => t.trim()).filter(Boolean)
         }
 
+        const status = (formBean.status as PostStatus) || 'DRAFT'
+        if (status === 'PUBLISHED' && !finalPublishAt) {
+            finalPublishAt = new Date()
+        }
+
         return {
             post: {
                 id: idPost,
@@ -47,10 +54,10 @@ export default class PostMapper {
                 summary: String(formBean.summary || '').trim(),
                 content: contentBlocks,
                 imageId: formBean.imageId,
-                status: (formBean.status as PostStatus) || 'DRAFT',
+                status: status,
                 tags: tagsList,
                 authorIds: Array.isArray(formBean.authorIds) ? formBean.authorIds : [],
-                publishAt: formBean.publishAt ? new Date(formBean.publishAt) : null,
+                publishAt: finalPublishAt,
                 hasBeenPublished: formBean.hasBeenPublished === 'true' || formBean.hasBeenPublished === true,
                 isFeatured: formBean.isFeatured
             }
