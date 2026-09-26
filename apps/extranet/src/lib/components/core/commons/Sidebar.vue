@@ -44,8 +44,8 @@ const handleLogout = async () => {
       </router-link>
 
       <router-link
-          to="/posts"
-          :class="['nav-link', { 'active': route.path === '/posts' || route.path.startsWith('/edit-post') }]"
+          to="/manage-post"
+          :class="['nav-link', { 'active': route.path === '/manage-post' || route.path.startsWith('/edit-post') }]"
       >
         📰 Gérer les Actualités
       </router-link>

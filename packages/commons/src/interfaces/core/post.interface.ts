@@ -64,3 +64,12 @@ export interface ListedPost {
     image: string
     mainTag: string
 }
+
+export interface AdminPostList {
+    id: string
+    title: string
+    status: PostStatus
+    tags: string[]
+    imageId: string | null
+    publishAt?: string | null
+}

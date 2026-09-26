@@ -50,7 +50,7 @@ const handleSave = async (status: string) => {
   try {
     // FINI LE FORMDATA : On envoie directement le JSON pur 🚀
     await PostService.save(formBean.value, postId.value)
-    router.push('/posts')
+    router.push('/manage-post')
   } catch (err: any) {
     errorMsg.value = err.message || "Erreur d'enregistrement de l'article."
   } finally {

@@ -2,14 +2,15 @@ import type {Request, Response} from 'express'
 import crypto from 'crypto'
 import {PostModel} from '#models'
 import {FileAction} from '#action-support'
-import {PostMapper} from '#mappers'
+import {PostMapper as old} from '#mappers'
+import {PostMapper} from "#modules"
 import {type FILE_TYPE, type PostContentBlock, type TABLE, type BLOCK_TYPE, type EditPostFormBean} from '@randomstack/commons'
 
 export default class AdminPostController {
 
     static async fetchEditPostInitialData(req: Request, res: Response): Promise<void> {
         try {
-            let flatFormBean = PostMapper.getInitialFormBean()
+            let flatFormBean = old.getInitialFormBean()
             const {id} = req.params
 
             if (id) {
@@ -18,7 +19,7 @@ export default class AdminPostController {
                     res.status(404).json({error: 'Article introuvable.'})
                     return
                 }
-                flatFormBean = PostMapper.fromDBToClientFormBean(post)
+                flatFormBean = old.fromDBToClientFormBean(post)
             }
 
             res.json(flatFormBean)
@@ -75,7 +76,7 @@ export default class AdminPostController {
 
             // LE BLOC "if (req.file)" A DISPARU : L'upload a déjà été fait avant la sauvegarde ! 🚀
 
-            const saveDTO = PostMapper.toSavePostDTO({
+            const saveDTO = old.toSavePostDTO({
                 ...req.body,
                 status: finalStatus,
                 hasBeenPublished: hasBeenPublishedFlag
@@ -95,7 +96,8 @@ export default class AdminPostController {
     static async fetchPosts(_req: Request, res: Response): Promise<void> {
         try {
             const posts = await PostModel.fetchAllPosts()
-            res.json(posts)
+
+            res.json(PostMapper.buildAdminPostList(posts))
         } catch (error: any) {
             console.error("[AdminPostController] Erreur fetchAll :", error)
             res.status(500).json({error: "Impossible de récupérer les articles."})

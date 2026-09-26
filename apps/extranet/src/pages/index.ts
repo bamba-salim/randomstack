@@ -8,7 +8,7 @@ import Login from './core/LoginPage.vue'
 import Dashboard from './core/DashboardPage.vue'
 import TechnologyForm from './core/EditTechnologyPage.vue'
 import PostForm from './core/EditPostPage.vue'
-import PostList from './core/PostListPage.vue'
+import ManagePost from './core/ManagePost.vue'
 
 
 const router = createRouter({
@@ -37,9 +37,9 @@ const router = createRouter({
                     component: TechnologyForm
                 },
                 {
-                    path: 'posts',
-                    name: 'post-list',
-                    component: PostList
+                    path: 'manage-post',
+                    name: 'manage-post',
+                    component: ManagePost
                 },
                 {
                     path: 'edit-post/:id?',

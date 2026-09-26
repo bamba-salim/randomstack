@@ -1,4 +1,4 @@
-import type {FeaturedPost, ListedPost, Post} from '@randomstack/commons'
+import type {FeaturedPost, ListedPost, Post, AdminPostList} from '@randomstack/commons'
 
 export default class PostMapper {
 
@@ -29,6 +29,21 @@ export default class PostMapper {
 
     static buildListedPostList(posts: Post[]) {
         return posts.map(post => this.buildListedPost(post))
+    }
+
+    static buildAdminPost(post: Post): AdminPostList {
+        return {
+            id: post.id,
+            title: post.title,
+            status: post.status,
+            tags: post.tags,
+            imageId: post.imageId,
+            publishAt: post.publishAt
+        }
+    }
+
+    static buildAdminPostList(posts: Post[]) {
+        return posts.map(post => this.buildAdminPost(post))
     }
 
 }
