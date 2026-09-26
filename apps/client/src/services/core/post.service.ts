@@ -11,4 +11,5 @@ export default class PostService extends ApiClient {
     static async fetchPublishedPosts(): Promise<Post[]> {
         return await this.get<Post[]>('/api/posts/fetch-posts')
     }
+
 }

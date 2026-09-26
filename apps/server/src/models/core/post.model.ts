@@ -16,7 +16,8 @@ export default class PostModel {
 
     static async fetchPublishedPost() {
         return await Database.client.post.findMany({
-            where: {status: 'PUBLISHED'}
+            where: {status: 'PUBLISHED'},
+            orderBy: {createdAt: 'desc'}
         })
     }
 

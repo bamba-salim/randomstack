@@ -45,3 +45,22 @@ export interface EditPostFormBean {
     hasBeenPublished?: boolean
     isFeatured: boolean
 }
+
+// PUBLIC INTERFACE
+
+export interface FeaturedPost {
+    id: string
+    slug: string
+    title: string
+    summary: string
+    image: string
+    mainTag: string
+}
+
+export interface ListedPost {
+    id: string
+    slug: string
+    title: string
+    image: string
+    mainTag: string
+}

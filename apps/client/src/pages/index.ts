@@ -43,12 +43,12 @@ const router = createRouter({
                     component: TechnologyDetail
                 },
                 {
-                    path: 'blog/:slug',
+                    path: ':tag/:slug',
                     name: 'post',
                     component: PostDetail
                 },
                 {
-                    path: '/:tag',
+                    path: ':tag',
                     name: 'tag',
                     component: TagPosts
                 }

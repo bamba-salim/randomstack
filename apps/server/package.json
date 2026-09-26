@@ -7,9 +7,9 @@
     "dev": "tsx watch src/index.ts"
   },
   "imports": {
-    "#config": {
-      "development": "./src/config/index.ts",
-      "default": "./dist/config/index.js"
+    "#modules": {
+      "development": "./src/modules/index.ts",
+      "default": "./dist/modules/index.js"
     },
     "#db": {
       "development": "./src/lib/db/index.ts",

@@ -1,27 +1,22 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { PostService } from '#services' // <-- Ton nouveau service 🚀
+import { PostService } from '#services'
+import { FeaturedPostCard, PostCard } from '#components' // 🚀
 import type { Post } from '@randomstack/commons'
 
 const router = useRouter()
+
+const featuredPost = ref<Post | null>(null)
 const posts = ref<Post[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 
-// Formatage propre de la date 📅
-const formatDate = (dateString: string | Date) => {
-  return new Date(dateString).toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  })
-}
-
 onMounted(async () => {
   try {
-    // 1. Récupération des articles réels depuis Postgres ! 🚀
-    posts.value = await PostService.fetchPublishedPosts()
+    const response = await PostService.fetchPublishedPosts()
+    featuredPost.value = response.featured
+    posts.value = response.posts
   } catch {
     error.value = "Impossible de récupérer les dernières actualités."
   } finally {
@@ -32,72 +27,46 @@ onMounted(async () => {
 
 <template>
   <div class="lobby-page-container">
-    <div class="lobby-layout-grid max-w-5xl w-full">
+    <div class="lobby-layout-grid max-w-6xl w-full mx-auto">
 
-      <!-- COLONNE GAUCHE : LE PORTAIL DE NEWS / ACTUALITÉS (MONÉTISATION PUB) 🚀 -->
-      <section class="news-main-section">
-        <h2 class="section-title">📰 Dernières Actualités & Guides</h2>
+      <!-- COLONNE GAUCHE : LE FLUX D'ACTUALITÉS 🚀 -->
+      <section class="news-main-section flex-1 min-w-0">
+        <h2 class="section-title mb-4">📰 Dernières Actualités</h2>
 
         <div v-if="loading" class="text-xs text-blue-500 font-bold py-6 animate-pulse">
-          Chargement des actualités en temps réel...
+          Chargement des actualités...
         </div>
 
-        <!-- Erreur -->
-        <div v-else-if="error" class="p-3 bg-red-950/10 border border-red-900/40 text-red-400 rounded-xl text-[11px] mt-4">
+        <div v-else-if="error" class="p-4 bg-red-50 border border-red-200 text-red-600 rounded-none text-xs">
           {{ error }}
         </div>
 
-        <!-- Liste des Articles -->
-        <div v-else class="news-list mt-4">
+        <div v-else class="flex flex-col gap-8 w-full">
 
-          <article
-              v-for="post in posts"
-              :key="post.id"
-              @click="router.push(`/blog/${post.slug}`)"
-              class="news-card cursor-pointer"
-          >
-            <!-- Méta-données (Date & Tags) -->
-            <div class="post-meta">
-              <!-- On utilise la date de publication ou de création -->
-              <span class="date">{{ formatDate(post.publishAt || post.createdAt) }}</span>
-              <span class="separator">•</span>
-              <!-- On affiche le premier tag comme catégorie (optionnel) -->
-              <span v-if="post.tags && post.tags.length > 0" class="text-[#2271b1]">#{{ post.tags[0] }}</span>
-            </div>
+          <!-- 1. L'ARTICLE À LA UNE (En Haut) 🚀 -->
+          <FeaturedPostCard v-if="featuredPost" :post="featuredPost" />
 
-            <!-- Image de couverture 🚀 -->
-            <div v-if="post.imageId" class="w-full h-40 bg-slate-50 border border-[#c3c4c7] rounded-xl overflow-hidden mb-3">
-              <img :src="`http://localhost:4000/api/files/${post.imageId}`" class="w-full h-full object-cover" />
-            </div>
+          <!-- 2. LA GRILLE DES AUTRES ARTICLES (2 Colonnes en dessous) 🚀 -->
+          <div v-if="posts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
+            <PostCard v-for="post in posts" :key="post.id" :post="post" />
+          </div>
 
-            <!-- Titre et Extrait -->
-            <h3 class="post-title">{{ post.title }}</h3>
-            <p class="post-excerpt">{{ post.summary }}</p>
-            <span class="read-more-link">Lire l'article →</span>
-          </article>
-
-          <!-- État vide -->
-          <p v-if="posts.length === 0" class="text-xs text-slate-500 italic mt-6 text-center">
+          <p v-if="!featuredPost && posts.length === 0" class="text-xs text-slate-500 italic text-center py-8 border border-dashed border-[#c3c4c7] bg-white">
             Aucun article n'a encore été publié.
           </p>
 
         </div>
       </section>
 
-      <!-- COLONNE DROITE : LE MEUBLE DE CONTRÔLE (ENTRÉES DE TIROIRS) 🚀 -->
-      <aside class="lobby-control-sidebar">
-
-        <!-- Boîte de bienvenue de RANDOMSTACK -->
+      <!-- COLONNE DROITE : LE MEUBLE ARCADE (Générateur & Encyclopédie) -->
+      <aside class="lobby-control-sidebar w-full md:w-80 shrink-0">
         <div class="welcome-box">
           <h1 class="brand-title">RANDOMSTACK</h1>
-          <p class="brand-description">Votre cabinet d'arcade pour concevoir des piles technologiques aléatoires et explorer l'écosystème web.</p>
+          <p class="brand-description">Votre cabinet d'arcade pour concevoir des piles technologiques de pointe et explorer l'écosystème web.</p>
         </div>
 
-        <!-- Raccourcis d'action néons -->
         <div class="shortcuts-grid">
-
-          <!-- Raccourci vers le Générateur -->
-          <button @click="router.push('/draft')" class="arcade-shortcut-btn generator-btn">
+          <button @click="router.push('/mix')" class="arcade-shortcut-btn generator-btn">
             <span class="btn-icon">🕹️</span>
             <div class="btn-content">
               <span class="main-label">Lancer le Générateur</span>
@@ -105,17 +74,14 @@ onMounted(async () => {
             </div>
           </button>
 
-          <!-- Raccourci vers l'Encyclopédie -->
           <button @click="router.push('/encyclopedia')" class="arcade-shortcut-btn encyclopedia-btn">
             <span class="btn-icon">📖</span>
             <div class="btn-content">
-              <span class="main-label">Consulter l'Encyclopédie</span>
+              <span class="main-label">L'Encyclopédie</span>
               <span class="sub-label">Découvrez les outils</span>
             </div>
           </button>
-
         </div>
-
       </aside>
 
     </div>
