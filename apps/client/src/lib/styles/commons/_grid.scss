@@ -1,0 +1,20 @@
+// --- SYSTÈME DE GRILLES UNIVERSELLES POUR CARTES ---
+.grid-cards {
+  @apply grid w-full gap-6;
+  grid-template-columns: 1fr; // 1 colonne sur smartphone par défaut
+
+  // 1. Grille à 2 colonnes (Articles de blog, Page Tag, Home)
+  &--2 {
+    @apply sm:grid-cols-2;
+  }
+
+  // 2. Grille à 3 colonnes (Recommandations / Articles similaires sous un article)
+  &--3 {
+    @apply sm:grid-cols-2 lg:grid-cols-3;
+  }
+
+  // 3. Grille à 4 colonnes (Encyclopédie des technologies)
+  &--4 {
+    @apply sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4;
+  }
+}

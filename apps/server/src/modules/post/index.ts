@@ -1,1 +1,0 @@
-export {default as PostMapper} from './core/post.mapper'

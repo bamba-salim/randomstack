@@ -1,19 +1,35 @@
 @use "tailwindcss";
 
+// 1. Tokens & Variables globales (Mobile/Desktop, palettes éditoriale et arcade)
+@use "./tokens/variables";
 
-// Importation des sous-fichiers de pages`
+// 2. Layout global & conteneur réutilisable
 @use "./layout/layout";
 
-@use "./components/header";
-@use "./components/footer";
-@use "./components/pagination";
-@use "./components/post-cards";
+@use './commons/ui-states';
 
+@use './commons/app-footer';
+@use './commons/app-header';
+@use './commons/badges';
+@use './commons/breadcrumbs';
+@use './commons/buttons';
+@use './commons/cards';
+@use './commons/grid';
+@use './commons/page-header';
+@use './commons/pagination';
 
+@use './modules/home';
 
-@use "./pages/home";
-@use "./pages/draft";
-@use "./pages/encyclopedia";
-@use "./pages/detail";
-@use "./pages/post-detail";
+@use './modules/blog/components/article-cards';
+@use './modules/blog/components/article-content';
+@use './modules/blog/view/article-detail';
+
+@use './modules/stack/components/blacklist-drawer';
+@use './modules/stack/components/history-drawer';
+@use './modules/stack/components/share-modal';
+@use './modules/stack/components/slot-reel';
+@use './modules/stack/components/tech-card';
+@use './modules/stack/view/encyclopedia';
+@use './modules/stack/view/generator';
+@use './modules/stack/view/technology-detail';
 

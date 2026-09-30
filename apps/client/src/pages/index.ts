@@ -2,12 +2,12 @@ import {createRouter, createWebHistory} from 'vue-router'
 
 import {AppLayout} from '#components'
 
-import Home from './core/Home.vue'
-import Draft from './core/Draft.vue'
-import Encyclopedia from './core/Encyclopedia.vue'
-import TechnologyDetail from './core/TechnologyDetail.vue'
-import PostDetail from './core/PostDetail.vue'
-import TagPosts from './core/TagPosts.vue'
+import HomeView from './core/HomeView.vue'
+import GeneratorView from './core/GeneratorView.vue'
+import EncyclopediaView from './core/EncyclopediaView.vue'
+import TechnologyDetailView from './core/TechnologyDetailView.vue'
+import ArticleDetailView from './core/ArticleDetailView.vue'
+import TagPostsView from './core/TagPostsView.vue'
 
 
 const router = createRouter({
@@ -16,41 +16,41 @@ const router = createRouter({
         {
             path: '/',
             name: 'home',
-            component: Home // 1. LOBBY : Standalone en dehors du Layout global 🚀
+            component: HomeView
         },
         {
             path: '/draft/:shareCode?',
-            name: 'draft',
-            component: Draft // 2. GÉNÉRATEUR : Standalone en dehors du Layout global 🚀
+            name: 'Generator',
+            component: GeneratorView
         },
         {
             path: '/',
-            component: AppLayout, // 3. ENCYCLOPÉDIE & PAGES FUTURES : Enveloppées dans le Layout 🚀
+            component: AppLayout,
             children: [
                 {
                     path: '/',
                     name: 'home',
-                    component: Home
+                    component: HomeView
                 },
                 {
                     path: 'encyclopedia',
                     name: 'encyclopedia',
-                    component: Encyclopedia
+                    component: EncyclopediaView
                 },
                 {
                     path: 'technology/:slug',
                     name: 'technology-detail',
-                    component: TechnologyDetail
+                    component: TechnologyDetailView
                 },
                 {
                     path: ':tag/:slug',
                     name: 'post',
-                    component: PostDetail
+                    component: ArticleDetailView
                 },
                 {
                     path: ':tag',
                     name: 'tag',
-                    component: TagPosts
+                    component: TagPostsView
                 }
             ]
         },

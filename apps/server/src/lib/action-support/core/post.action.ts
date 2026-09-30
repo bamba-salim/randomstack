@@ -15,8 +15,6 @@ export default class PostAction {
             const ageInMilliseconds = Date.now() - new Date(publishDate).getTime()
             const ageInHours = ageInMilliseconds / (1000 * 60 * 60)
 
-            console.log(ageInHours)
-
             if (ageInHours > 48) {
                 // Trop vieux ! On annule la sélection 🚀
                 featured = null

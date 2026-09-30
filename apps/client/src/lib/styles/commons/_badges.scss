@@ -1,0 +1,29 @@
+// --- BADGE UNIVERSEL (Tags, Catégories, Versions, Métadonnées) ---
+.badge {
+  @apply inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 select-none transition-colors duration-150;
+  border-radius: 2px;
+
+  // 1. Variante Neutre (défaut pour versions, métadonnées, gris doux)
+  &--neutral {
+    @apply bg-[#f6f8fa] text-slate-600 border border-[#c3c4c7];
+  }
+
+  // 2. Variante Primaire (Bleu éditorial - tags actifs, focus)
+  &--primary {
+    @apply bg-blue-50 text-[#2271b1] border border-blue-200;
+  }
+
+  // 3. Variante Sombre (Superposée sur les images avec dégradé)
+  &--dark {
+    @apply bg-black/50 text-slate-100 border border-slate-700 backdrop-blur-xs;
+  }
+
+  // 4. Comportement interactif (si le badge est un lien <router-link>)
+  &--clickable {
+    @apply cursor-pointer;
+
+    &:hover {
+      @apply bg-[#2271b1] text-white border-[#2271b1];
+    }
+  }
+}

@@ -1,0 +1,13 @@
+@use '../tokens/variables';
+
+.app-footer {
+  @apply bg-slate-950 border-t border-slate-900 py-6 px-4 flex justify-center shrink-0;
+
+  .footer-container {
+    @apply flex flex-col sm:flex-row items-center justify-between w-full max-w-5xl gap-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest;
+  }
+
+  .footer-link {
+    @apply text-slate-600 hover:text-slate-400 transition-colors duration-150;
+  }
+}

@@ -96,13 +96,7 @@ onMounted(() => {
     <!-- BARRE DE FILTRES DYNAMIQUE -->
     <div class="filter-bar-wrap">
 
-      <input
-          v-model="searchQuery"
-          @input="handleFilterChange"
-          type="text"
-          placeholder="🔍 Rechercher (nom, langage, usage...)"
-          class="filter-input"
-      />
+      <input v-model="searchQuery" @input="handleFilterChange" type="text" placeholder="🔍 Rechercher (nom, langage, usage...)" class="filter-input"/>
 
       <select v-model="selectedLanguage" @change="handleFilterChange" class="filter-select">
         <option value="">🌐 Tous les langages</option>
@@ -130,18 +124,10 @@ onMounted(() => {
         Page <strong>{{ currentPage }}</strong> sur {{ totalPages }} ({{ totalCount }} éléments)
       </span>
       <div class="pagination-actions">
-        <button
-            @click="changePage(currentPage - 1)"
-            :disabled="currentPage === 1"
-            class="page-btn"
-        >
+        <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" class="page-btn">
           Précédent
         </button>
-        <button
-            @click="changePage(currentPage + 1)"
-            :disabled="currentPage === totalPages"
-            class="page-btn"
-        >
+        <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages" class="page-btn">
           Suivant
         </button>
       </div>

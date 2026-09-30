@@ -3,9 +3,28 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f5f4f0 !important; // Fond saphir clair neutre global 🚀
+  background-color: var(--color-app-bg, #f5f4f0) !important;
 }
 
 .app-main-content {
   flex: 1 0 auto;
+}
+
+// Conteneur réutilisable pour aligner et centrer toutes les pages
+.app-container {
+  width: 100%;
+  max-width: var(--container-max-width, 1280px);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--container-padding, 1rem);
+  padding-right: var(--container-padding, 1rem);
+}
+
+.container-catalog {
+  width: 100%;
+  max-width: 1024px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }

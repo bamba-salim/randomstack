@@ -1,0 +1,36 @@
+:root {
+  /* --- Couleurs de marque & Arcade --- */
+  --color-primary: #3b82f6;
+  --color-neon-cyan: #06b6d4;
+  --color-neon-pink: #ec4899;
+  --color-gold: #dfa72d;
+
+  /* --- Palette Éditoriale (Encyclopédie & Blog) --- */
+  --color-app-bg: #f5f4f0;
+  --color-editorial-blue: #2271b1;
+  --color-editorial-blue-hover: #135e96;
+  --color-border-standard: #c3c4c7;
+  --color-border-darker: #8c8f94;
+  --color-surface-soft: #f6f8fa;
+  --color-text-title: #1d2327;
+  --color-text-body: #3c434a;
+
+  /* --- Typographies --- */
+  --font-serif: 'Georgia', serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* --- Responsive Layout Tokens --- */
+  --container-max-width: 1280px;
+  --container-padding: 1rem;       /* 16px sur smartphone */
+
+  @media (min-width: 768px) {
+    --container-padding: 1.5rem;   /* 24px sur tablette */
+  }
+
+  @media (min-width: 1024px) {
+    --container-padding: 2rem;     /* 32px sur grand écran */
+  }
+}
+
+// Variables Sass internes pour calculs spécifiques
+$slot-height: 140px;

@@ -1,0 +1,102 @@
+$neon-cyan: #06b6d4;
+$neon-pink: #ec4899;
+$slot-height: 140px;
+
+// --- LE ROULEAU INDIVIDUEL (COMPOSANT) ---
+.reel-container {
+  @apply flex flex-col min-w-0;
+
+  .reel-label {
+    @apply text-[7px] sm:text-[8px] font-black text-slate-500 tracking-wider uppercase mb-1.5 text-center;
+  }
+
+  .lock-btn {
+    @apply self-center mb-2 px-2.5 sm:px-3 py-1 bg-slate-900 border border-slate-800 text-[9px] sm:text-[10px] font-black tracking-wide rounded-md transition-all duration-200 cursor-pointer select-none;
+    color: $neon-cyan;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+
+    &:hover {
+      @apply bg-slate-800;
+    }
+
+    &.locked {
+      @apply border-pink-500/80 bg-pink-950/20 text-pink-400;
+      filter: drop-shadow(0 0 4px rgba(236, 72, 153, 0.4));
+    }
+
+    .lock-label {
+      @apply hidden sm:inline;
+    }
+  }
+}
+
+.reel-window {
+  height: $slot-height;
+  @apply bg-slate-900/60 border border-slate-800 rounded-xl relative overflow-hidden flex flex-col justify-center;
+  box-shadow: inset 0 12px 16px rgba(0, 0, 0, 0.7), inset 0 -12px 16px rgba(0, 0, 0, 0.7);
+}
+
+.reel-strip {
+  @apply flex flex-col absolute left-0 right-0 w-full;
+  top: 0;
+  transform: translateY(0);
+
+  &.spinning {
+    animation: spin-reel 2.5s cubic-bezier(0.1, 1, 0.1, 1) forwards;
+  }
+
+  &.delay-server.spinning {
+    animation-duration: 2.8s;
+  }
+  &.delay-database.spinning {
+    animation-duration: 3.1s;
+  }
+}
+
+.reel-item {
+  height: $slot-height;
+  @apply flex flex-col justify-center items-center gap-1.5 sm:gap-2.5 px-1 text-center shrink-0;
+
+  .tech-logo-placeholder {
+    @apply w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-slate-800 flex items-center justify-center font-black text-xs border border-slate-700 shadow-md shrink-0 overflow-hidden;
+    color: $neon-cyan;
+
+    img {
+      @apply w-full h-full object-cover;
+    }
+  }
+
+  .tech-details {
+    @apply flex flex-col justify-center items-center w-full;
+
+    .tech-name {
+      @apply text-[10px] sm:text-xs font-black text-slate-200 tracking-wide truncate max-w-full;
+    }
+
+    .tech-sub {
+      @apply text-[7px] sm:text-[8px] text-slate-500 font-bold uppercase truncate max-w-full mt-0.5;
+    }
+  }
+
+  .status-ready {
+    @apply text-slate-600 font-black text-xs;
+  }
+}
+
+// --- ANIMATION DE ROTATION SANCTUARISÉE ---
+@keyframes spin-reel {
+  0% {
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  15% {
+    filter: blur(3px);
+  }
+  85% {
+    filter: blur(1.5px);
+  }
+  100% {
+    transform: translateY(-90%);
+    filter: blur(0);
+  }
+}

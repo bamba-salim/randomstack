@@ -12,4 +12,8 @@ export default class PostService extends ApiClient {
         return await this.get<Post[]>('/api/posts/fetch-posts')
     }
 
+    static async fetchPostsByTag(tag: string): Promise<PublishedPostsResponse> {
+        return await this.get<PublishedPostsResponse>(`/api/posts/fetch-posts/tag/${tag}`)
+    }
+
 }

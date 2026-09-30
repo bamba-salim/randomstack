@@ -1,0 +1,10 @@
+// --- ÉTATS D'INTERFACE RÉUTILISABLES (LOADING, EMPTY, ERROR) ---
+.loading-state,
+.empty-state {
+  @apply text-center text-slate-500 italic text-sm py-12 mx-auto;
+  font-family: var(--font-serif, 'Georgia', serif);
+}
+
+.error-state {
+  @apply p-4 bg-red-50 border border-red-200 text-red-600 rounded-none py-12 text-center;
+}

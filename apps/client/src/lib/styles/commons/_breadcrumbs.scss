@@ -1,0 +1,16 @@
+// --- FIL D'ARIANE (COMPOSANT RÉUTILISABLE) ---
+.breadcrumb-nav {
+  @apply flex flex-wrap items-center gap-2 text-[9px] font-black text-slate-500 uppercase tracking-widest border-b border-[#c3c4c7]/40 pb-4 mb-2 w-full;
+
+  a {
+    @apply text-slate-400 hover:text-[#2271b1] transition-colors duration-150;
+  }
+
+  .separator {
+    @apply text-slate-300;
+  }
+
+  .current {
+    @apply text-[#1d2327];
+  }
+}

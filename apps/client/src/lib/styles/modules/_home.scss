@@ -1,0 +1,69 @@
+$primary: #3b82f6;
+$neon-cyan: #06b6d4;
+$neon-pink: #ec4899;
+
+// --- PAGE D'ACCUEIL / LOBBY ---
+.lobby-layout-grid {
+  @apply flex flex-col md:flex-row gap-8 w-full items-start;
+
+  // Colonne Gauche : Actualités
+  .news-main-section {
+    @apply flex-1 w-full min-w-0 flex flex-col text-left;
+
+    .section-title {
+      @apply text-xs font-black text-slate-400 uppercase tracking-widest border-b border-[#c3c4c7] pb-3 mb-6;
+    }
+  }
+
+  // Colonne Droite : Meuble de contrôle arcade
+  .lobby-control-sidebar {
+    @apply w-full md:w-80 flex flex-col gap-6 shrink-0;
+
+    .welcome-box {
+      @apply bg-white border border-[#c3c4c7] p-6 rounded-none text-left;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+
+      .brand-title {
+        @apply text-2xl font-black uppercase tracking-wider;
+        background: linear-gradient(to right, $neon-cyan, $primary, $neon-pink);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .brand-description {
+        @apply text-xs text-slate-500 mt-3 leading-relaxed font-semibold;
+      }
+    }
+
+    .shortcuts-grid {
+      @apply flex flex-col gap-4;
+    }
+
+    .arcade-shortcut-btn {
+      @apply flex items-center gap-4 p-4 bg-slate-900 border border-slate-800 rounded-none cursor-pointer text-left select-none transition-all duration-200;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+
+      &:hover {
+        @apply border-cyan-500/50 -translate-y-0.5;
+        box-shadow: 0 6px 15px rgba(6, 182, 212, 0.2);
+      }
+
+      .btn-icon {
+        @apply text-3xl;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+      }
+
+      .btn-content {
+        @apply flex flex-col items-start min-w-0;
+
+        .main-label {
+          @apply text-xs font-black uppercase tracking-widest text-slate-200;
+        }
+
+        .sub-label {
+          @apply text-[9px] font-bold text-slate-500 mt-1 uppercase tracking-wider truncate max-w-full;
+        }
+      }
+    }
+  }
+}

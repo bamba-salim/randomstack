@@ -7,6 +7,11 @@
     "dev": "tsx watch src/index.ts"
   },
   "imports": {
+
+    "#abstracts": {
+      "development": "./src/abstracts/index.ts",
+      "default": "./dist/abstracts/index.js"
+    },
     "#modules": {
       "development": "./src/modules/index.ts",
       "default": "./dist/modules/index.js"

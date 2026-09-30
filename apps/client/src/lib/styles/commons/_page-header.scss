@@ -1,0 +1,26 @@
+// --- EN-TÊTE DE PAGE UNIVERSEL ---
+.page-header {
+  @apply flex flex-col gap-2 mb-8 border-b border-[#c3c4c7] pb-6 text-left w-full;
+
+  .page-title {
+    @apply text-3xl sm:text-4xl font-extrabold text-[#1d2327] tracking-tight leading-tight;
+    font-family: var(--font-serif, 'Georgia', serif);
+  }
+
+  .page-subtitle {
+    @apply text-xs font-bold text-slate-500 uppercase tracking-widest mt-1;
+  }
+
+  .page-meta {
+    @apply flex items-center gap-3 text-xs text-slate-400 font-bold uppercase tracking-wider mt-2 flex-wrap;
+  }
+
+  // Variante centrée (idéale pour la page de Tag)
+  &--center {
+    @apply items-center text-center;
+
+    .page-subtitle {
+      @apply text-center;
+    }
+  }
+}

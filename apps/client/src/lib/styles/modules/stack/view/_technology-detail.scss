@@ -1,0 +1,101 @@
+// --- FICHE DÉTAILLÉE D'UNE TECHNOLOGIE ---
+.tech-detail-layout {
+  @apply flex flex-col gap-8 w-full text-left;
+
+  // 1. En-tête : Image gauche + Table métadonnées droite
+  .detail-top-section {
+    @apply flex flex-col sm:flex-row gap-8 border-b border-[#c3c4c7]/60 pb-8 items-start;
+
+    .detail-image-box {
+      @apply w-full sm:w-60 h-60 bg-white border border-[#c3c4c7] flex items-center justify-center overflow-hidden shrink-0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+
+      img {
+        @apply w-full h-full object-cover;
+      }
+
+      .initials-placeholder {
+        @apply text-5xl font-black text-slate-300 uppercase select-none;
+        font-family: var(--font-serif, 'Georgia', serif);
+      }
+    }
+
+    .detail-meta-table {
+      @apply flex-1 flex flex-col min-w-0 w-full;
+
+      .tech-title {
+        @apply text-3xl sm:text-4xl font-extrabold text-[#1d2327] tracking-tight mb-4 pb-3 border-b-2 border-slate-900;
+        font-family: var(--font-serif, 'Georgia', serif);
+      }
+
+      .meta-grid {
+        @apply flex flex-col gap-2.5;
+      }
+
+      .meta-row {
+        @apply flex justify-between items-center py-2 border-b border-dashed border-[#c3c4c7]/50 text-sm;
+
+        .meta-label {
+          @apply text-slate-400 font-bold uppercase tracking-wider text-xs;
+        }
+
+        .meta-value {
+          @apply text-[#1d2327] font-bold;
+        }
+      }
+    }
+  }
+
+  // Titres de sous-sections
+  .section-heading {
+    @apply text-xs font-black text-slate-400 uppercase tracking-widest mb-3;
+  }
+
+  // 2. Tableau des versions
+  .detail-versions-section {
+    @apply flex flex-col border-b border-[#c3c4c7]/60 pb-8;
+
+    .versions-table-wrap {
+      @apply border border-[#c3c4c7] bg-white overflow-hidden w-full max-w-xl;
+
+      .versions-table {
+        @apply w-full text-left border-collapse text-xs;
+
+        thead {
+          @apply bg-[#f6f8fa] border-b border-[#c3c4c7] text-[10px] font-black text-slate-500 uppercase tracking-widest;
+        }
+
+        th, td {
+          @apply p-3;
+        }
+
+        tbody {
+          @apply divide-y divide-[#c3c4c7]/40;
+        }
+      }
+    }
+  }
+
+  // 3. Description & Histoire
+  .detail-bottom-section {
+    @apply flex flex-col border-b border-[#c3c4c7]/60 pb-8;
+
+    .tech-long-description {
+      @apply text-base text-slate-700 leading-relaxed font-normal;
+    }
+
+    .history-paragraphs {
+      @apply flex flex-col gap-4 mt-2;
+
+      .history-paragraph {
+        @apply text-base text-slate-600 leading-relaxed;
+        text-indent: 1.5rem; // Retrait Wikipédia rétro
+      }
+    }
+  }
+
+  // 4. Section Ressources
+  .detail-links-section {
+    @apply flex flex-col pb-4;
+  }
+}

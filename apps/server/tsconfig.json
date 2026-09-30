@@ -13,6 +13,10 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "paths": {
+      "#abstracts": ["./src/abstracts/index.ts"],
+      "#modules": ["./src/modules/index.ts"],
+
+
       "#models": ["./src/models/index.ts"],
       "#modules": ["./src/modules/index.ts"],
       "#routes": ["./src/routes/index.ts"],

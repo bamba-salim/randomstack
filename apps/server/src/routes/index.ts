@@ -2,7 +2,7 @@ import {Router} from 'express'
 import StackRoute from './core/stack.route'
 import AuthRoute from './core/auth.route'
 import AdminRoute from './core/admin.route'
-import PostRoute from './core/post.route'
+import PostRoute from './core/public/post.route'
 import FileRoute from './core/public/file.route'
 
 export default class AppRouter {
@@ -14,7 +14,7 @@ export default class AppRouter {
         router.use('/posts', PostRoute.routes)
         router.use('/auth', AuthRoute.routes)
         router.use('/admin', AdminRoute.routes)
-        router.use('/files', FileRoute.routes) // <-- AJOUTÉ 🚀
+        router.use('/files', FileRoute.routes)
 
 
         return router
