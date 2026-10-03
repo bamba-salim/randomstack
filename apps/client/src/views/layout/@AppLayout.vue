@@ -6,14 +6,14 @@ import Footer from './Footer.vue'
 <template>
   <div class="app-layout-wrapper">
     <!-- Navbar globale -->
-    <Header />
+    <Header/>
 
     <!-- Zone d'affichage des pages enfants (Lobby, Draft, Encyclopedia) -->
     <main class="app-main-content">
-      <router-view />
+      <router-view/>
     </main>
 
     <!-- Footer global -->
-    <Footer />
+    <Footer/>
   </div>
 </template>

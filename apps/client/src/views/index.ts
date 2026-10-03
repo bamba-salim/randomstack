@@ -1,13 +1,16 @@
 import {createRouter, createWebHistory} from 'vue-router'
 
-import {AppLayout} from '#components'
+import AppLayout from './layout/@AppLayout.vue'
 
-import HomeView from './core/HomeView.vue'
-import GeneratorView from './core/GeneratorView.vue'
-import EncyclopediaView from './core/EncyclopediaView.vue'
-import TechnologyDetailView from './core/TechnologyDetailView.vue'
-import ArticleDetailView from './core/ArticleDetailView.vue'
-import TagPostsView from './core/TagPostsView.vue'
+import HomeView from './modules/commons/HomeView.vue'
+
+import GeneratorView from './modules/stack/GeneratorView.vue'
+
+import EncyclopediaView from './modules/stack/EncyclopediaView.vue'
+import TechnologyDetailView from './modules/stack/TechnologyDetailView.vue'
+
+import ArticleDetailView from './modules/blog/ArticleDetailView.vue'
+import TagPostsView from './modules/blog/TagPostsView.vue'
 
 
 const router = createRouter({
@@ -44,7 +47,7 @@ const router = createRouter({
                 },
                 {
                     path: ':tag/:slug',
-                    name: 'post',
+                    name: 'article',
                     component: ArticleDetailView
                 },
                 {

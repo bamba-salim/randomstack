@@ -16,9 +16,9 @@
       "development": "./src/lib/scripts/index.ts",
       "default": "./dist/lib/scripts/index.js"
     },
-    "#pages": {
-      "development": "./src/pages/index.ts",
-      "default": "./dist/pages/index.js"
+    "#views": {
+      "development": "./src/views/index.ts",
+      "default": "./dist/views/index.js"
     },
     "#components": {
       "development": "./src/lib/components/index.ts",

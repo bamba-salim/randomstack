@@ -2,7 +2,12 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { StackService } from '#services'
+
+import {Breadcrumbs} from '#components'
+
 import type { Technology } from '@randomstack/commons'
+
+
 
 const route = useRoute()
 
@@ -37,15 +42,13 @@ onMounted(async () => {
     <!-- Contenu de la fiche technique unifiée -->
     <div v-else-if="tech" class="tech-detail-layout">
 
-      <!-- Fil d'Ariane universel -->
-      <nav class="breadcrumb-nav">
-        <router-link to="/">Home</router-link>
-        <span class="separator">/</span>
-        <router-link to="/encyclopedia">Encyclopédie</router-link>
-        <span class="separator">/</span>
-        <span class="current">{{ tech.name }}</span>
-      </nav>
 
+
+      <Breadcrumbs :items="[
+  { label: 'Acceuil', to: '/' },
+  { label: 'Encyclopédie', to: '/encyclopedia' },
+  { label: tech.name }
+]" />
       <!-- NIVEAU 1 : IMAGE (GAUCHE) & TABLEAU DE MÉTADONNÉES (DROITE) -->
       <section class="detail-top-section">
         <!-- Logo / Initiales de secours -->

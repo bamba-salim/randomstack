@@ -7,15 +7,21 @@ const router = useRouter()
 </script>
 
 <template>
-  <article @click="router.push(`/${post.mainTag}/${post.slug}`)" class="standard-post-card cursor-pointer">
-    <div class="post-cover">
+  <article @click="router.push(`/${post.mainTag}/${post.slug}`)" class="card card--interactive">
+
+    <!-- Couverture universelle -->
+    <div class="card-cover">
       <img v-if="post.image" :src="`http://localhost:4000/api/files/${post.image}`" :alt="post.title" />
-      <div v-else class="empty-cover">NEWS</div>
+      <div v-else class="card-cover-empty">NEWS</div>
     </div>
 
-    <div class="post-content">
-      <span v-if="post.tags && post.tags.length > 0" class="primary-tag">#{{ post.mainTag    }}</span>
-      <h3 class="title">{{ post.title }}</h3>
+    <!-- Corps universel -->
+    <div class="card-body">
+      <div class="card-header-meta">
+        <span v-if="post.mainTag" class="badge badge--primary">#{{ post.mainTag }}</span>
+      </div>
+      <h3 class="card-title">{{ post.title }}</h3>
     </div>
+
   </article>
 </template>

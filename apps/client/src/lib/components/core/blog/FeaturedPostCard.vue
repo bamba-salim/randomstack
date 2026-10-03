@@ -6,27 +6,39 @@ defineProps<{ post: Post }>()
 const router = useRouter()
 
 const formatDate = (date: string | Date) => {
-  return new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  return new Date(date).toLocaleDateString('fr-FR', {
+    day: 'numeric', month: 'long', year: 'numeric'
+  })
 }
 </script>
 
 <template>
-  <article @click="router.push(`/${post.mainTag}/${post.slug}`)" class="featured-post-card cursor-pointer">
-    <div class="featured-cover">
+  <article @click="router.push(`/${post.mainTag}/${post.slug}`)" class="card card--interactive card--horizontal">
+
+    <!-- Couverture universelle avec fallback -->
+    <div class="card-cover">
       <img v-if="post.image" :src="`http://localhost:4000/api/files/${post.image}`" :alt="post.title" />
-      <div v-else class="empty-cover">À LA UNE</div>
+      <div v-else class="card-cover-empty">À LA UNE</div>
     </div>
 
-    <div class="featured-content">
-      <div class="meta-row">
-        <span class="primary-tag">#{{ post.mainTag }}</span>
-        <span class="date">{{ formatDate(post.publishAt) }}</span>
+    <!-- Corps universel -->
+    <div class="card-body">
+      <div class="card-header-meta">
+        <span class="badge badge--primary">#{{ post.mainTag }}</span>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          {{ formatDate(post.publishAt) }}
+        </span>
       </div>
 
-      <h2 class="title">{{ post.title }}</h2>
-      <p class="summary">{{ post.summary }}</p>
+      <h2 class="card-title">{{ post.title }}</h2>
+      <p class="card-text">{{ post.summary }}</p>
 
-      <span class="read-more">Lire l'article →</span>
+      <div class="card-footer">
+        <span class="text-[11px] font-black uppercase tracking-widest text-[#2271b1]">
+          Lire l'article →
+        </span>
+      </div>
     </div>
+
   </article>
 </template>

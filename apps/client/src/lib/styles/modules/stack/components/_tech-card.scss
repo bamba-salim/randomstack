@@ -8,23 +8,34 @@
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
   }
 
+  // Zone d'image ou initiales
   .card-bg-image {
     @apply absolute inset-0 w-full h-full z-0 bg-slate-50 flex items-center justify-center;
+
+    img {
+      @apply w-full h-full object-cover;
+    }
 
     .initials-bg {
       @apply text-5xl font-black text-slate-200 uppercase select-none;
     }
   }
 
+  // Masque dégradé noir
   .card-overlay {
     @apply absolute inset-0 z-10 flex flex-col justify-end p-4 transition-all duration-300;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.2) 50%, transparent 100%);
 
     .overlay-default-content {
-      @apply flex flex-col items-start text-left transition-all duration-300;
+      @apply flex flex-col items-start text-left transition-all duration-300 w-full;
+
+      // Conteneur de badges sémantique
+      .card-categories {
+        @apply flex flex-wrap gap-1.5 mb-1.5;
+      }
 
       .name {
-        @apply text-base font-black text-white tracking-wide mt-1;
+        @apply text-base font-black text-white tracking-wide mt-0.5;
         font-family: var(--font-serif, 'Georgia', serif);
       }
 
@@ -32,11 +43,13 @@
         @apply text-[9px] font-mono font-bold text-slate-300 uppercase tracking-wider;
       }
 
+      // Rétro-compatibilité pour les badges non factorisés
       .meta-badge {
         @apply px-2 py-0.5 rounded-none text-[8px] font-black uppercase bg-black/40 border border-slate-700 text-slate-100;
       }
     }
 
+    // Volet descriptif au survol (Noir épuré)
     .overlay-hover-content {
       @apply absolute inset-0 bg-slate-950/95 flex flex-col justify-center items-start text-left p-5 opacity-0 transition-opacity duration-300 pointer-events-none;
 

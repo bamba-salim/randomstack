@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { PostService } from '#services'
-import { BlockRenderer } from '#components'
-import type { Post } from '@randomstack/commons'
+import {ref, onMounted} from 'vue'
+import {useRoute} from 'vue-router'
+import {PostService} from '#services'
+import {BlockRenderer, Breadcrumbs} from '#components'
+import type {Post} from '@randomstack/commons'
 
 const route = useRoute()
 const post = ref<Post | null>(null)
@@ -46,19 +46,11 @@ onMounted(async () => {
     <article v-else-if="post" class="w-full max-w-3xl flex flex-col">
 
       <!-- Fil d'Ariane universel -->
-      <nav class="breadcrumb-nav">
-        <router-link to="/">Blog</router-link>
-
-        <template v-if="post.tags && post.tags.length > 0">
-          <span class="separator">/</span>
-          <router-link :to="`/${post.tags[0]}`">
-            <span class="current uppercase">{{ post.tags[0] }}</span>
-          </router-link>
-        </template>
-
-        <span class="separator">/</span>
-        <span class="current">{{ post.title }}</span>
-      </nav>
+      <Breadcrumbs :items="[
+  { label: 'Blog', to: '/' },
+  ...(post.tags?.[0] ? [{ label: post.tags[0], to: `/${post.tags[0]}`, uppercase: true }] : []),
+  { label: post.title }
+]"/>
 
       <!-- En-tête de page universel -->
       <header class="page-header mt-4">
@@ -82,11 +74,11 @@ onMounted(async () => {
 
       <!-- Corps de l'article (géré par les blocs et components/_article-content.scss) -->
       <div class="post-content-body flex flex-col gap-6 w-full text-left">
-        <BlockRenderer v-for="(block, index) in post.content" :key="index" :block="block" />
+        <BlockRenderer v-for="(block, index) in post.content" :key="index" :block="block"/>
       </div>
 
       <!-- Séparateur éditorial -->
-      <hr class="border-0 border-t border-[#c3c4c7] my-8 w-full" />
+      <hr class="border-0 border-t border-[#c3c4c7] my-8 w-full"/>
 
       <!-- Badges de Tags universels (adieu le pavé de 14 classes !) -->
       <div v-if="post.tags && post.tags.length > 0" class="flex flex-wrap gap-2">

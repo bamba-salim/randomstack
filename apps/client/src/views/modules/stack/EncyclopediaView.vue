@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { StackService } from '#services'
-import { TechCard } from '#components'
+import { TechCard, Pagination } from '#components'
 import { TechnologyFilter, type Technology } from '@randomstack/commons'
 
 const technologies = ref<Technology[]>([])
@@ -105,6 +105,14 @@ onMounted(async () => {
         </button>
       </div>
     </div>
+    <!-- Pagination du haut (boutons seuls calés à droite) -->
+    <Pagination
+        :current-page="currentPage"
+        :total-pages="totalPages"
+        :hide-info="true"
+        variant="top"
+        @change-page="changePage"
+    />
 
     <!-- États d'interface universels -->
     <div v-if="loading" class="loading-state">
@@ -129,27 +137,11 @@ onMounted(async () => {
     </p>
 
     <!-- Pagination avec boutons universels .btn -->
-    <div v-if="totalPages > 1" class="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#c3c4c7] pt-4 mt-4 text-xs select-none">
-      <span class="text-slate-500 font-bold">
-        Page <strong>{{ currentPage }}</strong> sur {{ totalPages }} ({{ totalCount }} éléments)
-      </span>
-      <div class="flex gap-2">
-        <button
-            @click="changePage(currentPage - 1)"
-            :disabled="currentPage === 1"
-            class="btn btn--secondary"
-        >
-          Précédent
-        </button>
-        <button
-            @click="changePage(currentPage + 1)"
-            :disabled="currentPage === totalPages"
-            class="btn btn--secondary"
-        >
-          Suivant
-        </button>
-      </div>
-    </div>
-
+    <Pagination
+        :current-page="currentPage"
+        :total-pages="totalPages"
+        :total-count="totalCount"
+        @change-page="changePage"
+    />
   </main>
 </template>

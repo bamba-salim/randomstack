@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { PostService } from '#services'
-import { FeaturedPostCard, PostCard } from '#components'
-import type { Post } from '@randomstack/commons'
+import {ref, onMounted, watch} from 'vue'
+import {useRoute} from 'vue-router'
+import {PostService} from '#services'
+import {FeaturedPostCard, PostCard, Breadcrumbs} from '#components'
+import type {Post} from '@randomstack/commons'
 
 const route = useRoute()
 const currentTag = ref('')
@@ -43,11 +43,7 @@ watch(() => route.params['tag'], (newTag) => {
   <main class="container-catalog py-8">
 
     <!-- Fil d'Ariane -->
-    <nav class="breadcrumb-nav">
-      <router-link to="/">Blog</router-link>
-      <span class="separator">/</span>
-      <span class="current uppercase">{{ currentTag }}</span>
-    </nav>
+    <Breadcrumbs :items="[{ label: 'Blog', to: '/' },{ label: currentTag, uppercase: true }]"/>
 
     <!-- En-tête de page universel (variante centrée) -->
     <header class="page-header page-header--center">
@@ -61,10 +57,10 @@ watch(() => route.params['tag'], (newTag) => {
 
     <!-- Contenu : Article à la une + Grille universelle à 2 colonnes -->
     <div v-else class="flex flex-col gap-8 w-full">
-      <FeaturedPostCard v-if="featuredPost" :post="featuredPost" />
+      <FeaturedPostCard v-if="featuredPost" :post="featuredPost"/>
 
       <div v-if="posts.length > 0" class="grid-cards grid-cards--2">
-        <PostCard v-for="post in posts" :key="post.id" :post="post" />
+        <PostCard v-for="post in posts" :key="post.id" :post="post"/>
       </div>
 
       <p v-if="!featuredPost && posts.length === 0" class="empty-state">

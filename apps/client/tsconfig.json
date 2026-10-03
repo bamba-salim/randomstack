@@ -21,7 +21,7 @@
     "noFallthroughCasesInSwitch": true,
 
     "paths": {
-      "#pages": ["./src/pages/index.ts"],
+      "#views": ["./src/views/index.ts"],
       "#services": ["./src/services/index.ts"],
       "#scripts": ["./src/scripts/index.ts"],
 

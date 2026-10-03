@@ -11,6 +11,8 @@ $neon-pink: #ec4899;
   }
 
   .logo-area {
+    @apply cursor-pointer select-none;
+
     .logo-text {
       @apply text-base font-black tracking-widest text-slate-100 uppercase;
       background: linear-gradient(to right, $neon-cyan, $primary, $neon-pink);
@@ -36,7 +38,7 @@ $neon-pink: #ec4899;
   }
 
   .mobile-menu-toggle {
-    @apply flex items-center justify-center p-2 text-slate-400 hover:text-slate-100 text-xl font-bold cursor-pointer sm:hidden;
+    @apply flex items-center justify-center p-2 text-slate-400 hover:text-slate-100 text-xl font-bold cursor-pointer sm:hidden bg-transparent border-0;
   }
 
   .mobile-nav-overlay {
@@ -47,7 +49,7 @@ $neon-pink: #ec4899;
     @apply fixed top-0 left-0 h-screen w-64 bg-slate-900 border-r border-slate-800 p-6 flex flex-col gap-4 z-50 transition-transform duration-300 sm:hidden;
 
     .mobile-nav-item {
-      @apply w-full text-left py-3 border-b border-slate-800/40 text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-100 transition-colors;
+      @apply w-full text-left py-3 border-b border-slate-800/40 text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-100 transition-colors bg-transparent border-0 cursor-pointer;
 
       &.active {
         @apply text-cyan-400 border-cyan-500/20;
