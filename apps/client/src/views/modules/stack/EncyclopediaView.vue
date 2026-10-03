@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { StackService } from '#services'
-import { TechCard, Pagination } from '#components'
-import { TechnologyFilter, type Technology } from '@randomstack/commons'
+import {ref, onMounted, computed} from 'vue'
+import {StackService} from '#services'
+import {Pagination} from '#components'
+import {TechnologyFilter, type Technology} from '@randomstack/commons'
+
+import TechCard from './components/TechCard.vue'
 
 const technologies = ref<Technology[]>([])
 const loading = ref(true)

@@ -2,8 +2,10 @@
 import {ref, onMounted} from 'vue'
 import {useRoute} from 'vue-router'
 import {PostService} from '#services'
-import {BlockRenderer, Breadcrumbs} from '#components'
+import {Breadcrumbs} from '#components'
 import type {Post} from '@randomstack/commons'
+
+import BlockRenderer from './components/BlockRenderer.vue'
 
 const route = useRoute()
 const post = ref<Post | null>(null)

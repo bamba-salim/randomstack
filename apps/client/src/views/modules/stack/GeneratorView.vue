@@ -3,8 +3,11 @@ import {ref, onMounted, computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {StackService, type DrawnStack, type ClientTechnology} from '#services'
 import {DraftScript} from '#scripts'
-import {SlotReel, BlacklistDrawer, HistoryDrawer, ShareModal} from "#components"
 
+import SlotReel from './components/SlotReel.vue'
+import BlacklistDrawer from './components/BlacklistDrawer.vue'
+import HistoryDrawer from './components/HistoryDrawer.vue'
+import ShareModal from './components/ShareModal.vue'
 
 const route = useRoute()
 const router = useRouter()

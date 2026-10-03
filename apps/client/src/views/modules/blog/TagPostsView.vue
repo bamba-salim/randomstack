@@ -2,8 +2,11 @@
 import {ref, onMounted, watch} from 'vue'
 import {useRoute} from 'vue-router'
 import {PostService} from '#services'
-import {FeaturedPostCard, PostCard, Breadcrumbs} from '#components'
+import { Breadcrumbs} from '#components'
 import type {Post} from '@randomstack/commons'
+
+import FeaturedPostCard from './components/FeaturedPostCard.vue'
+import PostCard from './components/PostCard.vue'
 
 const route = useRoute()
 const currentTag = ref('')
