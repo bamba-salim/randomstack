@@ -23,8 +23,8 @@ services:
     container_name: randomstack_server
     volumes:
       - .:/app
-      - /app/node_modules
-      - /app/apps/server/node_modules # Isolation des modules serveurs Linux 🚀
+      - root_node_modules:/app/node_modules
+      - server_node_modules:/app/apps/server/node_modules # Volume partagé 🚀
     ports:
       - "4000:4000"
     environment:
@@ -34,6 +34,26 @@ services:
       postgres_db:
         condition: service_healthy
     command: sh -c "npx prisma generate --config=apps/server/prisma.config.ts && npx prisma db push --config=apps/server/prisma.config.ts && npm run dev --workspace=apps/server"
+
+    # 2. WORKER BACKGROUND (Partage le même node_modules, démarrage direct) 🚀
+  worker:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile.dev
+    container_name: randomstack_worker
+    volumes:
+      - .:/app
+      - root_node_modules:/app/node_modules
+      - server_node_modules:/app/apps/server/node_modules # Même volume partagé 🚀
+    environment:
+      - DATABASE_URL=postgresql://postgres:devpassword@postgres_db:5432/randomstack?schema=public
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      server:
+        condition: service_started
+    command: npm run dev:worker --workspace=apps/server
+
   prisma-studio:
     build:
       context: .
@@ -88,3 +108,5 @@ services:
 
 volumes:
   postgres_data:
+  root_node_modules:
+  server_node_modules:

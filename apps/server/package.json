@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "dev:worker": "tsx watch src/worker.ts"
   },
   "imports": {
-
     "#abstracts": {
       "development": "./src/abstracts/index.ts",
       "default": "./dist/abstracts/index.js"
@@ -47,11 +47,15 @@
     "#utils": {
       "development": "./src/utils/index.ts",
       "default": "./dist/utils/index.js"
+    },
+    "#scheduler": {
+      "development": "./src/core/scheduler/index.ts",
+      "default": "./src/core/scheduler/index.js"
     }
   },
   "dependencies": {
-    "@prisma/client": "^7.0.0",
     "@prisma/adapter-pg": "^7.0.0",
+    "@prisma/client": "^7.0.0",
     "@randomstack/commons": "*",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
