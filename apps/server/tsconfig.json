@@ -14,6 +14,7 @@
     "skipLibCheck": true,
     "paths": {
       "#abstracts": ["./src/abstracts/index.ts"],
+      "#user": ["./src/modules/user/index.ts"],
       "#blog": ["./src/modules/blog/index.ts"],
       "#file": ["./src/modules/file/index.ts"],
       "#stack": ["./src/modules/stack/index.ts"],

@@ -1,4 +1,5 @@
-import {UserModel, TechnologyModel} from '#models'
+import {TechnologyModel} from '#models'
+import {UserModel} from '#user'
 import {TechnologyMapper} from '#mappers'
 import {PasswordUtils } from '#utils'
 import {FileUtils} from '#file'

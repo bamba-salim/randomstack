@@ -24,6 +24,10 @@
       "development": "./src/modules/stack/index.ts",
       "default": "./dist/modules/stack/index.js"
     },
+    "#user": {
+      "development": "./src/modules/user/index.ts",
+      "default": "./dist/modules/user/index.js"
+    },
     "#db": {
       "development": "./src/lib/db/index.ts",
       "default": "./dist/lib/db/index.js"

@@ -1,7 +1,7 @@
 import type {Request, Response} from 'express'
 import crypto from 'crypto'
 import {TechnologyModel} from '#models'
-import FileUtils from '../../modules/file'
+import {FileUtils} from '#file'
 import {TechnologyMapper} from '#mappers'
 import type {EditTechnology, EditTechnologyFormBean} from "@randomstack/commons";
 

@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import { AuthController } from '#controllers'
+import AuthController from './auth.controller'
 import { AuthMiddleware } from '#middlewares'
 
-export default class AuthRoute {
+export default class AuthRoutes {
     static get routes(): Router {
         const router = Router()
 

@@ -1,24 +1,24 @@
-import {Database} from '#db'
+import {BaseModel} from '#abstracts'
 import type {Role} from '@randomstack/commons'
 
 
-export default class UserModel {
+export default class UserModel extends BaseModel{
 
     static async findByEmail(email: string) {
-        return await Database.client.user.findUnique({
+        return await this.db.user.findUnique({
             where: {email}
         })
     }
 
     static async findById(id: string) {
-        return await Database.client.user.findUnique({
+        return await this.db.user.findUnique({
             where: {id},
             select: {id: true, email: true, role: true}
         })
     }
 
     static async createAdmin(email: string, passwordHash: string) {
-        return await Database.client.user.create({
+        return await this.db.user.create({
             data: {
                 email,
                 passwordHash,
@@ -28,7 +28,7 @@ export default class UserModel {
     }
 
     static async count(): Promise<number> {
-        return await Database.client.user.count()
+        return await this.db.user.count()
     }
 
 }

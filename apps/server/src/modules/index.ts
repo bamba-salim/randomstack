@@ -2,6 +2,7 @@
 import { Router } from 'express'
 import { BlogRoutes, AdminBlogRoutes } from './blog'
 import { FileRoutes } from './file'
+import {AuthRoutes } from './user'
 // import { StackRoutes, AdminStackRoutes } from './stack'
 // import { FileRoutes } from './file'
 
@@ -17,6 +18,9 @@ export default class AppRouter {
         // 🛠️ Back-office Extranet
         router.use('/admin/posts', AdminBlogRoutes.routes)
         // router.use('/admin/stacks', AdminStackRoutes.routes)
+
+        router.use('/auth', AuthRoutes.routes)
+
 
         return router
     }
