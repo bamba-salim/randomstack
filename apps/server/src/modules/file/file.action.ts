@@ -1,9 +1,9 @@
 import crypto from 'crypto'
 import path from 'path'
 
-import {FileModel} from '#models'
-import {FileUtils} from '#utils'
-import {PostMapper, FileMapper} from '#mappers'
+import FileModel from './file.model.js'
+import FileUtils from './file.utils.js'
+import FileMapper from './file.mapper.js'
 import type {FILE_TYPE, TABLE, FileType, File} from '@randomstack/commons'
 
 export default class FileAction {

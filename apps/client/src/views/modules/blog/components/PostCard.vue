@@ -9,9 +9,6 @@ const router = useRouter()
 <template>
   <article @click="router.push(`/${post.mainTag}/${post.slug}`)" class="card card--interactive">
 
-    {{ JSON.stringify(post) }}
-
-
     <!-- Couverture universelle -->
     <div class="card-cover">
       <img v-if="post.image" :src="`http://localhost:4000/api/files/${post.image}`" :alt="post.title" />

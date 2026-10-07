@@ -1,6 +1,7 @@
 import {UserModel, TechnologyModel} from '#models'
 import {TechnologyMapper} from '#mappers'
-import {PasswordUtils, FileUtils} from '#utils'
+import {PasswordUtils } from '#utils'
+import {FileUtils} from '#file'
 
 import type {Category, RawExcelTech} from '@randomstack/commons'
 

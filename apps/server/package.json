@@ -12,9 +12,17 @@
       "development": "./src/abstracts/index.ts",
       "default": "./dist/abstracts/index.js"
     },
-    "#modules": {
-      "development": "./src/modules/index.ts",
-      "default": "./dist/modules/index.js"
+    "#file": {
+      "development": "./src/modules/file/index.ts",
+      "default": "./dist/modules/file/index.js"
+    },
+    "#blog": {
+      "development": "./src/modules/blog/index.ts",
+      "default": "./dist/modules/blog/index.js"
+    },
+    "#stack": {
+      "development": "./src/modules/stack/index.ts",
+      "default": "./dist/modules/stack/index.js"
     },
     "#db": {
       "development": "./src/lib/db/index.ts",

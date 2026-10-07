@@ -1,6 +1,6 @@
 import type {Request, Response} from 'express'
 import crypto from 'crypto'
-import {FileAction} from '#action-support'
+import {FileAction} from '#file'
 
 import BlogModel from './blog.model'
 import BlogMapper from './blog.mapper'

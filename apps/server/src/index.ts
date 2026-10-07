@@ -6,7 +6,8 @@ import path from 'path' // <-- S'assurer que path est importé
 import {Database} from '#db'
 import AppRouter from './modules'
 import {SessionMiddleware} from '#middlewares'
-import {SeedAction, CronJobs} from '#action-support'
+import {CronJobs} from '#action-support'
+import {SeedAction} from '#stack'
 
 const app = express()
 

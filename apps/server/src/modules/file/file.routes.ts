@@ -1,7 +1,7 @@
-import { Router } from 'express'
-import { FileController } from '#controllers'
+import {Router} from 'express'
+import FileController from './file.controller.js'
 
-export default class FileRoute {
+export default class FileRoutes {
     static get routes(): Router {
         const router = Router()
 

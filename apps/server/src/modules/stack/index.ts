@@ -1,0 +1,1 @@
+export {default as SeedAction} from './seed.action'
