@@ -4,7 +4,7 @@ import path from 'path' // <-- S'assurer que path est importé
 
 
 import {Database} from '#db'
-import AppRouter from '#routes'
+import AppRouter from './modules'
 import {SessionMiddleware} from '#middlewares'
 import {SeedAction, CronJobs} from '#action-support'
 

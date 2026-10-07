@@ -2,7 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { PostService } from '#services'
-import { FeaturedPostCard, PostCard } from '#components'
+import FeaturedPostCard from '../blog/components/FeaturedPostCard.vue'
+import PostCard from '../blog/components/PostCard.vue'
 import type { Post } from '@randomstack/commons'
 
 const router = useRouter()
