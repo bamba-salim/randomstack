@@ -5,7 +5,7 @@ export default class TechnologyModel extends BaseModel {
 
     static async fetchTechnologies() {
         return await this.db.technology.findMany({
-            include: {info: true},
+            include: {detail: true},
             orderBy: {name: 'asc'}
         })
     }
@@ -13,7 +13,7 @@ export default class TechnologyModel extends BaseModel {
     static async fetchActiveTechnologies() {
         return await this.db.technology.findMany({
             where: {isActive: true},
-            include: {info: true},
+            include: {detail: true},
             orderBy: {name: 'asc'}
         })
     }
@@ -21,14 +21,14 @@ export default class TechnologyModel extends BaseModel {
     static async fetchTechnologyBySlug(slug: string) {
         return await this.db.technology.findUnique({
             where: {slug},
-            include: {info: true}
+            include: {detail: true}
         })
     }
 
     static async fetchTechnologyById(id: string) {
         return await this.db.technology.findUnique({
             where: {id},
-            include: {info: true}
+            include: {detail: true}
         })
     }
 
@@ -36,11 +36,11 @@ export default class TechnologyModel extends BaseModel {
         return await this.db.technology.create({
             data: {
                 ...payload.technology,
-                info: {
-                    create: payload.info
+                detail: {
+                    create: payload.detail
                 }
             },
-            include: {info: true}
+            include: {detail: true}
         })
     }
 
@@ -51,14 +51,14 @@ export default class TechnologyModel extends BaseModel {
             where: {id},
             data: {
                 ...technologyData,
-                info: {
+                detail: {
                     upsert: {
-                        create: payload.info,
-                        update: payload.info
+                        create: payload.detail,
+                        update: payload.detail
                     }
                 }
             },
-            include: {info: true}
+            include: {detail: true}
         })
     }
 
@@ -68,7 +68,7 @@ export default class TechnologyModel extends BaseModel {
 
     static async getTechnologies() {
         return await this.db.technology.findMany({
-            include: {info: true},
+            include: {detail: true},
             orderBy: {name: 'asc'}
         })
     }

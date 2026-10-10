@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import type { FeaturedPostListed } from '@randomstack/commons'
+import { fileUrl } from '#services'
 
 defineProps<{ post: FeaturedPostListed }>()
 const router = useRouter()
@@ -17,7 +18,7 @@ const formatDate = (date: string | Date) => {
 
     <!-- Couverture universelle avec fallback -->
     <div class="card-cover">
-      <img v-if="post.image" :src="`http://localhost:4000/files/${post.image}`" :alt="post.title" />
+      <img v-if="post.image" :src="fileUrl(post.image)" :alt="post.title" />
       <div v-else class="card-cover-empty">À LA UNE</div>
     </div>
 

@@ -4,7 +4,7 @@ import {useRoute, useRouter} from 'vue-router'
 
 import {Sidebar, ParagraphManager, BaseInput, BaseToggle} from '#components'
 
-import {saveTechnology, fetchTechnologies, fetchTechnologyFormData, uploadFile} from '#services'
+import {saveTechnology, fetchTechnologies, fetchTechnologyFormData, uploadFile, fileUrl} from '#services'
 import {TechnologyFilter} from '@randomstack/commons'
 
 import type {AdminTechnologyListed, EditTechnologyFormBean} from '@randomstack/commons'
@@ -241,7 +241,7 @@ onMounted(async () => {
       <div class="file-upload-zone">
         <img
             v-if="formBean.logo"
-            :src="`http://localhost:4000/files/${formBean.logo}`"
+            :src="fileUrl(formBean.logo)"
             class="w-full max-h-64 object-contain mb-3 bg-white border border-[#c3c4c7] rounded shadow-sm"
         />
         <span v-else class="text-xs text-slate-500 font-bold mb-2 block">Sélectionnez un logo :</span>

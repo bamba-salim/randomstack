@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref} from 'vue'
-import {uploadFile} from '#services'
+import {uploadFile, fileUrl} from '#services'
 import {type PostContentBlock, type BlockType, FILE_TYPE, TABLE, BLOCK_TYPE} from '@randomstack/commons'
 
 const block = defineModel<PostContentBlock>({required: true})
@@ -163,7 +163,7 @@ const handleNestedDrop = (targetCol: 'left' | 'right') => {
     <!-- 3. BLOC IMAGE (Full-Width) 🚀 -->
     <div v-else-if="block.type === 'IMAGE'" class="w-full">
       <div class="file-upload-zone">
-        <img v-if="block.value" :src="`http://localhost:4000/files/${block.value}`" class="image-preview"/>
+        <img v-if="block.value" :src="fileUrl(block.value)" class="image-preview"/>
         <span v-else class="empty-image-text">Sélectionnez une image :</span>
 
         <input type="file" accept="image/*" @change="handleImageUpload($event)" class="file-input w-full"/>

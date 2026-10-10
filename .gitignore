@@ -5,6 +5,13 @@ apps/server/public/uploads/*
 # Sauf le fichier de garde .gitkeep pour préserver le dossier
 !apps/server/public/uploads/.gitkeep
 
+# Secrets locaux
+.env
+.env.local
+apps/server/.env
+apps/client/.env
+apps/extranet/.env
+
 /.idea/
 /apps/server/node_modules/
 /apps/client/node_modules/

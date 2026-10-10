@@ -1,6 +1,6 @@
 import type {Category} from '../../constants'
 
-/** Entité DB imbriquée (Prisma TechnologyInfo) */
+/** Entité DB imbriquée (Prisma TechnologyInfo → table TechnologyDetail) */
 export interface TechnologyInfo {
     id: string
     websiteUrl: string | null
@@ -25,13 +25,13 @@ export interface Technology {
     categories: Category[]
     isActive: boolean
     createdAt?: string | Date
-    info?: TechnologyInfo | null
+    detail?: TechnologyInfo | null
 }
 
 /** Contrat d'écriture serveur */
 export interface EditTechnology {
-    technology: Omit<Technology, 'createdAt' | 'info'>
-    info: Omit<TechnologyInfo, 'id'>
+    technology: Omit<Technology, 'createdAt' | 'detail'>
+    detail: Omit<TechnologyInfo, 'id'>
 }
 
 export interface TechnologyVersion {

@@ -79,3 +79,9 @@ export const fetchPublishedPosts = async (): Promise<PublishedPostsResponse> => 
 export const fetchPostsByTag = async (tag: string): Promise<PublishedPostsResponse> => {
     return await ApiClient.get<PublishedPostsResponse>(`/fetch-posts/tag/${tag}`)
 }
+
+/** URL stable fichier via l’API (`/files/:id` → 302 signed Railway en prod). */
+export const fileUrl = (id: string | null | undefined): string => {
+    if (!id) return ''
+    return `${ApiClient.baseUrl}/files/${id}`
+}

@@ -1,9 +1,25 @@
 import fs from 'fs'
 import path from 'path'
-import type {File} from '@randomstack/commons'
+import type {FileRecord} from '@randomstack/commons'
 
 export default class FileUtils {
-    // 1. Lecture générique et sécurisée de fichiers JSON (typée) 🚀
+    /** Clé objet S3 / chemin relatif disque : uploads/{CATEGORY}/{TYPE}/{CATEGORY}-{id}{ext} */
+    static buildObjectKey(category: string, type: string, id: string, extension: string): string {
+        const cat = category.toUpperCase()
+        const typ = type.toUpperCase()
+        const ext = extension.startsWith('.') ? extension.toLowerCase() : `.${extension.toLowerCase()}`
+        return `uploads/${cat}/${typ}/${cat}-${id}${ext}`
+    }
+
+    static buildObjectKeyFromFile(file: FileRecord): string {
+        return this.buildObjectKey(String(file.category), String(file.type), file.id, file.extension)
+    }
+
+    /** URL stable exposée aux fronts (gate API, pas l’URL bucket). */
+    static getPublicApiPath(fileId: string): string {
+        return `/files/${fileId}`
+    }
+
     static readJSON<T>(relativeFilePath: string): T | null {
         try {
             const fullPath = path.resolve(process.cwd(), relativeFilePath)
@@ -17,7 +33,6 @@ export default class FileUtils {
         }
     }
 
-    // 2. Écriture générique de fichiers JSON 🚀
     static writeJSON(relativeFilePath: string, data: any): boolean {
         try {
             const fullPath = path.resolve(process.cwd(), relativeFilePath)
@@ -29,56 +44,38 @@ export default class FileUtils {
         }
     }
 
-    // 3. Sauvegarde d'images / fichiers téléversés (Prêt pour la V2) 🚀
-    // Ajout du paramètre "prefix" pour rendre le nommage totalement générique par table 🚀
-    static saveUpload(fileBuffer: Buffer, originalName: string, _category: string, _type: string, itemId: string): string | null {
+    /** Fallback local quand S3_* n’est pas configuré. */
+    static saveUploadLocal(fileBuffer: Buffer, objectKey: string): string | null {
         try {
-            const category = _category.toUpperCase()
-            const type = _type.toUpperCase()
-            const uploadDir = path.resolve(process.cwd(), 'public', 'uploads', category, type)
+            const absolutePath = path.resolve(process.cwd(), 'public', objectKey)
+            const dir = path.dirname(absolutePath)
 
-            if (!fs.existsSync(uploadDir)) {
-                fs.mkdirSync(uploadDir, {recursive: true})
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, {recursive: true})
             }
 
-            // Nommage dynamique : {table}-{id}.{extension} (ex: technology-uuid.png) 🚀
-            const ext = path.extname(originalName).toLowerCase()
-            const uniqueName = `${category}-${itemId}${ext}`
-            const finalPath = path.join(uploadDir, uniqueName)
-
-            fs.writeFileSync(finalPath, fileBuffer)
-
-            const uri = `/public/uploads/${category}/${type}/${uniqueName}`
-            return uri
+            fs.writeFileSync(absolutePath, fileBuffer)
+            return `/public/${objectKey}`
         } catch (error: any) {
-            console.error("[FileUtils] Échec de la sauvegarde physique du fichier :", error.message || error)
+            console.error('[FileUtils] Échec sauvegarde locale :', error.message || error)
             return null
         }
     }
 
-    static getFileUrl(file: File): string | null {
-        if (!file) return null
-        const uri = `/public/uploads/${file.category}/${file.type}/${file.category}-${file.id}${file.extension}`
-
-
-        return uri
+    static resolveLocalAbsolutePath(objectKey: string): string {
+        return path.resolve(process.cwd(), 'public', objectKey)
     }
 
-    // 4. Suppression physique d'un fichier 🗑️
-    static deleteFile(relativeFilePath: string): boolean {
+    static deleteLocal(objectKey: string): boolean {
         try {
-            // Nettoyage du chemin (enlève le slash initial si présent)
-            const cleanedPath = relativeFilePath.replace(/^\//, '')
-            const fullPath = path.resolve(process.cwd(), cleanedPath)
-
+            const fullPath = this.resolveLocalAbsolutePath(objectKey)
             if (fs.existsSync(fullPath)) {
                 fs.unlinkSync(fullPath)
-                console.log(`[FileUtils] 🗑️ Fichier supprimé du disque : ${fullPath}`)
                 return true
             }
             return false
         } catch (error: any) {
-            console.error(`[FileUtils] Échec de la suppression physique du fichier (${relativeFilePath}) :`, error.message || error)
+            console.error('[FileUtils] Échec suppression locale :', error.message || error)
             return false
         }
     }

@@ -69,3 +69,9 @@ export const uploadFile = async (
 
     return await ApiClient.postForm('/upload-file', formData)
 }
+
+/** URL stable fichier via l’API (`/files/:id` → 302 signed Railway en prod). */
+export const fileUrl = (id: string | null | undefined): string => {
+    if (!id) return ''
+    return `${ApiClient.baseUrl}/files/${id}`
+}

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue'
 import {useRoute} from 'vue-router'
-import {fetchPostBySlug} from '#services'
+import {fetchPostBySlug, fileUrl} from '#services'
 import {Breadcrumbs} from '#components'
 import type {PublicPostDetail} from '@randomstack/commons'
 
@@ -68,7 +68,7 @@ onMounted(async () => {
       <!-- Image de couverture de l'article -->
       <figure v-if="post.imageId" class="w-full bg-[#f6f8fa] border border-[#c3c4c7] overflow-hidden mb-8">
         <img
-            :src="`http://localhost:4000/files/${post.imageId}`"
+            :src="fileUrl(post.imageId)"
             :alt="post.title"
             class="w-full h-auto max-h-[480px] object-cover"
         />

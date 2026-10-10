@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import path from 'path'
@@ -6,6 +7,7 @@ import {Database} from '#db'
 import {SessionMiddleware} from '#middlewares'
 import {CronJobs} from '#action-support'
 import {SeedAction} from '#stack'
+import {ObjectStorage} from '#file'
 
 import WebService from './modules/web-service'
 import Api from './modules/api'
@@ -50,7 +52,8 @@ Database.checkConnection().then(async (connected) => {
         CronJobs.boot()
 
         app.listen(PORT, () => {
-            console.log(`[Server] Prêt et opérationnel sur le port ${PORT}`)
+            const storageMode = ObjectStorage.isEnabled() ? 'Railway S3 bucket' : 'local disk (public/uploads)'
+            console.log(`[Server] Prêt sur le port ${PORT} — fichiers: ${storageMode}`)
         })
     } else {
         console.error("[Server] Impossible d'établir une connexion à PostgreSQL.")

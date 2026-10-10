@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import {fetchTechnologyBySlug} from '#services'
+import {fetchTechnologyBySlug, fileUrl} from '#services'
 
 import {Breadcrumbs} from '#components'
 
@@ -53,7 +53,7 @@ onMounted(async () => {
       <section class="detail-top-section">
         <!-- Logo / Initiales de secours -->
         <div class="detail-image-box">
-          <img v-if="tech.logo" :src="`http://localhost:4000/files/${tech.logo}`" :alt="tech.name" />
+          <img v-if="tech.logo" :src="fileUrl(tech.logo)" :alt="tech.name" />
           <span v-else class="initials-placeholder">{{ tech.name.substring(0, 2) }}</span>
         </div>
 

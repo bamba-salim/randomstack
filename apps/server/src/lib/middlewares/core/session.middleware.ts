@@ -3,7 +3,7 @@ import session from 'express-session'
 export default class SessionMiddleware {
     static get config() {
         return session({
-            secret: 'randomstack-v0-session-secret',
+            secret: process.env['SESSION_SECRET'] || 'randomstack-v0-session-secret',
             resave: false,
             saveUninitialized: true,
             cookie: {

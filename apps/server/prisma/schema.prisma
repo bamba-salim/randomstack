@@ -49,8 +49,8 @@ model Technology {
   isActive   Boolean    @default(true) // Disponible uniquement au tirage ou non
   createdAt  DateTime   @default(now())
 
-  // Relation 1-à-1 : info.id = Technology.id
-  info TechnologyInfo?
+  // Relation 1-à-1 : detail.id = Technology.id (table TechnologyDetail)
+  detail TechnologyInfo?
 }
 
 // Infos enrichies d'une technologie (table lourde)

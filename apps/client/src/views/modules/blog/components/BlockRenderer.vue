@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { type PostContentBlock } from '@randomstack/commons'
+import { fileUrl } from '#services'
 import BlockRenderer from './BlockRenderer.vue'
 
 defineProps<{ block: PostContentBlock }>()
@@ -41,7 +42,7 @@ defineProps<{ block: PostContentBlock }>()
 
   <!-- IMAGE -->
   <figure v-else-if="block.type === 'IMAGE'" class="blog-image-block">
-    <img :src="`http://localhost:4000/files/${block.value}`" :alt="block.caption || 'Illustration'" />
+    <img :src="fileUrl(block.value)" :alt="block.caption || 'Illustration'" />
     <figcaption v-if="block.caption">{{ block.caption }}</figcaption>
   </figure>
 

@@ -1,5 +1,5 @@
 export default class ApiClient {
-    private static baseUrl = import.meta.env['VITE_API_URL'] || 'http://localhost:4000'
+    static readonly baseUrl = import.meta.env['VITE_API_URL'] || 'http://localhost:4000'
 
     static async get<T>(endpoint: string): Promise<T> {
         const response = await fetch(`${this.baseUrl}${endpoint}`, {

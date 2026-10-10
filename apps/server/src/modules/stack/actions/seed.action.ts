@@ -79,12 +79,13 @@ export default class SeedAction {
         const userCount = await UserModel.count()
         if (userCount === 0) {
 
-            const defaultEmail = 'admin@randomstack.com'
-            const passwordHash = PasswordUtils.hash('adminpassword')
+            const defaultEmail = process.env['ADMIN_EMAIL'] || 'admin@randomstack.com'
+            const defaultPassword = process.env['ADMIN_PASSWORD'] || 'adminpassword'
+            const passwordHash = PasswordUtils.hash(defaultPassword)
 
             await UserModel.createAdmin(defaultEmail, passwordHash)
 
-            console.log(`[Seed] 👤 Compte Administrateur généré par défaut : ${defaultEmail} / adminpassword`)
+            console.log(`[Seed] 👤 Compte Administrateur généré par défaut : ${defaultEmail}`)
         }
     }
 }

@@ -3,15 +3,15 @@ services:
     image: postgres:16-alpine
     container_name: randomstack_db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: devpassword
-      POSTGRES_DB: randomstack
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5435:5432"
+      - "${POSTGRES_HOST_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -24,18 +24,20 @@ services:
     volumes:
       - .:/app
       - root_node_modules:/app/node_modules
-      - server_node_modules:/app/apps/server/node_modules # Volume partagé 🚀
+      - server_node_modules:/app/apps/server/node_modules
     ports:
-      - "4000:4000"
+      - "${PORT}:${PORT}"
     environment:
-      - DATABASE_URL=postgresql://postgres:devpassword@postgres_db:5432/randomstack?schema=public
-      - PORT=4000
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
+      SESSION_SECRET: ${SESSION_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     depends_on:
       postgres_db:
         condition: service_healthy
     command: sh -c "npx prisma generate --config=apps/server/prisma.config.ts && npx prisma db push --config=apps/server/prisma.config.ts && npm run dev --workspace=apps/server"
 
-    # 2. WORKER BACKGROUND (Partage le même node_modules, démarrage direct) 🚀
   worker:
     build:
       context: .
@@ -44,9 +46,12 @@ services:
     volumes:
       - .:/app
       - root_node_modules:/app/node_modules
-      - server_node_modules:/app/apps/server/node_modules # Même volume partagé 🚀
+      - server_node_modules:/app/apps/server/node_modules
     environment:
-      - DATABASE_URL=postgresql://postgres:devpassword@postgres_db:5432/randomstack?schema=public
+      DATABASE_URL: ${DATABASE_URL}
+      SESSION_SECRET: ${SESSION_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     depends_on:
       postgres_db:
         condition: service_healthy
@@ -62,15 +67,14 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - /app/apps/server/node_modules # Isolation des modules serveurs Linux 🚀
+      - /app/apps/server/node_modules
     ports:
-      - "5555:5555"
+      - "${PRISMA_STUDIO_PORT}:5555"
     environment:
-      - DATABASE_URL=postgresql://postgres:devpassword@postgres_db:5432/randomstack?schema=public
+      DATABASE_URL: ${DATABASE_URL}
     depends_on:
       - postgres_db
     command: npx prisma studio --config=apps/server/prisma.config.ts --port 5555 --browser none
-
 
   client:
     build:
@@ -80,11 +84,11 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - /app/apps/client/node_modules # Isolation des modules clients Linux 🚀
+      - /app/apps/client/node_modules
     ports:
-      - "5173:5173"
+      - "${CLIENT_PORT}:5173"
     environment:
-      - VITE_API_URL=http://localhost:4000
+      VITE_API_URL: ${VITE_API_URL}
     depends_on:
       - server
     command: npm run dev --workspace=apps/client -- --host
@@ -97,11 +101,11 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - /app/apps/extranet/node_modules # Isolation des modules extranet Linux 🚀
+      - /app/apps/extranet/node_modules
     ports:
-      - "5175:5175"
+      - "${EXTRANET_PORT}:5175"
     environment:
-      - VITE_API_URL=http://localhost:4000
+      VITE_API_URL: ${VITE_API_URL}
     depends_on:
       - server
     command: npm run dev --workspace=apps/extranet -- --host

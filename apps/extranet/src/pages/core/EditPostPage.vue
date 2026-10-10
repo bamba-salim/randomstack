@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import {savePost, fetchTags, fetchPostFormData, uploadFile} from '#services'
+import {savePost, fetchTags, fetchPostFormData, uploadFile, fileUrl} from '#services'
 import {Sidebar, PostContentManager, BaseInput, BaseToggle} from '#components'
 import type {EditPostFormBean} from '@randomstack/commons'
 
@@ -153,7 +153,7 @@ onMounted(async () => {
         <div class="file-upload-zone">
           <img
               v-if="formBean.imageId"
-              :src="`http://localhost:4000/files/${formBean.imageId}`"
+              :src="fileUrl(formBean.imageId)"
               class="w-full max-h-64 object-contain mb-3 bg-white border border-[#c3c4c7] rounded shadow-sm"
           />
           <span v-else class="text-xs text-slate-500 font-bold mb-2 block">Sélectionnez une image de couverture :</span>

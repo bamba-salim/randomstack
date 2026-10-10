@@ -51,15 +51,15 @@ export default class TechnologyMapper {
             usage: tech.usage,
             logo: tech.logo,
             isActive: tech.isActive,
-            websiteUrl: tech.info?.websiteUrl || '',
-            docsUrl: tech.info?.docsUrl || '',
-            creator: tech.info?.creator || '',
-            foundedAt: tech.info?.foundedAt || '',
-            versions: tech.info?.versions || {stable: {num: '', date: ''}, latest: {num: '', date: ''}},
-            userCount: tech.info?.userCount || null,
-            projectCount: tech.info?.projectCount || null,
-            history: tech.info?.history || [],
-            description: tech.info?.description || ''
+            websiteUrl: tech.detail?.websiteUrl || '',
+            docsUrl: tech.detail?.docsUrl || '',
+            creator: tech.detail?.creator || '',
+            foundedAt: tech.detail?.foundedAt || '',
+            versions: tech.detail?.versions || {stable: {num: '', date: ''}, latest: {num: '', date: ''}},
+            userCount: tech.detail?.userCount || null,
+            projectCount: tech.detail?.projectCount || null,
+            history: tech.detail?.history || [],
+            description: tech.detail?.description || ''
         }
     }
 
@@ -72,7 +72,7 @@ export default class TechnologyMapper {
             logo: tech.logo,
             usage: tech.usage,
             categories: tech.categories || [],
-            descriptionPreview: this.toPreview(tech.info?.description)
+            descriptionPreview: this.toPreview(tech.detail?.description)
         }
     }
 
@@ -113,15 +113,15 @@ export default class TechnologyMapper {
             logo: tech.logo,
             usage: tech.usage,
             categories: tech.categories || [],
-            description: tech.info?.description ?? null,
-            history: tech.info?.history || [],
-            websiteUrl: tech.info?.websiteUrl ?? null,
-            docsUrl: tech.info?.docsUrl ?? null,
-            creator: tech.info?.creator ?? null,
-            foundedAt: tech.info?.foundedAt ?? null,
-            versions: tech.info?.versions ?? null,
-            userCount: tech.info?.userCount ?? null,
-            projectCount: tech.info?.projectCount ?? null
+            description: tech.detail?.description ?? null,
+            history: tech.detail?.history || [],
+            websiteUrl: tech.detail?.websiteUrl ?? null,
+            docsUrl: tech.detail?.docsUrl ?? null,
+            creator: tech.detail?.creator ?? null,
+            foundedAt: tech.detail?.foundedAt ?? null,
+            versions: tech.detail?.versions ?? null,
+            userCount: tech.detail?.userCount ?? null,
+            projectCount: tech.detail?.projectCount ?? null
         }
     }
 
@@ -180,7 +180,7 @@ export default class TechnologyMapper {
                         : ['FRONTEND']),
                 isActive: rawBody.isActive === 'true' || rawBody.isActive === true
             },
-            info: {
+            detail: {
                 description: String(rawBody.description || '').trim(),
                 websiteUrl: rawBody.websiteUrl ? String(rawBody.websiteUrl).trim() : null,
                 docsUrl: rawBody.docsUrl ? String(rawBody.docsUrl).trim() : null,
@@ -209,7 +209,7 @@ export default class TechnologyMapper {
                 categories: categories as Category[],
                 isActive: true
             },
-            info: {
+            detail: {
                 description: tech.Description || '',
                 websiteUrl: null,
                 docsUrl: null,
