@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import type { ListedPost } from '@randomstack/commons'
+import type { PublicPostListed } from '@randomstack/commons'
 
-defineProps<{ post: ListedPost }>()
+defineProps<{ post: PublicPostListed }>()
 const router = useRouter()
 </script>
 

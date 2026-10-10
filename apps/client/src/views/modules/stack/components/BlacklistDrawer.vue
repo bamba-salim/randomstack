@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { ClientTechnology } from '#services'
+import type { ExcludeTechnologyLite } from '#services'
 
 defineProps<{
   isOpen: boolean
   groupedTechnologies: {
-    CLIENT: ClientTechnology[]
-    SERVER: ClientTechnology[]
-    DATABASE: ClientTechnology[]
+    CLIENT: ExcludeTechnologyLite[]
+    SERVER: ExcludeTechnologyLite[]
+    DATABASE: ExcludeTechnologyLite[]
   }
   blacklist: string[]
 }>()

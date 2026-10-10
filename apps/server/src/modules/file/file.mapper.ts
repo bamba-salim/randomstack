@@ -1,8 +1,7 @@
-import type {Table, FileType} from "@randomstack/commons";
+import type {Table, FileType, UploadedFileListed} from '@randomstack/commons'
 
 export default class FileMapper {
     static toSaveFileDTO(id: string, type: FileType, category: Table, ext: string, mimeType: string, size: number, altText: string | null) {
-
         return {
             file: {
                 id: id,
@@ -13,6 +12,13 @@ export default class FileMapper {
                 size: size,
                 altText: altText,
             }
+        }
+    }
+
+    static buildUploadedFileListed(file: {id: string}, url: string): UploadedFileListed {
+        return {
+            idFile: file.id,
+            url
         }
     }
 }

@@ -1,16 +1,15 @@
 import type {FileType, Table} from '../../constants'
 
-export interface File {
+export interface FileRecord {
     id: string
     type: FileType
-    category: Table
+    category: Table | string
     extension: string
     mimeType: string
-    size: int
-    altText?: string
-    createdAt?: Date
+    size: number
+    altText: string | null
+    createdAt?: string | Date
 }
 
-export interface EditFile {
-    file: Omit<File, 'createdAt'>
-}
+/** @deprecated — préférer FileRecord */
+export type File = FileRecord

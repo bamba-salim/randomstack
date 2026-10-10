@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Post } from '@randomstack/commons'
+import type { AdminPostListed } from '@randomstack/commons'
 
 defineProps<{
-  posts: Post[]
+  posts: AdminPostListed[]
 }>()
 </script>
 

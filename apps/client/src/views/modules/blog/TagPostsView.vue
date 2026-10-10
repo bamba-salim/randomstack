@@ -3,7 +3,7 @@ import {ref, onMounted, watch} from 'vue'
 import {useRoute} from 'vue-router'
 import {fetchPostsByTag} from '#services'
 import { Breadcrumbs} from '#components'
-import type {Post} from '@randomstack/commons'
+import type {FeaturedPostListed, PublicPostListed} from '@randomstack/commons'
 
 import FeaturedPostCard from './components/FeaturedPostCard.vue'
 import PostCard from './components/PostCard.vue'
@@ -11,8 +11,8 @@ import PostCard from './components/PostCard.vue'
 const route = useRoute()
 const currentTag = ref('')
 
-const featuredPost = ref<Post | null>(null)
-const posts = ref<Post[]>([])
+const featuredPost = ref<FeaturedPostListed | null>(null)
+const posts = ref<PublicPostListed[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 

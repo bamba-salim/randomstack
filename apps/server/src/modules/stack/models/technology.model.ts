@@ -1,80 +1,64 @@
-import { BaseModel } from '#abstracts'
-import type { EditTechnology } from '@randomstack/commons'
+import {BaseModel} from '#abstracts'
+import type {EditTechnology} from '@randomstack/commons'
 
 export default class TechnologyModel extends BaseModel {
 
-    // =========================================================================
-    // 🌐 1. REQUÊTES CLIENT (ENCYCLOPÉDIE & GÉNÉRATEUR)
-    // =========================================================================
-
-    /**
-     * Récupère toutes les technologies avec leurs détails pour l'encyclopédie
-     */
     static async fetchTechnologies() {
         return await this.db.technology.findMany({
-            include: { detail: true },
-            orderBy: { name: 'asc' }
+            include: {info: true},
+            orderBy: {name: 'asc'}
         })
     }
 
-    /**
-     * Récupère uniquement les technologies actives pour le tirage de la machine à sous
-     */
     static async fetchActiveTechnologies() {
         return await this.db.technology.findMany({
-            where: { isActive: true },
-            include: { detail: true },
-            orderBy: { name: 'asc' }
+            where: {isActive: true},
+            include: {info: true},
+            orderBy: {name: 'asc'}
         })
     }
 
-    /**
-     * Fiche détaillée d'une technologie via son permalien (slug)
-     */
     static async fetchTechnologyBySlug(slug: string) {
         return await this.db.technology.findUnique({
-            where: { slug },
-            include: { detail: true }
+            where: {slug},
+            include: {info: true}
         })
     }
-
-    // =========================================================================
-    // 🛠️ 2. REQUÊTES ADMIN (EXTRANET / ÉDITION)
-    // =========================================================================
 
     static async fetchTechnologyById(id: string) {
         return await this.db.technology.findUnique({
-            where: { id },
-            include: { detail: true }
+            where: {id},
+            include: {info: true}
         })
     }
 
     static async createTechnology(payload: EditTechnology) {
-        const { id: _, ...detailWithoutId } = payload.detail
-
         return await this.db.technology.create({
             data: {
                 ...payload.technology,
-                detail: {
-                    create: detailWithoutId
+                info: {
+                    create: payload.info
                 }
             },
-            include: { detail: true }
+            include: {info: true}
         })
     }
 
     static async updateTechnology(id: string, payload: EditTechnology) {
-        const { id: _, slug: __, ...technologyData } = payload.technology
+        const {id: _, slug: __, ...technologyData} = payload.technology
 
         return await this.db.technology.update({
-            where: { id },
+            where: {id},
             data: {
                 ...technologyData,
-                detail: {
-                    update: payload.detail
+                info: {
+                    upsert: {
+                        create: payload.info,
+                        update: payload.info
+                    }
                 }
             },
-            include: { detail: true }
+            include: {info: true}
         })
     }
 
@@ -84,7 +68,7 @@ export default class TechnologyModel extends BaseModel {
 
     static async getTechnologies() {
         return await this.db.technology.findMany({
-            include: {detail: true},
+            include: {info: true},
             orderBy: {name: 'asc'}
         })
     }

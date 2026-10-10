@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import type { Technology } from '@randomstack/commons'
+import type { PublicTechnologyListed } from '@randomstack/commons'
 
 defineProps<{
-  tech: Technology
+  tech: PublicTechnologyListed
 }>()
 
 const router = useRouter()
@@ -36,7 +36,7 @@ const router = useRouter()
 
       <!-- État survolé -->
       <div class="overlay-hover-content">
-        <p class="desc">{{ tech.description }}</p>
+        <p class="desc">{{ tech.descriptionPreview }}</p>
         <span class="view-more-btn">Découvrir l'outil →</span>
       </div>
 

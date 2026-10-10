@@ -1,25 +1,19 @@
 import type {
-    Post,
-    FeaturedPost,
-    ListedPost,
-    AdminPostList,
+    FeaturedPostListed,
+    PublicPostListed,
+    AdminPostListed,
+    PublicPostDetail,
+    PublishedPostsResponse,
+    SavePostResponse,
     EditPost,
     EditPostFormBean,
-    PostStatus,
+    PostStatus
 } from '@randomstack/commons'
-import { StrUtils } from '#utils'
+import {StrUtils} from '#utils'
 
 export default class BlogMapper {
 
-    // =========================================================================
-    // 🌐 1. OUTBOUND DTOs (LECTURE PUBLIQUE & LISTING ADMIN)
-    // Transforme les entités BDD lourdes en DTOs légers pour les frontends
-    // =========================================================================
-
-    /**
-     * Construit le DTO de l'article mis en avant pour le blog / home
-     */
-    static buildFeaturedPost(post: Post): FeaturedPost {
+    static buildFeaturedPostListed(post: any): FeaturedPostListed {
         return {
             id: post.id,
             slug: post.slug,
@@ -31,10 +25,7 @@ export default class BlogMapper {
         }
     }
 
-    /**
-     * Construit le DTO unitaire d'un article pour les grilles standard (Client)
-     */
-    static buildListedPost(post: Post): ListedPost {
+    static buildPublicPostListed(post: any): PublicPostListed {
         return {
             id: post.id,
             slug: post.slug,
@@ -45,17 +36,25 @@ export default class BlogMapper {
         }
     }
 
-    /**
-     * Mappe une liste complète d'articles pour les grilles publiques
-     */
-    static buildListedPostList(posts: Post[]): ListedPost[] {
-        return posts.map(post => this.buildListedPost(post))
+    static buildPublicPostListedList(posts: any[]): PublicPostListed[] {
+        return posts.map(post => this.buildPublicPostListed(post))
     }
 
-    /**
-     * Mappe un article pour le tableau de bord de l'Extranet (Admin)
-     */
-    static buildAdminPost(post: Post): AdminPostList {
+    static buildPublicPostDetail(post: any): PublicPostDetail {
+        return {
+            id: post.id,
+            slug: post.slug,
+            title: post.title,
+            summary: post.summary,
+            content: post.content || [],
+            imageId: post.imageId,
+            tags: post.tags || [],
+            mainTag: post.tags?.[0] || '',
+            publishAt: post.publishAt || post.updatedAt
+        }
+    }
+
+    static buildAdminPostListed(post: any): AdminPostListed {
         return {
             id: post.id,
             title: post.title,
@@ -66,27 +65,30 @@ export default class BlogMapper {
         }
     }
 
-    /**
-     * Mappe l'ensemble des articles pour l'index de l'Extranet
-     */
-    static buildAdminPostList(posts: Post[]): AdminPostList[] {
-        return posts.map(post => this.buildAdminPost(post))
+    static buildAdminPostListedList(posts: any[]): AdminPostListed[] {
+        return posts.map(post => this.buildAdminPostListed(post))
     }
 
+    static buildPublishedPostsResponse(
+        featured: any | null,
+        posts: any[]
+    ): PublishedPostsResponse {
+        return {
+            featured: featured ? this.buildFeaturedPostListed(featured) : null,
+            posts: this.buildPublicPostListedList(posts)
+        }
+    }
 
-    // =========================================================================
-    // 🛠️ 2. INBOUND & FORMBEANS (ÉDITION & ÉCRITURE EXTRANET)
-    // Gestion du FormBean d'édition et transformation vers la couche BDD
-    // =========================================================================
+    static buildSavePostResponse(post: any): SavePostResponse {
+        return {
+            success: true,
+            post: this.buildAdminPostListed(post)
+        }
+    }
 
-    /**
-     * Convertit le FormBean reçu du client (req.body) en DTO d'écriture BDD (EditPost)
-     * Génère un permalien (slug) stable et immuable basé sur le titre et l'ID
-     */
     static toSavePostDTO(formBean: EditPostFormBean, idPost: string): EditPost {
         const slug = StrUtils.slugify(formBean.title, idPost)
 
-        // 1. Parsing sécurisé des blocs de contenu JSON (provenant souvent d'un FormData)
         let contentBlocks: any[] = []
         if (typeof formBean.content === 'string') {
             try {
@@ -98,17 +100,15 @@ export default class BlogMapper {
             contentBlocks = formBean.content
         }
 
-        // 2. Normalisation des tags (tableau ou chaîne séparée par des virgules)
         let tagsList: string[] = []
-        const rawTags = formBean.tags
+        const rawTags = formBean.tags as unknown
 
         if (Array.isArray(rawTags)) {
             tagsList = rawTags.map(t => String(t).trim()).filter(Boolean)
         } else if (typeof rawTags === 'string' && rawTags.trim() !== '') {
-            tagsList = rawTags.split(',').map(t => t.trim()).filter(Boolean)
+            tagsList = rawTags.split(',').map((t: string) => t.trim()).filter(Boolean)
         }
 
-        // 3. Détermination du statut et de la date de publication
         const status = (formBean.status as PostStatus) || 'DRAFT'
         let finalPublishAt = formBean.publishAt ? new Date(formBean.publishAt) : null
 
@@ -128,15 +128,12 @@ export default class BlogMapper {
                 tags: tagsList,
                 authorIds: Array.isArray(formBean.authorIds) ? formBean.authorIds : [],
                 publishAt: finalPublishAt,
-                hasBeenPublished: formBean.hasBeenPublished === 'true' || formBean.hasBeenPublished === true,
+                hasBeenPublished: formBean.hasBeenPublished === true,
                 isFeatured: Boolean(formBean.isFeatured)
             }
         }
     }
 
-    /**
-     * Hydrate le FormBean d'édition pour l'Extranet à partir des données de la BDD
-     */
     static fromDBToClientFormBean(post: any): EditPostFormBean {
         return {
             id: post.id,
@@ -149,14 +146,10 @@ export default class BlogMapper {
             authorIds: post.authorIds || [],
             publishAt: post.publishAt ? new Date(post.publishAt).toISOString() : null,
             hasBeenPublished: post.hasBeenPublished,
-            isFeatured: post.isFeatured,
-            logo: null
+            isFeatured: post.isFeatured
         }
     }
 
-    /**
-     * Génère un FormBean vierge pour l'initialisation du formulaire de création
-     */
     static getInitialFormBean(): EditPostFormBean {
         return {
             title: '',
@@ -168,8 +161,22 @@ export default class BlogMapper {
             authorIds: [],
             publishAt: null,
             hasBeenPublished: false,
-            isFeatured: false,
-            logo: null
+            isFeatured: false
         }
+    }
+
+    static buildUniqueTags(tags: string[]): string[] {
+        return Array.isArray(tags) ? tags : []
+    }
+
+    static buildPostsContentsAudit(imageBlocks: any[]): {size: number; data: any[]} {
+        return {
+            size: imageBlocks.length,
+            data: imageBlocks
+        }
+    }
+
+    static buildSuccessAck(): {success: true} {
+        return {success: true}
     }
 }

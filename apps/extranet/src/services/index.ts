@@ -1,9 +1,9 @@
 import ApiClient from './api.client'
 import type {
-    Technology,
-    EditPostFormBean,
+    AdminTechnologyListed,
+    AdminPostListed,
     EditTechnologyFormBean,
-    Post,
+    EditPostFormBean,
     FileType,
     Table
 } from '@randomstack/commons'
@@ -13,8 +13,8 @@ export {login, getMe, logout} from './auth'
 
 // ─── Technologies (admin /ws) ────────────────────────────────────────────────
 
-export const fetchTechnologies = async (): Promise<Technology[]> => {
-    return await ApiClient.get<Technology[]>('/ws/fetch-technologies')
+export const fetchTechnologies = async (): Promise<AdminTechnologyListed[]> => {
+    return await ApiClient.get<AdminTechnologyListed[]>('/ws/fetch-technologies')
 }
 
 export const fetchTechnologyFormData = async (id?: string): Promise<EditTechnologyFormBean> => {
@@ -26,7 +26,7 @@ export const fetchTechnologyFormData = async (id?: string): Promise<EditTechnolo
 export const saveTechnology = async (
     payload: EditTechnologyFormBean,
     id?: string
-): Promise<{success: boolean; technology: Technology}> => {
+): Promise<{success: boolean; technology: AdminTechnologyListed}> => {
     const endpoint = id ? `/ws/save-technology/${id}` : '/ws/save-technology'
     return await ApiClient.post(endpoint, payload)
 }
@@ -39,14 +39,14 @@ export const fetchPostFormData = async (id?: string): Promise<EditPostFormBean> 
     )
 }
 
-export const fetchPosts = async (): Promise<Post[]> => {
-    return await ApiClient.get<Post[]>('/ws/fetch-posts')
+export const fetchPosts = async (): Promise<AdminPostListed[]> => {
+    return await ApiClient.get<AdminPostListed[]>('/ws/fetch-posts')
 }
 
 export const savePost = async (
     payload: EditPostFormBean,
     id?: string
-): Promise<{success: boolean; post: Post}> => {
+): Promise<{success: boolean; post: AdminPostListed}> => {
     const endpoint = `/ws/save-post${id ? `/${id}` : ''}`
     return await ApiClient.post(endpoint, payload)
 }

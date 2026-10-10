@@ -1,19 +1,20 @@
-import type {Category} from '../../types'
+import type {Category} from '../../constants'
 
-
-export interface TechnologyDetail {
-    id: string // Clé primaire identique à l'ID de la technologie associée 🚀
+/** Entité DB imbriquée (Prisma TechnologyInfo) */
+export interface TechnologyInfo {
+    id: string
     websiteUrl: string | null
     docsUrl: string | null
     creator: string | null
     foundedAt: string | null
-    versions: TechnoLogyVersion | null // Stockera { stable: { num: string, date: string }, latest: { num: string, date: string } }
+    versions: TechnologyVersion | null
     userCount: number | null
     projectCount: number | null
     history: string[]
     description: string | null
 }
 
+/** Entité DB Technology */
 export interface Technology {
     id: string
     name: string
@@ -22,32 +23,28 @@ export interface Technology {
     logo: string | null
     usage: string
     categories: Category[]
-    isActive:boolean
+    isActive: boolean
     createdAt?: string | Date
-    detail?: TechnologyDetail | null // Jointure vers la table de détails 🚀
+    info?: TechnologyInfo | null
 }
 
+/** Contrat d'écriture serveur */
 export interface EditTechnology {
-    technology: Omit<Technology, 'createdAt' | 'detail'>
-    detail: Omit<TechnologyDetail, 'id'>
+    technology: Omit<Technology, 'createdAt' | 'info'>
+    info: Omit<TechnologyInfo, 'id'>
 }
+
+export interface TechnologyVersion {
+    stable: {num: string; date: string}
+    latest: {num: string; date: string}
+}
+
+/** @deprecated — préférer TechnologyVersion */
+export type TechnoLogyVersion = TechnologyVersion
 
 export interface RawExcelTech {
     Langage: string
     Framework: string
     Utilisation: string
     Description: string
-}
-
-export interface TechnoLogyVersion {
-    stable: { num: string, date: string }
-    latest: { num: string, date: string }
-}
-
-export interface TechnologyToExclude {
-    id: string
-    name: string
-    logo: string
-    usage: string
-    categories: Category[]
 }

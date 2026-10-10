@@ -4,12 +4,12 @@ import { useRouter } from 'vue-router'
 import {fetchPublishedPosts} from '#services'
 import FeaturedPostCard from '../blog/components/FeaturedPostCard.vue'
 import PostCard from '../blog/components/PostCard.vue'
-import type { Post } from '@randomstack/commons'
+import type { FeaturedPostListed, PublicPostListed } from '@randomstack/commons'
 
 const router = useRouter()
 
-const featuredPost = ref<Post | null>(null)
-const posts = ref<Post[]>([])
+const featuredPost = ref<FeaturedPostListed | null>(null)
+const posts = ref<PublicPostListed[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 

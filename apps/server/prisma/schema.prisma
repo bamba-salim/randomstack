@@ -49,24 +49,26 @@ model Technology {
   isActive   Boolean    @default(true) // Disponible uniquement au tirage ou non
   createdAt  DateTime   @default(now())
 
-  // Relation 1-à-1 : detail.id est la clé primaire ET la clé étrangère référençant l'ID de Technology
-  detail TechnologyDetail?
+  // Relation 1-à-1 : info.id = Technology.id
+  info TechnologyInfo?
 }
 
-// Modèle de détails d'une technologie (Lourd)
-model TechnologyDetail {
-  id         String     @id // Clé primaire identique à Technology.id (sélecteur partagé)
+// Infos enrichies d'une technologie (table lourde)
+model TechnologyInfo {
+  id         String     @id // Clé primaire identique à Technology.id
   technology Technology @relation(fields: [id], references: [id], onDelete: Cascade)
 
   websiteUrl   String?
   docsUrl      String?
   creator      String?
-  foundedAt    String? // Date/Année de création de la techno (ex: "2013")
-  versions     Json? // JSON stockant { stable: { num: "...", date: "..." }, latest: { num: "...", date: "..." } }
-  userCount    Int? // Nombre d'utilisateurs (ex: étoiles GitHub)
-  projectCount Int? // Nombre de projets
-  history      String[] // Tableau sémantique de paragraphes
-  description  String?  @db.Text // Rendu nullable avec un "?"
+  foundedAt    String?
+  versions     Json?
+  userCount    Int?
+  projectCount Int?
+  history      String[]
+  description  String?  @db.Text
+
+  @@map("TechnologyDetail") // conserve le nom de table existant en BDD
 }
 
 model SavedStack {

@@ -1,5 +1,8 @@
-import type {Technology} from "./technology.interface";
-import type {Post} from "./post.interface";
+import type {
+    PublicTechnologyListed,
+    AdminTechnologyListed,
+    AdminPostListed
+} from '../../dtos'
 
 export interface FilterOptions {
     searchQuery: string
@@ -10,7 +13,7 @@ export interface FilterOptions {
 }
 
 export interface FilterResult {
-    paginatedItems: Technology[]
+    paginatedItems: Array<PublicTechnologyListed | AdminTechnologyListed>
     totalPages: number
     totalItemsCount: number
 }
@@ -24,7 +27,7 @@ export interface PostFilterOptions {
 }
 
 export interface PostFilterResult {
-    paginatedItems: Post[]
+    paginatedItems: AdminPostListed[]
     totalPages: number
     totalItemsCount: number
 }

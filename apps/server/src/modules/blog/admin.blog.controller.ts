@@ -12,7 +12,7 @@ export default class AdminBlogController {
     /**
      * Initialisation du formulaire Extranet (FormBean)
      * Fournit un FormBean vide pour la création ou pré-rempli pour la modification
-     * Cible : GET /api/admin/posts/form-bean / GET /api/admin/posts/form-bean/:id
+     * Cible : GET /ws/fetch-post-form-data / GET /ws/fetch-post-form-data/:id
      */
     static async fetchEditPostInitialData(req: Request, res: Response): Promise<void> {
         try {
@@ -93,7 +93,7 @@ export default class AdminBlogController {
                 ? await BlogModel.updatePost(id, saveDTO)
                 : await BlogModel.createPost(saveDTO)
 
-            res.json({success: true, post: result})
+            res.json(BlogMapper.buildSavePostResponse(result))
         } catch (error: any) {
             console.error('[AdminBlogController] Échec savePost :', error.message || error)
             res.status(500).json({error: "Erreur lors de la sauvegarde de l'article."})
@@ -107,7 +107,7 @@ export default class AdminBlogController {
     static async fetchPosts(_req: Request, res: Response): Promise<void> {
         try {
             const posts = await BlogModel.fetchAllAdminPosts()
-            res.json(BlogMapper.buildAdminPostList(posts))
+            res.json(BlogMapper.buildAdminPostListedList(posts))
         } catch (error: any) {
             console.error('[AdminBlogController] Erreur fetchPosts :', error.message || error)
             res.status(500).json({error: 'Impossible de récupérer les articles.'})
@@ -128,7 +128,7 @@ export default class AdminBlogController {
             }
 
             await BlogModel.softDeletePost(id)
-            res.json({success: true})
+            res.json(BlogMapper.buildSuccessAck())
         } catch (error: any) {
             console.error('[AdminBlogController] Échec deletePost :', error.message || error)
             res.status(500).json({error: 'Erreur lors de la suppression.'})
@@ -158,7 +158,7 @@ export default class AdminBlogController {
                 })
             })
 
-            res.json({size: imageContents.length, data: imageContents})
+            res.json(BlogMapper.buildPostsContentsAudit(imageContents))
         } catch (error: any) {
             console.error('[AdminBlogController] Erreur fetchPostsContents :', error.message || error)
             res.status(500).json({error: 'Erreur lors de la lecture des contenus.'})

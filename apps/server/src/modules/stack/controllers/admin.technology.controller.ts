@@ -7,7 +7,7 @@ export default class AdminTechnologyController {
 
     /**
      * Initialisation du FormBean pour l'Extranet (création ou édition)
-     * Cible : GET /api/admin/technologies/form-bean/:id?
+     * Cible : GET /ws/fetch-technology-init-form-data/:id?
      */
     static async fetchEditTechnologyInitialData(req: Request, res: Response): Promise<void> {
         try {
@@ -53,7 +53,7 @@ export default class AdminTechnologyController {
                 ? await TechnologyModel.updateTechnology(id, editDTO)
                 : await TechnologyModel.createTechnology(editDTO)
 
-            res.json({success: true, technology: result})
+            res.json(TechnologyMapper.buildSaveTechnologyResponse(result))
         } catch (error: any) {
             console.error('[AdminTechnologyController] Échec saveTechnology :', error.message || error)
             res.status(500).json({error: 'Erreur lors de la sauvegarde de la technologie.'})
@@ -61,15 +61,14 @@ export default class AdminTechnologyController {
     }
 
 
-    static async fetchTechnologies(req: Request, res: Response) {
+    /** GET table admin → AdminTechnologyListed[] */
+    static async fetchTechnologies(_req: Request, res: Response) {
         try {
             const technos = await TechnologyModel.getTechnologies()
-            res.json(technos)
-
+            res.json(TechnologyMapper.buildAdminTechnologyListedList(technos))
         } catch (error) {
-            console.error('[AdminTechnologyController] Échec saveTechnology :', error.message || error)
-            res.status(500).json({error: 'Erreur lors de la sauvegarde de la technologie.'})
+            console.error('[AdminTechnologyController] Échec fetchTechnologies :', error)
+            res.status(500).json({error: 'Erreur lors du chargement des technologies.'})
         }
-
     }
 }

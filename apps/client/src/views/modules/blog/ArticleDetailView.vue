@@ -3,12 +3,12 @@ import {ref, onMounted} from 'vue'
 import {useRoute} from 'vue-router'
 import {fetchPostBySlug} from '#services'
 import {Breadcrumbs} from '#components'
-import type {Post} from '@randomstack/commons'
+import type {PublicPostDetail} from '@randomstack/commons'
 
 import BlockRenderer from './components/BlockRenderer.vue'
 
 const route = useRoute()
-const post = ref<Post | null>(null)
+const post = ref<PublicPostDetail | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 

@@ -2,11 +2,11 @@
 import {ref, onMounted, computed} from 'vue'
 import {fetchAllTechnologies} from '#services'
 import {Pagination} from '#components'
-import {TechnologyFilter, type Technology} from '@randomstack/commons'
+import {TechnologyFilter, type PublicTechnologyListed} from '@randomstack/commons'
 
 import TechCard from './components/TechCard.vue'
 
-const technologies = ref<Technology[]>([])
+const technologies = ref<PublicTechnologyListed[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 

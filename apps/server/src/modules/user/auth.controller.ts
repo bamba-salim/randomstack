@@ -1,14 +1,12 @@
 import type {Request, Response} from 'express'
 
 import UserModel from './user.model'
+import AuthMapper from './auth.mapper'
 import {PasswordUtils} from '#utils'
 
 export default class AuthController {
 
-    // Méthode d'aide privée pour valider les identifiants sans dupliquer de code 🚀
     private static async verifyCredentials(email: string, password: string) {
-        //TODO: user dto or mapper
-
         if (!email || !password) {
             return {user: null, error: 'Email et mot de passe requis.'}
         }
@@ -16,7 +14,7 @@ export default class AuthController {
         const user = await UserModel.findByEmail(email)
 
         if (!user) {
-            return {user: null, error: "Ce compte n'existe pas."} // Existence du compte 🚀
+            return {user: null, error: "Ce compte n'existe pas."}
         }
 
         const isPasswordValid = PasswordUtils.verify(password, user.passwordHash)
@@ -28,10 +26,8 @@ export default class AuthController {
         return {user, error: null}
     }
 
-    // 1. LOGIN PUBLIC (Connexion classique)
     static async login(req: Request, res: Response): Promise<void> {
         try {
-            //TODO: user dto or mapper
             const {email, password} = req.body
             const {user, error} = await AuthController.verifyCredentials(email, password)
 
@@ -44,34 +40,24 @@ export default class AuthController {
             session.userId = user!.id
             session.userRole = user!.role
 
-            res.json({
-                user: {id: user!.id, email: user!.email, role: user!.role}
-            })
+            res.json(AuthMapper.buildSessionUserResponse(user!))
         } catch {
             res.status(500).json({error: "Erreur lors de l'authentification."})
         }
     }
 
-    // 2. LOGIN ADMINISTRATEUR (Pour l'Extranet) 🔒
     static async adminLogin(req: Request, res: Response): Promise<void> {
         try {
             const {email, password} = req.body
-
-
             const {user, error} = await AuthController.verifyCredentials(email, password)
 
-
-            // Si la vérification de base (email/mot de passe) échoue, on renvoie l'erreur
             if (error) {
                 res.status(401).json({error})
                 return
             }
 
-            // Rôles habilités pour l'extranet
             const allowedAdminRoles = ['ADMIN', 'EDITOR', 'MODERATOR']
 
-            // SÉCURITÉ & UX : Si l'utilisateur est un simple USER public,
-            // on renvoie le même message d'erreur "Ce compte n'existe pas" (masquage d'autorisation) 🚀
             if (!user || !allowedAdminRoles.includes(user.role)) {
                 res.status(401).json({error: "Ce compte n'existe pas."})
                 return
@@ -81,9 +67,7 @@ export default class AuthController {
             session.userId = user.id
             session.userRole = user.role
 
-            res.json({
-                user: {id: user.id, email: user.email, role: user.role}
-            })
+            res.json(AuthMapper.buildSessionUserResponse(user))
         } catch {
             res.status(500).json({error: "Erreur lors de l'authentification administrateur."})
         }
@@ -99,7 +83,7 @@ export default class AuthController {
                 return
             }
 
-            res.json({user})
+            res.json(AuthMapper.buildSessionUserResponse(user))
         } catch {
             res.status(500).json({error: 'Impossible de récupérer le profil.'})
         }
@@ -112,7 +96,7 @@ export default class AuthController {
                 return
             }
             res.clearCookie('connect.sid')
-            res.json({success: true})
+            res.json(AuthMapper.buildSuccessAck())
         })
     }
 }

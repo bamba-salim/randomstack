@@ -1,18 +1,6 @@
-import type {Technology} from "./technology.interface";
+import type {Category} from '../../constants'
 
-
-export interface DrawnStack {
-    clientLayer: Technology | null
-    serverLayer: Technology | null
-    databaseLayer: Technology | null
-    timestamp: string
-}
-
-export interface DrawResponse {
-    current: DrawnStack
-    history: DrawnStack[]
-}
-
+/** Contrat d'écriture share (serveur) */
 export interface SaveStackDTO {
     shareCode: string
     projectType: Category

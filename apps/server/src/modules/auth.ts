@@ -11,7 +11,7 @@ export default class Auth {
         const router = Router()
 
         router.post('/login', AuthController.login)
-        router.post('/admin-login', AuthController.adminLogin)
+        router.post('/admin/login', AuthController.adminLogin)
 
         router.get('/me', AuthMiddleware.isAuthenticated, AuthController.me)
         router.post('/logout', AuthMiddleware.isAuthenticated, AuthController.logout)

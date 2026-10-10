@@ -1,4 +1,4 @@
-import {BlockType, PostStatus} from '../../types'
+import type {BlockType, PostStatus} from '../../constants'
 
 export interface PostContentBlock {
     type: BlockType
@@ -9,6 +9,7 @@ export interface PostContentBlock {
     right?: PostContentBlock | null
 }
 
+/** Entité DB Post */
 export interface Post {
     id: string
     title: string
@@ -26,50 +27,7 @@ export interface Post {
     updatedAt: string | Date
 }
 
-// Le contrat double-DTO d'écriture serveur
+/** Contrat d'écriture serveur */
 export interface EditPost {
     post: Omit<Post, 'createdAt' | 'updatedAt'>
-}
-
-// Le FormBean unifié utilisé par le formulaire de l'Extranet 🚀
-export interface EditPostFormBean {
-    id?: string
-    title: string
-    summary: string
-    content: PostContentBlock[]
-    imageId?: string | null
-    status: PostStatus
-    tags: string[]
-    authorIds: string[]
-    publishAt?: string | null
-    hasBeenPublished?: boolean
-    isFeatured: boolean
-}
-
-// PUBLIC INTERFACE
-
-export interface FeaturedPost {
-    id: string
-    slug: string
-    title: string
-    summary: string
-    image: string
-    mainTag: string
-}
-
-export interface ListedPost {
-    id: string
-    slug: string
-    title: string
-    image: string
-    mainTag: string
-}
-
-export interface AdminPostList {
-    id: string
-    title: string
-    status: PostStatus
-    tags: string[]
-    imageId: string | null
-    publishAt?: string | null
 }

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Technology } from '@randomstack/commons'
+import type { AdminTechnologyListed } from '@randomstack/commons'
 
 defineProps<{
-  technologies: Technology[]
+  technologies: AdminTechnologyListed[]
 }>()
 </script>
 

@@ -3,11 +3,11 @@ import {ref, onMounted, computed} from 'vue'
 import {useRouter} from 'vue-router'
 import {logout, fetchTechnologies} from '#services'
 // Importation propre du filtre et des types depuis le module commun ! 🚀
-import {TechnologyFilter, type Technology} from '@randomstack/commons'
+import {TechnologyFilter, type AdminTechnologyListed} from '@randomstack/commons'
 import {TechnologyTable} from "#components"
 
 const router = useRouter()
-const technologies = ref<Technology[]>([])
+const technologies = ref<AdminTechnologyListed[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 

@@ -8,7 +8,8 @@ import {
   fetchShare,
   fetchHistory,
   type DrawnStack,
-  type ClientTechnology
+  type DrawTechnologyLite,
+  type ExcludeTechnologyLite
 } from '#services'
 import {DraftScript} from '#scripts'
 
@@ -45,7 +46,7 @@ const databaseLocked = ref(false)
 
 // ─── Données et Blacklist ──────────────────────────────────────────────────
 // Liste complète des technologies chargées au montage
-const allTechnologies = ref<ClientTechnology[]>([])
+const allTechnologies = ref<ExcludeTechnologyLite[]>([])
 // IDs des technologies exclues du tirage par l'utilisateur
 const blacklist = ref<string[]>([])
 // Type de projet sélectionné (FRONTEND / MOBILE / DESKTOP)
@@ -73,9 +74,9 @@ const toggleBlacklist = (techId: string) => {
 
 // ─── Rouleaux (contenu affiché dans chaque SlotReel) ──────────────────────
 // Chaque rouleau contient une liste de technologies à défiler (strip) ou la techno finale seule
-const clientReel = ref<ClientTechnology[]>([])
-const serverReel = ref<ClientTechnology[]>([])
-const databaseReel = ref<ClientTechnology[]>([])
+const clientReel = ref<DrawTechnologyLite[]>([])
+const serverReel = ref<DrawTechnologyLite[]>([])
+const databaseReel = ref<DrawTechnologyLite[]>([])
 
 /**
  * Déclenche un tirage de stack.

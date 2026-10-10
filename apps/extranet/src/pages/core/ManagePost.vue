@@ -2,10 +2,10 @@
 import {ref, onMounted, computed} from 'vue'
 import {fetchPosts} from '#services'
 import {Sidebar, PostTable} from '#components' // Importation sémantique 🚀
-import {type Post} from '@randomstack/commons'
+import type {AdminPostListed} from '@randomstack/commons'
 import {PostFilter} from '#utils'// Import de l'ordonnanceur commun 🚀
 
-const posts = ref<Post[]>([])
+const posts = ref<AdminPostListed[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 

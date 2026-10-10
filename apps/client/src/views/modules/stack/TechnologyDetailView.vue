@@ -5,13 +5,13 @@ import {fetchTechnologyBySlug} from '#services'
 
 import {Breadcrumbs} from '#components'
 
-import type { Technology } from '@randomstack/commons'
+import type { PublicTechnologyDetail } from '@randomstack/commons'
 
 
 
 const route = useRoute()
 
-const tech = ref<Technology | null>(null)
+const tech = ref<PublicTechnologyDetail | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 
@@ -82,21 +82,21 @@ onMounted(async () => {
               <span class="meta-value">{{ tech.usage }}</span>
             </div>
 
-            <div v-if="tech.detail?.creator" class="meta-row">
+            <div v-if="tech.creator" class="meta-row">
               <span class="meta-label">Créateur / Auteur</span>
-              <span class="meta-value">{{ tech.detail.creator }}</span>
+              <span class="meta-value">{{ tech.creator }}</span>
             </div>
 
-            <div v-if="tech.detail?.foundedAt" class="meta-row">
+            <div v-if="tech.foundedAt" class="meta-row">
               <span class="meta-label">Année de création</span>
-              <span class="meta-value font-mono">{{ tech.detail.foundedAt }}</span>
+              <span class="meta-value font-mono">{{ tech.foundedAt }}</span>
             </div>
 
-            <div v-if="tech.detail?.userCount || tech.detail?.projectCount" class="meta-row">
+            <div v-if="tech.userCount || tech.projectCount" class="meta-row">
               <span class="meta-label">Statistiques d'usage</span>
               <span class="meta-value">
-                <span v-if="tech.detail.userCount" class="mr-3">⭐ {{ tech.detail.userCount.toLocaleString() }}</span>
-                <span v-if="tech.detail.projectCount">📦 {{ tech.detail.projectCount.toLocaleString() }}</span>
+                <span v-if="tech.userCount" class="mr-3">⭐ {{ tech.userCount.toLocaleString() }}</span>
+                <span v-if="tech.projectCount">📦 {{ tech.projectCount.toLocaleString() }}</span>
               </span>
             </div>
           </div>
@@ -104,7 +104,7 @@ onMounted(async () => {
       </section>
 
       <!-- NIVEAU 2 : TABLEAU DES VERSIONS (OPTIONNEL) -->
-      <section v-if="tech.detail?.versions" class="detail-versions-section">
+      <section v-if="tech.versions" class="detail-versions-section">
         <h2 class="section-heading">Versions de l'écosystème</h2>
         <div class="versions-table-wrap">
           <table class="versions-table">
@@ -116,15 +116,15 @@ onMounted(async () => {
             </tr>
             </thead>
             <tbody>
-            <tr v-if="tech.detail.versions.stable?.num">
+            <tr v-if="tech.versions.stable?.num">
               <td class="font-bold">Stable (Production)</td>
-              <td class="font-mono text-cyan-600 font-bold">{{ tech.detail.versions.stable.num }}</td>
-              <td class="text-slate-500">{{ tech.detail.versions.stable.date || 'Inconnue' }}</td>
+              <td class="font-mono text-cyan-600 font-bold">{{ tech.versions.stable.num }}</td>
+              <td class="text-slate-500">{{ tech.versions.stable.date || 'Inconnue' }}</td>
             </tr>
-            <tr v-if="tech.detail.versions.latest?.num">
+            <tr v-if="tech.versions.latest?.num">
               <td class="font-bold">Latest (Développement)</td>
-              <td class="font-mono text-pink-600 font-bold">{{ tech.detail.versions.latest.num }}</td>
-              <td class="text-slate-500">{{ tech.detail.versions.latest.date || 'Inconnue' }}</td>
+              <td class="font-mono text-pink-600 font-bold">{{ tech.versions.latest.num }}</td>
+              <td class="text-slate-500">{{ tech.versions.latest.date || 'Inconnue' }}</td>
             </tr>
             </tbody>
           </table>
@@ -135,13 +135,13 @@ onMounted(async () => {
       <section class="detail-bottom-section">
         <h2 class="section-heading">Description</h2>
         <p class="tech-long-description">
-          {{ tech.detail?.description || 'Aucune description disponible.' }}
+          {{ tech.description || 'Aucune description disponible.' }}
         </p>
 
-        <div v-if="tech.detail?.history && tech.detail.history.length > 0" class="tech-history-section">
+        <div v-if="tech.history && tech.history.length > 0" class="tech-history-section">
           <h2 class="section-heading mt-6">Histoire & Évolution</h2>
           <div class="history-paragraphs">
-            <p v-for="(para, idx) in tech.detail.history" :key="idx" class="history-paragraph">
+            <p v-for="(para, idx) in tech.history" :key="idx" class="history-paragraph">
               {{ para }}
             </p>
           </div>
@@ -149,20 +149,20 @@ onMounted(async () => {
       </section>
 
       <!-- NIVEAU 4 : RESSOURCES UTILES (BOUTONS UNIVERSELS) -->
-      <section v-if="tech.detail?.websiteUrl || tech.detail?.docsUrl" class="detail-links-section">
+      <section v-if="tech.websiteUrl || tech.docsUrl" class="detail-links-section">
         <h2 class="section-heading">Ressources utiles</h2>
         <div class="flex flex-col sm:flex-row gap-3 mt-2">
           <a
-              v-if="tech.detail.websiteUrl"
-              :href="tech.detail.websiteUrl"
+              v-if="tech.websiteUrl"
+              :href="tech.websiteUrl"
               target="_blank"
               class="btn btn--secondary"
           >
             🌐 Visiter le Site Officiel
           </a>
           <a
-              v-if="tech.detail.docsUrl"
-              :href="tech.detail.docsUrl"
+              v-if="tech.docsUrl"
+              :href="tech.docsUrl"
               target="_blank"
               class="btn btn--primary"
           >

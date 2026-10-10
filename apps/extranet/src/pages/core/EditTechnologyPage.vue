@@ -7,7 +7,7 @@ import {Sidebar, ParagraphManager, BaseInput, BaseToggle} from '#components'
 import {saveTechnology, fetchTechnologies, fetchTechnologyFormData, uploadFile} from '#services'
 import {TechnologyFilter} from '@randomstack/commons'
 
-import type {Technology, EditTechnologyFormBean} from '@randomstack/commons'
+import type {AdminTechnologyListed, EditTechnologyFormBean} from '@randomstack/commons'
 
 const route = useRoute()
 const router = useRouter()
@@ -20,7 +20,7 @@ const errorMsg = ref<string | null>(null)
 
 const formBean = ref<EditTechnologyFormBean | null>(null)
 
-const allTechnologies = ref<Technology[]>([])
+const allTechnologies = ref<AdminTechnologyListed[]>([])
 const selectedLanguageDropdown = ref('')
 const isCustomLanguage = ref(false)
 

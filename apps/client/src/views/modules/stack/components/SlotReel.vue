@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { ClientTechnology } from '#services'
+import type { DrawTechnologyLite } from '#services'
 
 const props = withDefaults(
     defineProps<{
       label: string
-      items: ClientTechnology[]
+      items: DrawTechnologyLite[]
       isLocked: boolean
       isSpinning: boolean
       delayClass?: string

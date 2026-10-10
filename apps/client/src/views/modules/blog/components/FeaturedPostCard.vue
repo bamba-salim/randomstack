@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import type { Post } from '@randomstack/commons'
+import type { FeaturedPostListed } from '@randomstack/commons'
 
-defineProps<{ post: Post }>()
+defineProps<{ post: FeaturedPostListed }>()
 const router = useRouter()
 
 const formatDate = (date: string | Date) => {

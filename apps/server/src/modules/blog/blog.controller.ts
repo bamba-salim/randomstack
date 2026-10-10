@@ -19,10 +19,7 @@ export default class BlogController {
             // 2. Récupération des autres articles (déduplication garantie)
             const otherPosts = await BlogModel.fetchPublishedPosts(excludeId)
 
-            res.json({
-                featured: featuredPost ? BlogMapper.buildFeaturedPost(featuredPost) : null,
-                posts: BlogMapper.buildListedPostList(otherPosts)
-            })
+            res.json(BlogMapper.buildPublishedPostsResponse(featuredPost, otherPosts))
         } catch (error: any) {
             console.error('[BlogController] Erreur fetchPublishedPosts :', error.message || error)
             res.status(500).json({ error: 'Erreur lors du chargement des articles.' })
@@ -44,10 +41,7 @@ export default class BlogController {
             // 2. Liste des autres articles avec ce tag
             const otherPosts = await BlogModel.fetchPublishedPostsByTag(tag, excludeId)
 
-            res.json({
-                featured: featuredPost ? BlogMapper.buildFeaturedPost(featuredPost) : null,
-                posts: BlogMapper.buildListedPostList(otherPosts)
-            })
+            res.json(BlogMapper.buildPublishedPostsResponse(featuredPost, otherPosts))
         } catch (error: any) {
             console.error('[BlogController] Erreur fetchPostsByTag :', error.message || error)
             res.status(500).json({ error: 'Erreur lors du chargement des articles par tag.' })
@@ -79,7 +73,7 @@ export default class BlogController {
                 return
             }
 
-            res.json(post)
+            res.json(BlogMapper.buildPublicPostDetail(post))
         } catch (error: any) {
             console.error('[BlogController] Erreur fetchPostBySlug :', error.message || error)
             res.status(500).json({ error: "Erreur lors de la récupération de l'article." })
@@ -104,8 +98,8 @@ export default class BlogController {
             // 2. Algorithme des 3 articles similaires
             const similarPosts = await BlogModel.fetchSimilarPosts(currentPost.id, currentPost.tags, 3)
 
-            // 3. Transformation en ListedPost pour le client
-            res.json(BlogMapper.buildListedPostList(similarPosts))
+            // 3. Transformation en PublicPostListed pour le client
+            res.json(BlogMapper.buildPublicPostListedList(similarPosts))
         } catch (error: any) {
             console.error('[BlogController] Erreur fetchSimilarPosts :', error.message || error)
             res.status(500).json({ error: 'Erreur lors de la récupération des articles similaires.' })
@@ -119,7 +113,7 @@ export default class BlogController {
     static async fetchUniqueTags(_req: Request, res: Response): Promise<void> {
         try {
             const tags = await BlogModel.fetchUniqueTags()
-            res.json(tags)
+            res.json(BlogMapper.buildUniqueTags(tags))
         } catch (error: any) {
             console.error('[BlogController] Erreur fetchUniqueTags :', error.message || error)
             res.status(500).json({ error: 'Erreur lors de la récupération des tags.' })
