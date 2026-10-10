@@ -41,7 +41,7 @@ defineProps<{ block: PostContentBlock }>()
 
   <!-- IMAGE -->
   <figure v-else-if="block.type === 'IMAGE'" class="blog-image-block">
-    <img :src="`http://localhost:4000/api/files/${block.value}`" :alt="block.caption || 'Illustration'" />
+    <img :src="`http://localhost:4000/files/${block.value}`" :alt="block.caption || 'Illustration'" />
     <figcaption v-if="block.caption">{{ block.caption }}</figcaption>
   </figure>
 

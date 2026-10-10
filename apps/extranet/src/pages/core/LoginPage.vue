@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref} from 'vue'
 import {useRouter} from 'vue-router'
-import {AuthService} from '#services'
+import {login} from '#services'
 
 const router = useRouter()
 const email = ref('')
@@ -15,7 +15,7 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
-    await AuthService.login({email: email.value, password: password.value})
+    await login({email: email.value, password: password.value})
     router.push('/dashboard') // Redirection automatique 🚀
   } catch (err: any) {
     // Affiche l'erreur précise (ex: "Ce compte n'existe pas." ou "Mot de passe incorrect")

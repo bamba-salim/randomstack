@@ -9,12 +9,12 @@
   },
   "imports": {
     "#services": {
-      "development": "./src/lib/services/index.ts",
-      "default": "./dist/lib/services/index.js"
+      "development": "./src/services/index.ts",
+      "default": "./dist/services/index.js"
     },
     "#scripts": {
-      "development": "./src/lib/scripts/index.ts",
-      "default": "./dist/lib/scripts/index.js"
+      "development": "./src/scripts/index.ts",
+      "default": "./dist/scripts/index.js"
     },
     "#views": {
       "development": "./src/views/index.ts",

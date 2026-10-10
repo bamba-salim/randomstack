@@ -43,3 +43,11 @@ export interface TechnoLogyVersion {
     stable: { num: string, date: string }
     latest: { num: string, date: string }
 }
+
+export interface TechnologyToExclude {
+    id: string
+    name: string
+    logo: string
+    usage: string
+    categories: Category[]
+}

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, onMounted, watch} from 'vue'
 import {useRoute} from 'vue-router'
-import {PostService} from '#services'
+import {fetchPostsByTag} from '#services'
 import { Breadcrumbs} from '#components'
 import type {Post} from '@randomstack/commons'
 
@@ -22,7 +22,7 @@ const loadData = async (tag: string) => {
   currentTag.value = tag
 
   try {
-    const response = await PostService.fetchPostsByTag(tag)
+    const response = await fetchPostsByTag(tag)
     featuredPost.value = response.featured
     posts.value = response.posts
   } catch {

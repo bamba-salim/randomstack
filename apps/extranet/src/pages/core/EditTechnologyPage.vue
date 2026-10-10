@@ -4,10 +4,10 @@ import {useRoute, useRouter} from 'vue-router'
 
 import {Sidebar, ParagraphManager, BaseInput, BaseToggle} from '#components'
 
-import {TechnologyService} from '#services'
-import {FormDataUtils, TechnologyFilter} from '@randomstack/commons'
+import {saveTechnology, fetchTechnologies, fetchTechnologyFormData, uploadFile} from '#services'
+import {TechnologyFilter} from '@randomstack/commons'
 
-import type {Technology, Category, EditTechnologyFormBean} from '@randomstack/commons'
+import type {Technology, EditTechnologyFormBean} from '@randomstack/commons'
 
 const route = useRoute()
 const router = useRouter()
@@ -18,15 +18,11 @@ const techId = ref<string | undefined>(undefined)
 const loading = ref(false)
 const errorMsg = ref<string | null>(null)
 
-// 1. LE FORMBEAN UNIQUE AVEC TOUS LES NOUVEAUX CHAMPS DU CAHIER DES CHARGES 🚀
 const formBean = ref<EditTechnologyFormBean | null>(null)
 
-// Variables de contrôle d'autocomplétion des langages
 const allTechnologies = ref<Technology[]>([])
 const selectedLanguageDropdown = ref('')
 const isCustomLanguage = ref(false)
-
-const previewUrl = ref<string | null>(null)
 
 const uniqueLanguages = computed(() => {
   return TechnologyFilter.getUniqueLanguages(allTechnologies.value)
@@ -49,12 +45,19 @@ const cancelCustomLanguage = () => {
   formBean.value.language = selectedLanguageDropdown.value
 }
 
-const handleFileChange = (e: Event) => {
-  const files = (e.target as HTMLInputElement).files
-  if (files && files.length > 0 && formBean.value) {
-    const file = files[0]!
-    formBean.value.logo = file
-    previewUrl.value = URL.createObjectURL(file)
+// Upload instantané du logo (comme la couverture des posts)
+const handleLogoUpload = async (e: Event) => {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (!file || !formBean.value) return
+
+  try {
+    loading.value = true
+    const {idFile} = await uploadFile(file, 'IMAGE', 'technology')
+    formBean.value.logo = idFile
+  } catch {
+    alert("Erreur lors de l'upload du logo.")
+  } finally {
+    loading.value = false
   }
 }
 
@@ -64,9 +67,7 @@ const handleSave = async () => {
   loading.value = true
 
   try {
-
-    const formData = FormDataUtils.toFormData(formBean.value)
-    await TechnologyService.save(formData, techId.value)
+    await saveTechnology(formBean.value, techId.value)
     router.push('/dashboard')
   } catch (err: any) {
     errorMsg.value = err.message || "Erreur lors de l'enregistrement."
@@ -76,28 +77,23 @@ const handleSave = async () => {
 }
 
 onMounted(async () => {
-  try {
-    // TODO: get only categories or langages
-    allTechnologies.value = await TechnologyService.fetchAll()
-  } catch {
-    console.warn("Impossible de pré-charger la liste des langages.")
-  }
-
   loading.value = true
   try {
-    isEditMode.value = true
-    techId.value = route.params['id'] as string
-
-    const flatFormBean = await TechnologyService.fetchTechnologyFormData(techId.value)
-    formBean.value = flatFormBean
-
-    selectedLanguageDropdown.value = flatFormBean.language
-    isCustomLanguage.value = false
-
-    if (flatFormBean.logo) {
-      previewUrl.value = flatFormBean.logo
+    try {
+      allTechnologies.value = await fetchTechnologies()
+    } catch {
+      console.warn("Impossible de pré-charger la liste des langages.")
     }
 
+    const {id} = route.params
+    techId.value = id as string | undefined
+    isEditMode.value = Boolean(techId.value)
+
+    const flatFormBean = await fetchTechnologyFormData(techId.value)
+    formBean.value = flatFormBean
+
+    selectedLanguageDropdown.value = flatFormBean.language || ''
+    isCustomLanguage.value = false
   } catch {
     errorMsg.value = "Impossible d'initialiser le formulaire."
   } finally {
@@ -243,11 +239,13 @@ onMounted(async () => {
     <div class="form-group col-span-2">
       <label class="form-label">Logo / Illustration</label>
       <div class="file-upload-zone">
-        <div class="current-logo-preview">
-          <img v-if="previewUrl" :src="previewUrl"/>
-          <span v-else class="text-slate-400 font-bold">?</span>
-        </div>
-        <input type="file" accept="image/*" @change="handleFileChange" class="file-input"/>
+        <img
+            v-if="formBean.logo"
+            :src="`http://localhost:4000/files/${formBean.logo}`"
+            class="w-full max-h-64 object-contain mb-3 bg-white border border-[#c3c4c7] rounded shadow-sm"
+        />
+        <span v-else class="text-xs text-slate-500 font-bold mb-2 block">Sélectionnez un logo :</span>
+        <input type="file" accept="image/*" @change="handleLogoUpload" class="file-input w-full"/>
       </div>
     </div>
 

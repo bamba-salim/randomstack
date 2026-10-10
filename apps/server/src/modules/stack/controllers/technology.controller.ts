@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import TechnologyModel from '../models/technology.model'
+import TechnologyMapper from '../mappers/technology.mapper'
 
 export default class TechnologyController {
 

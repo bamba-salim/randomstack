@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { PostService } from '#services'
+import {fetchPublishedPosts} from '#services'
 import FeaturedPostCard from '../blog/components/FeaturedPostCard.vue'
 import PostCard from '../blog/components/PostCard.vue'
 import type { Post } from '@randomstack/commons'
@@ -15,7 +15,7 @@ const error = ref<string | null>(null)
 
 onMounted(async () => {
   try {
-    const response = await PostService.fetchPublishedPosts()
+    const response = await fetchPublishedPosts()
     featuredPost.value = response.featured
     posts.value = response.posts
   } catch {

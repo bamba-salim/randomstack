@@ -1,6 +1,5 @@
-export {default as FileAction} from './file.action';
-export {default as FileController} from './file.controller';
-export {default as FileMapper} from './file.mapper';
-export {default as FileModel} from './file.model';
-export {default as FileRoutes} from './file.routes';
-export {default as FileUtils} from './file.utils';
+export {default as FileAction} from './file.action'
+export {default as FileController} from './file.controller'
+export {default as FileMapper} from './file.mapper'
+export {default as FileModel} from './file.model'
+export {default as FileUtils} from './file.utils'

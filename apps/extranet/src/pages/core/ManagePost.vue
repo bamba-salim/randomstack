@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref, onMounted, computed} from 'vue'
-import {PostService} from '#services'
+import {fetchPosts} from '#services'
 import {Sidebar, PostTable} from '#components' // Importation sémantique 🚀
 import {type Post} from '@randomstack/commons'
 import {PostFilter} from '#utils'// Import de l'ordonnanceur commun 🚀
@@ -48,7 +48,7 @@ const changePage = (page: number) => {
 
 const loadData = async () => {
   try {
-    posts.value = await PostService.fetchAll()
+    posts.value = await fetchPosts()
   } catch (err: any) {
     error.value = "Impossible de charger la liste d'administration des actualités."
   } finally {

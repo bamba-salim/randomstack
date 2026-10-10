@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue'
 import {useRoute} from 'vue-router'
-import {PostService} from '#services'
+import {fetchPostBySlug} from '#services'
 import {Breadcrumbs} from '#components'
 import type {Post} from '@randomstack/commons'
 
@@ -23,7 +23,7 @@ onMounted(async () => {
   const isPreview = route.query['preview'] === 'true'
 
   try {
-    post.value = await PostService.fetchBySlug(slug, isPreview)
+    post.value = await fetchPostBySlug(slug, isPreview)
   } catch {
     error.value = "Impossible de charger cet article. Il a peut-être été supprimé ou n'est pas encore publié."
   } finally {
@@ -68,7 +68,7 @@ onMounted(async () => {
       <!-- Image de couverture de l'article -->
       <figure v-if="post.imageId" class="w-full bg-[#f6f8fa] border border-[#c3c4c7] overflow-hidden mb-8">
         <img
-            :src="`http://localhost:4000/api/files/${post.imageId}`"
+            :src="`http://localhost:4000/files/${post.imageId}`"
             :alt="post.title"
             class="w-full h-auto max-h-[480px] object-cover"
         />

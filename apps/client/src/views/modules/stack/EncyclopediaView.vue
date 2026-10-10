@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref, onMounted, computed} from 'vue'
-import {StackService} from '#services'
+import {fetchAllTechnologies} from '#services'
 import {Pagination} from '#components'
 import {TechnologyFilter, type Technology} from '@randomstack/commons'
 
@@ -44,7 +44,7 @@ const changePage = (page: number) => {
 
 onMounted(async () => {
   try {
-    technologies.value = await StackService.fetchAllTechnologies()
+    technologies.value = await fetchAllTechnologies()
   } catch {
     error.value = "Impossible de récupérer l'encyclopédie."
   } finally {

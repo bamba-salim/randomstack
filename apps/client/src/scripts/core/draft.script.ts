@@ -1,24 +1,27 @@
-import type { ClientTechnology } from '#services'
+import type {ClientTechnology} from '#services'
 
 export default class DraftScript {
-    // Constantes de placeholders d'attente pour la rotation des rouleaux 🚀
+    // Placeholders d'attente pour la rotation des rouleaux
     static readonly PLACEHOLDERS: ClientTechnology[] = [
-        { id: 'p1', name: 'Angular', language: 'TypeScript', usage: 'Frontend', description: '', category: 'FRONTEND' },
-        { id: 'p2', name: 'Django', language: 'Python', usage: 'Backend', description: '', category: 'BACKEND' },
-        { id: 'p3', name: 'MySQL', language: 'SQL', usage: 'Database', description: '', category: 'DATABASE' },
-        { id: 'p4', name: 'React', language: 'JS', usage: 'Frontend', description: '', category: 'FRONTEND' },
-        { id: 'p5', name: 'FastAPI', language: 'Python', usage: 'Backend', description: '', category: 'BACKEND' },
-        { id: 'p6', name: 'MongoDB', language: 'NoSQL', usage: 'Database', description: '', category: 'DATABASE' },
-        { id: 'p7', name: 'Svelte', language: 'JS', usage: 'Frontend', description: '', category: 'FRONTEND' },
-        { id: 'p8', name: 'Spring Boot', language: 'Java', usage: 'Backend', description: '', category: 'BACKEND' },
-        { id: 'p9', name: 'Redis', language: 'NoSQL', usage: 'Database', description: '', category: 'DATABASE' }
+        {id: 'p1', name: 'Angular', slug: 'angular', language: 'TypeScript', logo: null, usage: 'Frontend', categories: ['FRONTEND'], isActive: true},
+        {id: 'p2', name: 'Django', slug: 'django', language: 'Python', logo: null, usage: 'Backend', categories: ['BACKEND'], isActive: true},
+        {id: 'p3', name: 'MySQL', slug: 'mysql', language: 'SQL', logo: null, usage: 'Database', categories: ['DATABASE'], isActive: true},
+        {id: 'p4', name: 'React', slug: 'react', language: 'JS', logo: null, usage: 'Frontend', categories: ['FRONTEND'], isActive: true},
+        {id: 'p5', name: 'FastAPI', slug: 'fastapi', language: 'Python', logo: null, usage: 'Backend', categories: ['BACKEND'], isActive: true},
+        {id: 'p6', name: 'MongoDB', slug: 'mongodb', language: 'NoSQL', logo: null, usage: 'Database', categories: ['DATABASE'], isActive: true},
+        {id: 'p7', name: 'Svelte', slug: 'svelte', language: 'JS', logo: null, usage: 'Frontend', categories: ['FRONTEND'], isActive: true},
+        {id: 'p8', name: 'Spring Boot', slug: 'spring-boot', language: 'Java', logo: null, usage: 'Backend', categories: ['BACKEND'], isActive: true},
+        {id: 'p9', name: 'Redis', slug: 'redis', language: 'NoSQL', logo: null, usage: 'Database', categories: ['DATABASE'], isActive: true}
     ]
 
-    // Fonction de génération de la bande verticale de défilement (pure et déconnectée) 🚀
     static generateReelStrip(finalItem: ClientTechnology | null, category: string): ClientTechnology[] {
         const filtered = this.PLACEHOLDERS.filter(p => {
-            if (category === 'CLIENT') return ['FRONTEND', 'MOBILE', 'DESKTOP'].includes(p.category)
-            return p.category === category
+            if (category === 'CLIENT') {
+                return p.categories.some(c => ['FRONTEND', 'MOBILE', 'DESKTOP'].includes(c))
+            }
+            if (category === 'SERVER') return p.categories.includes('BACKEND')
+            if (category === 'DATABASE') return p.categories.includes('DATABASE')
+            return p.categories.includes(category as ClientTechnology['categories'][number])
         })
 
         const strip: ClientTechnology[] = []
@@ -27,8 +30,16 @@ export default class DraftScript {
             if (item) strip.push(item)
         }
 
-        // Le 10ème élément est notre résultat final de tirage
-        strip.push(finalItem || { id: 'empty', name: '...', language: '', usage: '', description: '', category: '' })
+        strip.push(finalItem || {
+            id: 'empty',
+            name: '...',
+            slug: 'empty',
+            language: '',
+            logo: null,
+            usage: '',
+            categories: [],
+            isActive: false
+        })
         return strip
     }
 }

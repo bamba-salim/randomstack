@@ -1,13 +1,15 @@
 import express from 'express'
 import cors from 'cors'
-import path from 'path' // <-- S'assurer que path est importé
-
+import path from 'path'
 
 import {Database} from '#db'
-import AppRouter from './modules'
 import {SessionMiddleware} from '#middlewares'
 import {CronJobs} from '#action-support'
 import {SeedAction} from '#stack'
+
+import WebService from './modules/web-service'
+import Api from './modules/api'
+import Auth from './modules/auth'
 
 const app = express()
 
@@ -18,10 +20,8 @@ const ALLOWED_ORIGINS = [
     '*'
 ]
 
-// Activation de CORS avec partage de credentials pour la session
 app.use(cors({
     origin: (origin, callback) => {
-        // On autorise les requêtes sans origine (comme Postman ou curl) ou celles dans notre liste blanche
         if (!origin || ALLOWED_ORIGINS.includes(origin)) {
             callback(null, true)
         } else {
@@ -36,14 +36,13 @@ app.use(SessionMiddleware.config)
 
 app.use('/public', express.static(path.resolve(process.cwd(), 'public')))
 
-
-// Enregistrement des points d'API
-app.use('/api', AppRouter.routes)
-
+// Même pattern pour les 3 surfaces
+app.use('/', WebService.routes)   // 🌐 Client (public)
+app.use('/ws', Api.routes)        // 🛠️ Extranet (admin)
+app.use('/auth', Auth.routes)     // 🔐 Auth
 
 const PORT = process.env['PORT'] || 4000
 
-// Validation et démarrage de l'infrastructure
 Database.checkConnection().then(async (connected) => {
     if (connected) {
         await SeedAction.execute()

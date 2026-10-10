@@ -1,6 +1,5 @@
-import type {Technology, Category} from '../../types'
+import type {Technology} from '../../interfaces'
 import type {FilterResult, FilterOptions} from '../../interfaces'
-
 
 export default class TechnologyFilter {
     static run(techs: Technology[], options: FilterOptions): FilterResult {
@@ -8,37 +7,51 @@ export default class TechnologyFilter {
 
         let result = techs
 
-        // 1. Filtrage cumulatif par Langage
+        // 1. Filtrage par langage
         if (selectedLanguage) {
-            result = result.filter(t => t.language.toLowerCase() === selectedLanguage.toLowerCase())
+            result = result.filter(t =>
+                t.language?.toLowerCase() === selectedLanguage.toLowerCase()
+            )
         }
 
-        // 2. CORRECTION : Filtrage par Catégorie adapté pour le tableau categories[] 🚀
+        // 2. Filtrage par catégorie (tableau categories[])
         if (selectedCategory && selectedCategory !== 'ALL') {
             result = result.filter(t => {
                 const targetCategories = selectedCategory === 'FRONTEND'
                     ? ['FRONTEND', 'DESKTOP']
                     : [selectedCategory]
 
-                // On vérifie si au moins une des catégories de l'élément correspond aux critères 🚀
                 return Array.isArray(t.categories) && t.categories.some(cat => targetCategories.includes(cat))
             })
         }
 
-        // 3. Filtrage textuel global (nom, langage, usage, description)
+        // 3. Recherche textuelle (detail optionnel / nullable)
         if (searchQuery) {
             const q = searchQuery.toLowerCase().trim()
-            result = result.filter(t =>
-                t.name.toLowerCase().includes(q) ||
-                t.language.toLowerCase().includes(q) ||
-                t.usage.toLowerCase().includes(q) ||
-                t.detail.description.toLowerCase().includes(q) ||
-                t.detail.history.join(',').toLowerCase().includes(q) ||
-                t.categories.join(',').toLowerCase().includes(q)
-            )
+            result = result.filter(t => {
+                const name = t.name?.toLowerCase() ?? ''
+                const language = t.language?.toLowerCase() ?? ''
+                const usage = t.usage?.toLowerCase() ?? ''
+                const description = t.detail?.description?.toLowerCase() ?? ''
+                const history = Array.isArray(t.detail?.history)
+                    ? t.detail.history.join(',').toLowerCase()
+                    : ''
+                const categories = Array.isArray(t.categories)
+                    ? t.categories.join(',').toLowerCase()
+                    : ''
+
+                return (
+                    name.includes(q) ||
+                    language.includes(q) ||
+                    usage.includes(q) ||
+                    description.includes(q) ||
+                    history.includes(q) ||
+                    categories.includes(q)
+                )
+            })
         }
 
-        // 4. Calculs de pagination
+        // 4. Pagination
         const totalItemsCount = result.length
         const totalPages = Math.ceil(totalItemsCount / itemsPerPage) || 1
 
@@ -55,7 +68,7 @@ export default class TechnologyFilter {
     }
 
     static getUniqueLanguages(techs: Technology[]): string[] {
-        const langs = techs.map(t => t.language.trim()).filter(Boolean)
-        return Array.from(new Set(langs)).sort()
+        const langs = techs.map(t => t.language?.trim()).filter(Boolean) as string[]
+        return Array.from(new Set(langs)).sort((a, b) => a.localeCompare(b, 'fr'))
     }
 }

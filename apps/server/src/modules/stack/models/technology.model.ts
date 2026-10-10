@@ -81,4 +81,11 @@ export default class TechnologyModel extends BaseModel {
     static async countTechnologies(): Promise<number> {
         return await this.db.technology.count()
     }
+
+    static async getTechnologies() {
+        return await this.db.technology.findMany({
+            include: {detail: true},
+            orderBy: {name: 'asc'}
+        })
+    }
 }

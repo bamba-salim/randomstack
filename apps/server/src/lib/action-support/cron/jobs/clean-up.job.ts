@@ -1,5 +1,5 @@
 import cron from 'node-cron'
-import { StackModel } from '#models'
+import { StackModel } from '#stack'
 
 export default class CleanUpJob {
     static start(): void {

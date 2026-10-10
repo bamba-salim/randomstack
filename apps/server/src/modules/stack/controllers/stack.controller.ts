@@ -1,8 +1,9 @@
 import type { Request, Response } from 'express'
-import TechnologyModel from './technology.model'
-import StackModel from './stack.model'
-import DrawAction from './draw.action'
-import StackMapper from './stack.mapper'
+import TechnologyModel from '../models/technology.model'
+import StackModel from '../models/stack.model.js'
+import DrawAction from '../actions/draw.action'
+import StackMapper from '../mappers/stack.mapper.js'
+import TechnologyMapper from '../mappers/technology.mapper.js'
 import type { Category } from '@randomstack/commons'
 
 export default class StackController {
@@ -16,37 +17,47 @@ export default class StackController {
      */
     static async draw(req: Request, res: Response): Promise<void> {
         try {
+            // Payload envoyé par le client :
+            // - locks       : { client, server, database } — couches verrouillées (cadenas)
+            // - currentStack: le stack actuellement affiché côté client (pour conserver les couches verrouillées)
+            // - blacklist   : tableau d'IDs de technologies à exclure du tirage
             const { locks, currentStack, blacklist } = req.body
 
-            // Récupère uniquement les technologies actives
+            // Étape 1 — Récupération des technologies actives depuis la base de données
             const allTechs = await TechnologyModel.fetchActiveTechnologies()
 
-            // 1. Filtrage par la Blacklist
+            // Étape 2 — Application de la blacklist
+            // On retire les technologies dont l'ID figure dans la liste d'exclusion
             const blacklistedIds = Array.isArray(blacklist) ? blacklist : []
             const allowedTechs = allTechs.filter(t => !blacklistedIds.includes(t.id))
 
-            // 2. Tirage aléatoire
+            // Étape 3 — Tirage aléatoire
+            // DrawAction sélectionne une techno par couche (client / serveur / base de données)
             const newDraw = DrawAction.run(allowedTechs as any)
 
-            // 3. Résolution des Cadenas (Locks)
-            const finalClient = (locks?.client && currentStack) ? currentStack.clientLayer : newDraw.clientLayer
-            const finalServer = (locks?.server && currentStack) ? currentStack.serverLayer : newDraw.serverLayer
+            // Étape 4 — Résolution des cadenas (locks)
+            // Si une couche est verrouillée ET qu'un stack courant existe côté client,
+            // on conserve la technologie déjà affichée pour cette couche au lieu du nouveau tirage
+            const finalClient   = (locks?.client   && currentStack) ? currentStack.clientLayer   : newDraw.clientLayer
+            const finalServer   = (locks?.server   && currentStack) ? currentStack.serverLayer   : newDraw.serverLayer
             const finalDatabase = (locks?.database && currentStack) ? currentStack.databaseLayer : newDraw.databaseLayer
 
             const resolvedStack = {
-                clientLayer: finalClient,
-                serverLayer: finalServer,
+                clientLayer:   finalClient,
+                serverLayer:   finalServer,
                 databaseLayer: finalDatabase,
-                timestamp: newDraw.timestamp
+                timestamp:     newDraw.timestamp
             }
 
-            // 4. Historique de session
+            // Étape 5 — Sauvegarde dans l'historique de session
+            // Le stack résolu est ajouté en tête de l'historique (le plus récent en premier)
             const session = (req as any).session || {}
             if (!session.history) {
                 session.history = []
             }
             session.history.unshift(resolvedStack)
 
+            // Retourne le stack final et l'historique complet de la session
             res.json({
                 current: resolvedStack,
                 history: session.history
@@ -66,6 +77,20 @@ export default class StackController {
         res.json({
             history: session.history || []
         })
+    }
+
+
+    static async fetchDrawActiveTechnologies(req: Request, res: Response): Promise<void> {
+        try {
+            const techs = await TechnologyModel.fetchActiveTechnologies()
+
+            const techsList = TechnologyMapper.buildTechnologyToExclude()
+            //todo : mappers
+            res.json(techs)
+        } catch (error) {
+            console.error('[TechnologyController] Erreur fetchTechnologies :', error)
+            res.status(500).json({ error: 'Erreur lors du chargement des technologies.' })
+        }
     }
 
     /**

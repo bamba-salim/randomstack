@@ -11,7 +11,7 @@ const router = useRouter()
 
     <!-- Couverture universelle -->
     <div class="card-cover">
-      <img v-if="post.image" :src="`http://localhost:4000/api/files/${post.image}`" :alt="post.title" />
+      <img v-if="post.image" :src="`http://localhost:4000/files/${post.image}`" :alt="post.title" />
       <div v-else class="card-cover-empty">NEWS</div>
     </div>
 

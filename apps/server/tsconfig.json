@@ -14,21 +14,18 @@
     "skipLibCheck": true,
     "paths": {
       "#abstracts": ["./src/abstracts/index.ts"],
+
       "#user": ["./src/modules/user/index.ts"],
       "#blog": ["./src/modules/blog/index.ts"],
       "#file": ["./src/modules/file/index.ts"],
       "#stack": ["./src/modules/stack/index.ts"],
 
 
-      "#models": ["./src/models/index.ts"],
       "#modules": ["./src/modules/index.ts"],
-      "#routes": ["./src/routes/index.ts"],
-      "#controllers": ["./src/controllers/index.ts"],
 
       "#action-support": ["./src/lib/action-support/index.ts"],
       "#db": ["./src/lib/db/index.ts"],
       "#interfaces": ["./src/lib/interfaces/index.ts"],
-      "#mappers": ["./src/lib/mappers/index.ts"],
       "#middlewares": ["./src/lib/middlewares/index.ts"],
       "#utils": ["./src/lib/utils/index.ts"],
       "#scheduler": ["./src/core/scheduler/index.ts"],

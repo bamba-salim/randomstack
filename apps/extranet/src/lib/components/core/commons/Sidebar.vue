@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { AuthService } from '#services'
+import {logout} from '#services'
 
 const router = useRouter()
 const route = useRoute()
@@ -11,7 +11,7 @@ const isMobileMenuOpen = ref(false)
 
 const handleLogout = async () => {
   try {
-    await AuthService.logout()
+    await logout()
     router.push('/login')
   } catch {
     alert("Erreur déconnexion.")

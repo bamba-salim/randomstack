@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 
-import {AuthService} from '#services'
+import {getMe} from '#services'
 
 import AdminLayout from './layout/AdminLayout.vue'
 
@@ -58,7 +58,7 @@ const router = createRouter({
 router.beforeEach(async (to, _from, next) => {
     let user = null
     try {
-        user = await AuthService.getMe()
+        user = await getMe()
     } catch {
         user = null
     }

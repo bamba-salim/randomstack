@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, onMounted, computed} from 'vue'
 import {useRouter} from 'vue-router'
-import {AuthService, TechnologyService} from '#services'
+import {logout, fetchTechnologies} from '#services'
 // Importation propre du filtre et des types depuis le module commun ! 🚀
 import {TechnologyFilter, type Technology} from '@randomstack/commons'
 import {TechnologyTable} from "#components"
@@ -50,7 +50,7 @@ const changePage = (page: number) => {
 
 const loadData = async () => {
   try {
-    technologies.value = await TechnologyService.fetchAll()
+    technologies.value = await fetchTechnologies()
   } catch (err: any) {
     error.value = "Impossible de se connecter à l'API d'administration."
   } finally {
@@ -60,7 +60,7 @@ const loadData = async () => {
 
 const handleLogout = async () => {
   try {
-    await AuthService.logout()
+    await logout()
     router.push('/login')
   } catch {
     alert("Erreur déconnexion.")

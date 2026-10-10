@@ -32,29 +32,15 @@
       "development": "./src/lib/db/index.ts",
       "default": "./dist/lib/db/index.js"
     },
-    "#interfaces": {
-      "development": "./src/lib/interfaces/index.ts",
-      "default": "./dist/lib/interfaces/index.js"
-    },
     "#middlewares": {
       "development": "./src/lib/middlewares/index.ts",
       "default": "./dist/lib/middlewares/index.js"
     },
-    "#routes": {
-      "development": "./src/routes/index.ts",
-      "default": "./dist/routes/index.js"
-    },
-    "#controllers": {
-      "development": "./src/controllers/index.ts",
-      "default": "./dist/controllers/index.js"
-    },
+
+
     "#action-support": {
       "development": "./src/action-support/index.ts",
       "default": "./dist/action-support/index.js"
-    },
-    "#models": {
-      "development": "./src/models/index.ts",
-      "default": "./dist/models/index.js"
     },
     "#utils": {
       "development": "./src/utils/index.ts",

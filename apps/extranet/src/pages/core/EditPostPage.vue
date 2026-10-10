@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import {PostService, FileService} from '#services' // <-- IMPORT FileService 🚀
+import {savePost, fetchTags, fetchPostFormData, uploadFile} from '#services'
 import {Sidebar, PostContentManager, BaseInput, BaseToggle} from '#components'
 import type {EditPostFormBean} from '@randomstack/commons'
 
@@ -29,7 +29,7 @@ const handleCoverUpload = async (e: Event) => {
     loading.value = true
 
     // On appelle l'upload générique (qui renvoie { id, url })
-    const {idFile} = await FileService.uploadFile(file, 'IMAGE', 'POST')
+    const {idFile} = await uploadFile(file, 'IMAGE', 'POST')
 
     // On affecte directement l'ID à notre FormBean ! 🚀
     formBean.value.imageId = idFile
@@ -49,7 +49,7 @@ const handleSave = async (status: string) => {
 
   try {
     // FINI LE FORMDATA : On envoie directement le JSON pur 🚀
-    await PostService.save(formBean.value, postId.value)
+    await savePost(formBean.value, postId.value)
     router.push('/manage-post')
   } catch (err: any) {
     errorMsg.value = err.message || "Erreur d'enregistrement de l'article."
@@ -101,7 +101,7 @@ onMounted(async () => {
   try {
 
     try {
-      availableTags.value = await PostService.fetchTags()
+      availableTags.value = await fetchTags()
     } catch {
       console.warn("Impossible de charger les suggestions de tags.")
     }
@@ -109,7 +109,7 @@ onMounted(async () => {
     const {id} = route.params
     postId.value = id as string | undefined
 
-    formBean.value = await PostService.fetchPostFormData(postId.value)
+    formBean.value = await fetchPostFormData(postId.value)
 
   } catch {
     errorMsg.value = "Erreur de chargement."
@@ -153,7 +153,7 @@ onMounted(async () => {
         <div class="file-upload-zone">
           <img
               v-if="formBean.imageId"
-              :src="`http://localhost:4000/api/files/${formBean.imageId}`"
+              :src="`http://localhost:4000/files/${formBean.imageId}`"
               class="w-full max-h-64 object-contain mb-3 bg-white border border-[#c3c4c7] rounded shadow-sm"
           />
           <span v-else class="text-xs text-slate-500 font-bold mb-2 block">Sélectionnez une image de couverture :</span>

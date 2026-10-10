@@ -25,7 +25,7 @@ defineProps<{
       <tr v-for="post in posts" :key="post.id">
         <td class="p-4">
           <div class="w-12 h-8 rounded bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
-            <img v-if="post.imageId" :src="`http://localhost:4000/api/files/${post.imageId}`" class="w-full h-full object-cover" />
+            <img v-if="post.imageId" :src="`http://localhost:4000/files/${post.imageId}`" class="w-full h-full object-cover" />
             <span v-else class="text-[9px] font-black text-slate-400 uppercase">NEWS</span>
           </div>
         </td>

@@ -42,7 +42,7 @@ defineEmits<{
         <!-- Éléments du rouleau -->
         <div v-for="tech in items" :key="tech.id" class="reel-item">
           <div class="tech-logo-placeholder">
-            <img v-if="tech.logo" :src="`http://localhost:4000${tech.logo}`" :alt="tech.name" />
+            <img v-if="tech.logo" :src="`http://localhost:4000/files/${tech.logo}`" :alt="tech.name" />
             <span v-else>{{ tech.name.substring(0, 2) }}</span>
           </div>
           <div class="tech-details">
