@@ -1,32 +1,32 @@
-import type {Request, Response} from 'express'
-
-import {TechnologyModel, StackModel} from '#models'
-import {DrawAction} from '#action-support'
-
-import type {Category} from '@randomstack/commons'
-
+import type { Request, Response } from 'express'
+import TechnologyModel from './technology.model'
+import StackModel from './stack.model'
+import DrawAction from './draw.action'
+import StackMapper from './stack.mapper'
+import type { Category } from '@randomstack/commons'
 
 export default class StackController {
-
     private static generateShortCode(): string {
-        const code = Math.random().toString(36).substring(2, 8).toUpperCase()
-        return code
+        return Math.random().toString(36).substring(2, 8).toUpperCase()
     }
 
+    /**
+     * Tirage aléatoire de la machine à sous avec gestion des cadenas et blacklist
+     * Cible : POST /api/stacks/draw
+     */
     static async draw(req: Request, res: Response): Promise<void> {
         try {
-            const {locks, currentStack, blacklist} = req.body
+            const { locks, currentStack, blacklist } = req.body
 
+            // Récupère uniquement les technologies actives
+            const allTechs = await TechnologyModel.fetchActiveTechnologies()
 
-            const allTechs = await TechnologyModel.fetchTechnologies()
-
-            // 1. Filtrage par la Blacklist (exclure les IDs d'une liste) 🚀
+            // 1. Filtrage par la Blacklist
             const blacklistedIds = Array.isArray(blacklist) ? blacklist : []
             const allowedTechs = allTechs.filter(t => !blacklistedIds.includes(t.id))
 
-
-            // 2. Tirage aléatoire uniquement sur les technologies autorisées 🚀
-            const newDraw = DrawAction.run(allowedTechs)
+            // 2. Tirage aléatoire
+            const newDraw = DrawAction.run(allowedTechs as any)
 
             // 3. Résolution des Cadenas (Locks)
             const finalClient = (locks?.client && currentStack) ? currentStack.clientLayer : newDraw.clientLayer
@@ -40,8 +40,8 @@ export default class StackController {
                 timestamp: newDraw.timestamp
             }
 
-            // 4. Enregistrement de la stack réellement résolue dans la session
-            const session = req.session as any
+            // 4. Historique de session
+            const session = (req as any).session || {}
             if (!session.history) {
                 session.history = []
             }
@@ -52,21 +52,28 @@ export default class StackController {
                 history: session.history
             })
         } catch (error) {
-            res.status(500).json({error: 'Une erreur est survenue lors du tirage.'})
+            console.error('[StackController] Erreur draw :', error)
+            res.status(500).json({ error: 'Une erreur est survenue lors du tirage.' })
         }
     }
 
+    /**
+     * Récupère l'historique des tirages stocké dans la session
+     * Cible : GET /api/stacks/history
+     */
     static async getHistory(req: Request, res: Response): Promise<void> {
-        const session = req.session as any
+        const session = (req as any).session || {}
         res.json({
             history: session.history || []
         })
     }
 
+    /**
+     * Enregistre une combinaison partagée (expire après 7 jours)
+     * Cible : POST /api/stacks/share
+     */
     static async saveShare(req: Request, res: Response): Promise<void> {
         try {
-
-            //TODO: creae dto and mapper
             const { projectType, frontendId, backendId, databaseId, ormId } = req.body
 
             if (!projectType || !frontendId || !backendId || !databaseId) {
@@ -77,7 +84,6 @@ export default class StackController {
             const shareCode = StackController.generateShortCode()
             const expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
 
-            //TODO: creae dto and mapper
             const saved = await StackModel.create({
                 shareCode,
                 projectType: projectType as Category,
@@ -95,11 +101,15 @@ export default class StackController {
                 expiresAt: saved.expiresAt
             })
         } catch (error: any) {
-            console.error("[StackController] Échec saveShare :", error.message || error)
+            console.error('[StackController] Échec saveShare :', error.message || error)
             res.status(500).json({ error: 'Erreur lors de la création du lien de partage.' })
         }
     }
 
+    /**
+     * Résout un lien de partage via son code court
+     * Cible : GET /api/stacks/share/:code
+     */
     static async fetchShare(req: Request, res: Response): Promise<void> {
         try {
             const { code } = req.params
@@ -111,23 +121,15 @@ export default class StackController {
             }
 
             if (new Date(shared.expiresAt) < new Date()) {
-                res.status(410).json({ error: "Ce lien de partage a expiré." })
+                res.status(410).json({ error: 'Ce lien de partage a expiré.' })
                 return
             }
 
-            const allTechs = await TechnologyModel.findAll()
-            const getTech = (id: string) => allTechs.find(t => t.id === id) || null
-
-            res.json({
-                projectType: shared.projectType,
-                clientLayer: getTech(shared.frontendId),
-                serverLayer: getTech(shared.backendId),
-                databaseLayer: getTech(shared.databaseId),
-                timestamp: shared.createdAt.toLocaleTimeString('fr-FR')
-            })
-        } catch {
+            const allTechs = await TechnologyModel.fetchTechnologies()
+            res.json(StackMapper.buildSharedStackResponse(shared, allTechs as any))
+        } catch (error) {
+            console.error('[StackController] Échec fetchShare :', error)
             res.status(500).json({ error: 'Erreur lors de la récupération du partage.' })
         }
     }
-
 }
