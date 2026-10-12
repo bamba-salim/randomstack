@@ -15,8 +15,8 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
-    await login({email: email.value, password: password.value})
-    router.push('/dashboard') // Redirection automatique 🚀
+    const user = await login({email: email.value, password: password.value})
+    router.push(user.role === 'ADMIN' || user.role === 'EDITOR' ? '/dashboard' : '/manage-post')
   } catch (err: any) {
     // Affiche l'erreur précise (ex: "Ce compte n'existe pas." ou "Mot de passe incorrect")
     errorMsg.value = err.message || "Une erreur est survenue lors de la connexion."

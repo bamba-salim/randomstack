@@ -2,10 +2,17 @@ import ApiClient from './api.client'
 import type {
     AdminTechnologyListed,
     AdminPostListed,
+    AdminUserListed,
+    AdminUserDetail,
+    CreateUserFormBean,
+    CreateUserResponse,
     EditTechnologyFormBean,
     EditPostFormBean,
+    EditorialAuthorLite,
     FileType,
-    Table
+    Role,
+    Table,
+    UpdateUserRoleResponse
 } from '@randomstack/commons'
 import {FILE_TYPE, TABLE} from '@randomstack/commons'
 
@@ -37,6 +44,31 @@ export const fetchPostFormData = async (id?: string): Promise<EditPostFormBean> 
     return await ApiClient.get<EditPostFormBean>(
         `/ws/fetch-post-form-data${id ? `/${id}` : ''}`
     )
+}
+
+export const fetchEditorialAuthors = async (): Promise<EditorialAuthorLite[]> => {
+    return await ApiClient.get<EditorialAuthorLite[]>('/ws/fetch-editorial-authors')
+}
+
+// ─── Users (admin /ws — ADMIN only) ──────────────────────────────────────────
+
+export const fetchUsers = async (): Promise<AdminUserListed[]> => {
+    return await ApiClient.get<AdminUserListed[]>('/ws/fetch-users')
+}
+
+export const fetchUserById = async (id: string): Promise<AdminUserDetail> => {
+    return await ApiClient.get<AdminUserDetail>(`/ws/fetch-user/${id}`)
+}
+
+export const updateUserRole = async (
+    id: string,
+    role: Role
+): Promise<UpdateUserRoleResponse> => {
+    return await ApiClient.post<UpdateUserRoleResponse>(`/ws/update-user-role/${id}`, {role})
+}
+
+export const createUser = async (payload: CreateUserFormBean): Promise<CreateUserResponse> => {
+    return await ApiClient.post<CreateUserResponse>('/ws/create-user', payload)
 }
 
 export const fetchPosts = async (): Promise<AdminPostListed[]> => {

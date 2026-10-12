@@ -21,7 +21,7 @@ export interface Post {
     tags: string[]
     hasBeenPublished: boolean
     isFeatured: boolean
-    authorIds: string[]
+    authorId: string | null
     publishAt: string | Date | null
     createdAt: string | Date
     updatedAt: string | Date

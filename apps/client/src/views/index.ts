@@ -1,8 +1,13 @@
 import {createRouter, createWebHistory} from 'vue-router'
 
+import {getMe} from '#services'
+
 import AppLayout from './layout/@AppLayout.vue'
 
 import HomeView from './modules/commons/HomeView.vue'
+import LoginView from './modules/commons/LoginView.vue'
+import RegisterView from './modules/commons/RegisterView.vue'
+import ProfileView from './modules/commons/ProfileView.vue'
 
 import GeneratorView from './modules/stack/GeneratorView.vue'
 
@@ -17,11 +22,6 @@ const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
-            path: '/',
-            name: 'home',
-            component: HomeView
-        },
-        {
             path: '/draft/:shareCode?',
             name: 'Generator',
             component: GeneratorView
@@ -31,9 +31,27 @@ const router = createRouter({
             component: AppLayout,
             children: [
                 {
-                    path: '/',
+                    path: '',
                     name: 'home',
                     component: HomeView
+                },
+                {
+                    path: 'login',
+                    name: 'login',
+                    component: LoginView,
+                    meta: {guestOnly: true}
+                },
+                {
+                    path: 'register',
+                    name: 'register',
+                    component: RegisterView,
+                    meta: {guestOnly: true}
+                },
+                {
+                    path: 'profile',
+                    name: 'profile',
+                    component: ProfileView,
+                    meta: {requiresAuth: true}
                 },
                 {
                     path: 'encyclopedia',
@@ -63,4 +81,26 @@ const router = createRouter({
         }
     ]
 })
+
+router.beforeEach(async (to, _from, next) => {
+    if (!to.meta['requiresAuth'] && !to.meta['guestOnly']) {
+        next()
+        return
+    }
+
+    const user = await getMe()
+
+    if (to.meta['requiresAuth'] && !user) {
+        next({path: '/login', query: {redirect: to.fullPath}})
+        return
+    }
+
+    if (to.meta['guestOnly'] && user) {
+        next('/profile')
+        return
+    }
+
+    next()
+})
+
 export default router

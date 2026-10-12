@@ -1,6 +1,6 @@
 import type {Category} from '../../constants'
 
-/** Entité DB imbriquée (Prisma TechnologyInfo → table TechnologyDetail) */
+/** Entité DB imbriquée (Prisma TechnologyInfo) */
 export interface TechnologyInfo {
     id: string
     websiteUrl: string | null

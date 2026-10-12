@@ -1,9 +1,17 @@
 <script setup lang="ts">
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import {savePost, fetchTags, fetchPostFormData, uploadFile, fileUrl} from '#services'
-import {Sidebar, PostContentManager, BaseInput, BaseToggle} from '#components'
-import type {EditPostFormBean} from '@randomstack/commons'
+import {
+  savePost,
+  fetchTags,
+  fetchPostFormData,
+  fetchEditorialAuthors,
+  uploadFile,
+  fileUrl,
+  getMe
+} from '#services'
+import {PostContentManager, BaseInput, BaseToggle} from '#components'
+import type {EditPostFormBean, EditorialAuthorLite, Role} from '@randomstack/commons'
 
 const route = useRoute()
 const router = useRouter()
@@ -11,6 +19,11 @@ const isEditMode = ref(false)
 const postId = ref<string | undefined>(undefined)
 const loading = ref(false)
 const errorMsg = ref<string | null>(null)
+const actorRole = ref<Role | null>(null)
+const isSuperAdmin = computed(() => actorRole.value === 'ADMIN')
+const canFeature = computed(() => actorRole.value === 'ADMIN' || actorRole.value === 'EDITOR')
+const isReadOnly = computed(() => actorRole.value === 'MODERATOR')
+const authorOptions = ref<EditorialAuthorLite[]>([])
 
 const formBean = ref<EditPostFormBean | null>(null)
 const previewUrl = ref<string | null>(null)
@@ -43,12 +56,11 @@ const handleCoverUpload = async (e: Event) => {
 
 // --- SAUVEGARDE 100% JSON (Plus de FormData !) 🚀 ---
 const handleSave = async (status: string) => {
-  if (!formBean.value || loading.value) return
+  if (!formBean.value || loading.value || isReadOnly.value) return
   formBean.value.status = status as any
   loading.value = true
 
   try {
-    // FINI LE FORMDATA : On envoie directement le JSON pur 🚀
     await savePost(formBean.value, postId.value)
     router.push('/manage-post')
   } catch (err: any) {
@@ -99,6 +111,8 @@ const removeTag = (index: number) => {
 onMounted(async () => {
   loading.value = true
   try {
+    const me = await getMe()
+    actorRole.value = me?.role ?? null
 
     try {
       availableTags.value = await fetchTags()
@@ -106,8 +120,22 @@ onMounted(async () => {
       console.warn("Impossible de charger les suggestions de tags.")
     }
 
+    if (isSuperAdmin.value) {
+      try {
+        authorOptions.value = await fetchEditorialAuthors()
+      } catch {
+        authorOptions.value = []
+      }
+    }
+
     const {id} = route.params
     postId.value = id as string | undefined
+    isEditMode.value = Boolean(postId.value)
+
+    if (!postId.value && isReadOnly.value) {
+      errorMsg.value = 'Un modérateur ne peut pas créer d’article.'
+      return
+    }
 
     formBean.value = await fetchPostFormData(postId.value)
 
@@ -132,10 +160,36 @@ onMounted(async () => {
     </div>
 
     <form v-else-if="formBean" @submit.prevent class="form-page-container">
-      <div class="form-group mb-2">
-        <BaseToggle v-model="formBean.isFeatured" label="🌟 Épingler cet article à la une" />
+      <p v-if="isReadOnly" class="error-box mb-4">
+        Lecture seule — tu pourras signaler un problème sur cet article prochainement.
+      </p>
+
+      <div v-if="canFeature" class="form-group mb-2">
+        <BaseToggle
+            v-model="formBean.isFeatured"
+            label="Épingler cet article à la une"
+        />
+        <p class="text-[10px] text-slate-500 mt-1">
+          Un seul article à la une : épingler celui-ci désépingle les autres.
+        </p>
       </div>
-        <BaseInput v-model="formBean.title" label="Titre" required />
+
+      <div v-if="isSuperAdmin" class="form-group mb-2">
+        <label class="form-label">Auteur</label>
+        <select v-model="formBean.authorId" class="form-input" :disabled="isReadOnly">
+          <option disabled :value="null">Choisir un auteur…</option>
+          <option
+              v-for="author in authorOptions"
+              :key="author.id"
+              :value="author.id"
+          >
+            {{ author.displayName }} ({{ author.email }})
+          </option>
+        </select>
+        <p class="text-[10px] text-slate-500 mt-1">Réservé à l’administrateur.</p>
+      </div>
+
+      <BaseInput v-model="formBean.title" label="Titre" required />
       <div class="form-group col-span-2 flex ">
         <label class="form-label">Résumé court</label>
         <textarea
@@ -218,7 +272,7 @@ onMounted(async () => {
       </div>
 
 
-      <div class="form-actions border-t border-[#c3c4c7] pt-6 mt-4 flex gap-3">
+      <div v-if="!isReadOnly" class="form-actions border-t border-[#c3c4c7] pt-6 mt-4 flex gap-3">
         <button type="button" @click="handleSave('DRAFT')"
                 class="py-2.5 px-4 bg-white border border-[#c3c4c7] hover:bg-[#f6f8fa] text-xs font-bold text-slate-600 rounded cursor-pointer transition-colors duration-150">
           Enregistrer le Brouillon
@@ -226,6 +280,12 @@ onMounted(async () => {
         <button type="button" @click="handleSave('PUBLISHED')"
                 class="py-2.5 px-5 bg-[#2271b1] hover:bg-[#135e96] border border-[#2271b1] text-xs font-bold text-white rounded cursor-pointer transition-colors duration-150 shadow-sm">
           Publier
+        </button>
+      </div>
+      <div v-else class="form-actions border-t border-[#c3c4c7] pt-6 mt-4">
+        <button type="button" @click="router.push('/manage-post')"
+                class="py-2.5 px-4 bg-white border border-[#c3c4c7] hover:bg-[#f6f8fa] text-xs font-bold text-slate-600 rounded cursor-pointer transition-colors duration-150">
+          ← Retour à la liste
         </button>
       </div>
     </form>

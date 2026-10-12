@@ -12,16 +12,20 @@
 @use './commons/app-header';
 @use './commons/badges';
 @use './commons/breadcrumbs';
+@use './commons/ad-slot';
 @use './commons/buttons';
 @use './commons/cards';
+@use './commons/cookie-banner';
 @use './commons/grid';
 @use './commons/page-header';
 @use './commons/pagination';
 
 @use './modules/home';
+@use './modules/commons/auth';
 
 @use './modules/blog/components/article-cards';
 @use './modules/blog/components/article-content';
+@use './modules/blog/components/author-card';
 @use './modules/blog/view/article-detail';
 
 @use './modules/stack/components/blacklist-drawer';

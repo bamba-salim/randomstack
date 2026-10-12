@@ -1,9 +1,5 @@
-import type {
-    PublicTechnologyListed,
-    AdminTechnologyListed,
-    FilterResult,
-    FilterOptions
-} from '../..'
+import type {PublicTechnologyListed, AdminTechnologyListed} from '../../dtos/core/stack.dto'
+import type {FilterResult, FilterOptions} from '../../interfaces/core/filter.interface'
 
 type FilterableTech = Pick<PublicTechnologyListed, 'name' | 'language' | 'usage' | 'categories'> & {
     descriptionPreview?: string | null

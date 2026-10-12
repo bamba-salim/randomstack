@@ -1,5 +1,5 @@
 import type {PostStatus} from '../../constants'
-import type {PostContentBlock} from '../../interfaces'
+import type {PostContentBlock} from '../../interfaces/core/post.interface'
 
 /** Formulaire création / édition article (extranet) */
 export interface EditPostFormBean {
@@ -10,7 +10,8 @@ export interface EditPostFormBean {
     imageId?: string | null
     status: PostStatus
     tags: string[]
-    authorIds: string[]
+    /** Rempli à la création ; modifiable uniquement par ADMIN */
+    authorId: string | null
     publishAt?: string | null
     hasBeenPublished?: boolean
     isFeatured: boolean
@@ -47,6 +48,14 @@ export interface AdminPostListed {
     publishAt?: string | null
 }
 
+/** Auteur exposé sur la fiche article (card + articles associés) */
+export interface AuthorListed {
+    id: string
+    displayName: string
+    bio: string | null
+    photoId: string | null
+}
+
 /** Page article publique */
 export interface PublicPostDetail {
     id: string
@@ -58,6 +67,7 @@ export interface PublicPostDetail {
     tags: string[]
     mainTag: string
     publishAt: string | Date | null
+    author: AuthorListed | null
 }
 
 export interface PublishedPostsResponse {

@@ -8,9 +8,15 @@ apps/server/public/uploads/*
 # Secrets locaux
 .env
 .env.local
+**/.env
+**/.env.local
+!**/.env.example
 apps/server/.env
 apps/client/.env
 apps/extranet/.env
+
+# macOS
+.DS_Store
 
 /.idea/
 /apps/server/node_modules/

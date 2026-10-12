@@ -1,0 +1,89 @@
+// Barre pub entre date et résumé (remplace le trait du page-header)
+.article-header-ad {
+  width: 100%;
+  margin: 0 0 1.25rem;
+}
+
+// Chapô / résumé — entre le corps (1.25rem) et le H2 (2rem)
+.article-summary {
+  width: 100%;
+  margin: 0 0 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--color-text-title, #1d2327);
+  text-align: left;
+}
+
+// Shell article + pubs latérales
+// Mobile : contenu seul · Tablette : contenu + rail droit · Desktop : 2 rails
+.article-page-shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem 2rem;
+  width: 100%;
+  align-items: start;
+
+  @media (min-width: 768px) and (max-width: 1199px) {
+    grid-template-columns: minmax(0, 1fr) 140px;
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: 160px minmax(0, 1fr) 160px;
+  }
+}
+
+.article-column {
+  width: 100%;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.article-rail {
+  display: none;
+  width: 140px;
+  position: sticky;
+  top: 5.5rem;
+
+  &--left {
+    @media (min-width: 1200px) {
+      display: block;
+      width: 160px;
+    }
+  }
+
+  &--right {
+    @media (min-width: 768px) {
+      display: block;
+    }
+
+    @media (min-width: 1200px) {
+      width: 160px;
+    }
+  }
+}
+
+// Sections listes (similaires / même auteur)
+.article-posts-section {
+  width: 100%;
+  margin-top: 2.5rem;
+  text-align: left;
+
+  .section-title {
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #94a3b8;
+    border-bottom: 1px solid #c3c4c7;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  // 1 col mobile · 2 tablet · 4 desktop
+  .related-articles-grid {
+    @apply sm:grid-cols-2 lg:grid-cols-4;
+  }
+}

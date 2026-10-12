@@ -17,6 +17,7 @@ import SlotReel from './components/SlotReel.vue'
 import BlacklistDrawer from './components/BlacklistDrawer.vue'
 import HistoryDrawer from './components/HistoryDrawer.vue'
 import ShareModal from './components/ShareModal.vue'
+import {CookieBanner} from '#components'
 
 const route = useRoute()
 const router = useRouter()
@@ -363,5 +364,7 @@ onMounted(async () => {
         :share-code="shareCodeGenerated"
         @close="showShareModal = false"
     />
+
+    <CookieBanner/>
   </main>
 </template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, onMounted, computed} from 'vue'
 import {fetchAllTechnologies} from '#services'
-import {Pagination} from '#components'
+import {Pagination, AdSlot} from '#components'
 import {TechnologyFilter, type PublicTechnologyListed} from '@randomstack/commons'
 
 import TechCard from './components/TechCard.vue'
@@ -61,6 +61,8 @@ onMounted(async () => {
       <h1 class="page-title">L'Encyclopédie</h1>
       <p class="page-subtitle">Découvrez le catalogue des technologies de RANDOMSTACK</p>
     </header>
+
+    <AdSlot placement="encyclopedia-banner" variant="banner"/>
 
     <!-- Barre d'outils universelle : Recherche + Filtres d'onglets -->
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-2">

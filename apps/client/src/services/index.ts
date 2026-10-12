@@ -7,9 +7,13 @@ import type {
     PublicTechnologyDetail,
     ExcludeTechnologyLite,
     PublicPostDetail,
+    PublicPostListed,
     PublishedPostsResponse,
-    SharedStackListed
+    SharedStackListed,
+    FileType,
+    Table
 } from '@randomstack/commons'
+import {FILE_TYPE, TABLE} from '@randomstack/commons'
 
 export type {
     DrawnStack,
@@ -19,9 +23,12 @@ export type {
     PublicTechnologyDetail,
     ExcludeTechnologyLite,
     PublicPostDetail,
+    PublicPostListed,
     PublishedPostsResponse,
     SharedStackListed
 }
+
+export {login, register, getMe, updateProfile, logout, clearAuthCache} from './auth'
 
 // ─── Stack / tirage ──────────────────────────────────────────────────────────
 
@@ -78,6 +85,32 @@ export const fetchPublishedPosts = async (): Promise<PublishedPostsResponse> => 
 
 export const fetchPostsByTag = async (tag: string): Promise<PublishedPostsResponse> => {
     return await ApiClient.get<PublishedPostsResponse>(`/fetch-posts/tag/${tag}`)
+}
+
+/** Similaires par tags, complétés par les derniers publiés (serveur). */
+export const fetchSimilarPosts = async (slug: string): Promise<PublicPostListed[]> => {
+    return await ApiClient.get<PublicPostListed[]>(`/fetch-similar-posts/${slug}`)
+}
+
+/** Articles publiés du même auteur (exclut l’article courant si `excludePostId`). */
+export const fetchPostsByAuthor = async (
+    authorId: string,
+    excludePostId?: string
+): Promise<PublicPostListed[]> => {
+    const query = excludePostId ? `?exclude=${encodeURIComponent(excludePostId)}` : ''
+    return await ApiClient.get<PublicPostListed[]>(`/fetch-posts/author/${authorId}${query}`)
+}
+
+export const uploadFile = async (
+    file: File,
+    type: FileType = FILE_TYPE.IMAGE,
+    category: Table = TABLE.USER
+): Promise<{idFile: string; url: string}> => {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('type', type)
+    formData.append('category', category)
+    return await ApiClient.postForm('/upload-file', formData)
 }
 
 /** URL stable fichier via l’API (`/files/:id` → 302 signed Railway en prod). */

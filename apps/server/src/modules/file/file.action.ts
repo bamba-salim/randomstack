@@ -1,7 +1,7 @@
 import crypto from 'crypto'
 import path from 'path'
 
-import {FILE_TYPE, TABLE, type FileType, type FileRecord} from '@randomstack/commons'
+import type {FILE_TYPE, TABLE, FileType, FileRecord} from '@randomstack/commons'
 
 import FileModel from './file.model.js'
 import FileUtils from './file.utils.js'

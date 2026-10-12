@@ -32,6 +32,7 @@ export default class WebService {
         // Blog
         router.get('/fetch-posts', BlogController.fetchPublishedPosts)
         router.get('/fetch-posts/tag/:tag', BlogController.fetchPostsByTag)
+        router.get('/fetch-posts/author/:authorId', BlogController.fetchPostsByAuthor)
         router.get('/fetch-tags', BlogController.fetchUniqueTags)
         router.get('/fetch-similar-posts/:slug', BlogController.fetchSimilarPosts)
         router.get('/fetch-post/:slug', BlogController.fetchPostBySlug)

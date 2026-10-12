@@ -11,3 +11,6 @@ export {default as ParagraphManager} from './core/stack/ParagraphManager.vue'
 export {default as PostContentManager} from './core/blog/PostContentManager.vue'
 export {default as PostContent} from './core/blog/PostContent.vue'
 export {default as PostTable} from './core/blog/PostTable.vue'
+
+// USER
+export {default as UserTable} from './core/user/UserTable.vue'

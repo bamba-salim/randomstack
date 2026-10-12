@@ -99,7 +99,7 @@ export default class BlogModel extends BaseModel {
      * Recommandations : Algorithme des articles similaires par tags partagés
      * avec repli automatique (fallback) sur les derniers articles publiés
      */
-    static async fetchSimilarPosts(currentPostId: string, tags: string[], limit = 3) {
+    static async fetchSimilarPosts(currentPostId: string, tags: string[], limit = 4) {
         let similarPosts: any[] = []
 
         // 1. Recherche prioritaire par tags partagés
@@ -115,7 +115,7 @@ export default class BlogModel extends BaseModel {
             })
         }
 
-        // Si le quota de 3 articles est atteint, on retourne directement
+        // Si le quota est atteint, on retourne directement
         if (similarPosts.length >= limit) {
             return similarPosts
         }
@@ -134,6 +134,19 @@ export default class BlogModel extends BaseModel {
         })
 
         return [...similarPosts, ...fallbackPosts]
+    }
+
+    /** Articles publiés d'un auteur */
+    static async fetchPublishedPostsByAuthor(authorId: string, excludePostId?: string, limit = 4) {
+        return await this.db.post.findMany({
+            where: {
+                status: 'PUBLISHED',
+                authorId,
+                id: excludePostId ? {not: excludePostId} : undefined
+            },
+            orderBy: {publishAt: 'desc'},
+            take: limit
+        })
     }
 
     /**
@@ -156,17 +169,27 @@ export default class BlogModel extends BaseModel {
     // =========================================================================
 
     /**
-     * Récupère tous les articles non purgés pour le tableau de bord de l'extranet
-     * (Exclut uniquement les éléments de la corbeille DELETED)
+     * Récupère les articles non purgés pour l'extranet.
+     * Si `authorId` est fourni (AUTHOR), restreint à ses articles.
      */
-    static async fetchAllAdminPosts() {
+    static async fetchAllAdminPosts(authorId?: string) {
         return await this.db.post.findMany({
             where: {
-                status: {
-                    not: 'DELETED'
-                }
+                status: {not: 'DELETED'},
+                ...(authorId ? {authorId} : {})
             },
-            orderBy: { createdAt: 'desc' }
+            orderBy: {createdAt: 'desc'}
+        })
+    }
+
+    /** Un seul article à la une : désépingle tous les autres */
+    static async clearOtherFeatured(exceptPostId: string) {
+        return await this.db.post.updateMany({
+            where: {
+                isFeatured: true,
+                id: {not: exceptPostId}
+            },
+            data: {isFeatured: false}
         })
     }
 

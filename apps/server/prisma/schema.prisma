@@ -17,6 +17,7 @@ enum Category {
 
 enum Role {
   USER
+  AUTHOR
   MODERATOR
   EDITOR
   ADMIN
@@ -49,7 +50,7 @@ model Technology {
   isActive   Boolean    @default(true) // Disponible uniquement au tirage ou non
   createdAt  DateTime   @default(now())
 
-  // Relation 1-à-1 : detail.id = Technology.id (table TechnologyDetail)
+  // Relation 1-à-1 : detail.id = Technology.id
   detail TechnologyInfo?
 }
 
@@ -67,8 +68,6 @@ model TechnologyInfo {
   projectCount Int?
   history      String[]
   description  String?  @db.Text
-
-  @@map("TechnologyDetail") // conserve le nom de table existant en BDD
 }
 
 model SavedStack {
@@ -86,16 +85,43 @@ model SavedStack {
   user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// Modèle User lié bidirectionnellement aux commentaires 🚀
+// Auth uniquement — le profil public vit dans UserProfile
 model User {
-  id           String       @id @default(uuid())
-  email        String       @unique
-  passwordHash String
-  role         Role         @default(USER)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  savedStacks  SavedStack[]
-  comments     Comment[] // Lien de relation obligatoire avec les commentaires 🚀
+  id            String       @id @default(uuid())
+  email         String       @unique
+  passwordHash  String
+  role          Role         @default(USER)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  savedStacks   SavedStack[]
+  comments      Comment[]
+  profile       UserProfile?
+  authoredPosts Post[]
+}
+
+// Profil public (bio, photo, portfolio) — id = User.id
+model UserProfile {
+  id          String     @id
+  user        User       @relation(fields: [id], references: [id], onDelete: Cascade)
+  displayName String
+  bio         String?    @db.Text
+  photoId     String?
+  photo       File?      @relation(fields: [photoId], references: [id], onDelete: SetNull)
+  links       UserLink[]
+  updatedAt   DateTime   @updatedAt
+}
+
+// Liens portfolio (GitHub, site, etc.)
+model UserLink {
+  id        String      @id @default(uuid())
+  profileId String
+  profile   UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  label     String
+  url       String
+  sortOrder Int         @default(0)
+  createdAt DateTime    @default(now())
+
+  @@index([profileId])
 }
 
 // Modèle Post enrichi des tags, de la sécurité de publication et des commentaires 🚀
@@ -109,7 +135,8 @@ model Post {
   tags             String[]
   hasBeenPublished Boolean    @default(false)
   isFeatured       Boolean    @default(false) // <-- NOUVEAU : Article à la une 🌟
-  authorIds        String[]
+  authorId         String?
+  author           User?      @relation(fields: [authorId], references: [id], onDelete: SetNull)
   publishAt        DateTime?
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
@@ -118,7 +145,8 @@ model Post {
   imageId String?
   image   File?   @relation(fields: [imageId], references: [id], onDelete: SetNull)
 
-  @@index([slug]) // Index de performance pour charger les articles instantanément via le slug
+  @@index([slug])
+  @@index([authorId])
 }
 
 // Nouveau modèle de Commentaires V2.5/V3 🚀
@@ -146,5 +174,6 @@ model File {
   createdAt DateTime @default(now())
 
   // Relations inverses
-  posts Post[]
+  posts         Post[]
+  profilePhotos UserProfile[]
 }

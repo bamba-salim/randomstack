@@ -23,4 +23,9 @@
       @apply text-center;
     }
   }
+
+  // Sans trait — remplacé par une barre pub (page article)
+  &--flush {
+    @apply mb-4 border-b-0 pb-0;
+  }
 }

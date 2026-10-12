@@ -2,7 +2,7 @@
 import {ref, onMounted, watch} from 'vue'
 import {useRoute} from 'vue-router'
 import {fetchPostsByTag} from '#services'
-import { Breadcrumbs} from '#components'
+import {Breadcrumbs, AdSlot} from '#components'
 import type {FeaturedPostListed, PublicPostListed} from '@randomstack/commons'
 
 import FeaturedPostCard from './components/FeaturedPostCard.vue'
@@ -61,6 +61,8 @@ watch(() => route.params['tag'], (newTag) => {
     <!-- Contenu : Article à la une + Grille universelle à 2 colonnes -->
     <div v-else class="flex flex-col gap-8 w-full">
       <FeaturedPostCard v-if="featuredPost" :post="featuredPost"/>
+
+      <AdSlot placement="tag-inline" variant="banner"/>
 
       <div v-if="posts.length > 0" class="grid-cards grid-cards--2">
         <PostCard v-for="post in posts" :key="post.id" :post="post"/>

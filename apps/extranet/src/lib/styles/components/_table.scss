@@ -59,7 +59,12 @@
     @apply px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase bg-[#f6f8fa] text-slate-600 border border-[#c3c4c7];
   }
 
-  .edit-btn {
-    @apply px-3 py-1.5 bg-[#f6f8fa] border border-[#c3c4c7] hover:bg-[#e0e0e0] rounded text-[10px] text-slate-600 font-bold transition-colors duration-150 cursor-pointer;
+}
+
+.edit-btn {
+  @apply inline-flex items-center px-3 py-1.5 bg-[#f6f8fa] border border-[#c3c4c7] hover:bg-[#e0e0e0] rounded text-[10px] text-slate-600 font-bold transition-colors duration-150 cursor-pointer;
+
+  &:disabled {
+    @apply opacity-50 cursor-not-allowed hover:bg-[#f6f8fa];
   }
 }

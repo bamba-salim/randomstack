@@ -1,3 +1,5 @@
 export {default as AuthController} from './auth.controller'
 export {default as AuthMapper} from './auth.mapper'
+export {default as UserMapper} from './user.mapper'
 export {default as UserModel} from './user.model'
+export {default as AdminUserController} from './admin.user.controller'

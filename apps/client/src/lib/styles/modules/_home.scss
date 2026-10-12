@@ -6,42 +6,47 @@ $neon-pink: #ec4899;
 .lobby-layout-grid {
   @apply flex flex-col md:flex-row gap-8 w-full items-start;
 
-  // Colonne Gauche : Actualités
+  // Mobile : sidebar d'abord (DOM) ; desktop : news à gauche via order
   .news-main-section {
-    @apply flex-1 w-full min-w-0 flex flex-col text-left;
+    @apply flex-1 w-full min-w-0 flex flex-col text-left order-2 md:order-1;
 
     .section-title {
       @apply text-xs font-black text-slate-400 uppercase tracking-widest border-b border-[#c3c4c7] pb-3 mb-6;
     }
   }
 
-  // Colonne Droite : Meuble de contrôle arcade
   .lobby-control-sidebar {
-    @apply w-full md:w-80 flex flex-col gap-6 shrink-0;
+    @apply w-full md:w-80 shrink-0 order-1 md:order-2;
+
+    // Mobile : carte 2 cols + 2 boutons sur 1 ligne
+    .sidebar-promo-grid {
+      @apply grid grid-cols-2 gap-3 w-full;
+      @apply md:flex md:flex-col md:gap-6;
+    }
 
     .welcome-box {
-      @apply bg-white border border-[#c3c4c7] p-6 rounded-none text-left;
+      @apply col-span-2 bg-white border border-[#c3c4c7] p-5 md:p-6 rounded-none text-left;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 
       .brand-title {
-        @apply text-2xl font-black uppercase tracking-wider;
+        @apply text-xl md:text-2xl font-black uppercase tracking-wider;
         background: linear-gradient(to right, $neon-cyan, $primary, $neon-pink);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
 
       .brand-description {
-        @apply text-xs text-slate-500 mt-3 leading-relaxed font-semibold;
+        @apply text-xs text-slate-500 mt-2 md:mt-3 leading-relaxed font-semibold;
       }
     }
 
-    .shortcuts-grid {
-      @apply flex flex-col gap-4;
-    }
-
     .arcade-shortcut-btn {
-      @apply flex items-center gap-4 p-4 bg-slate-900 border border-slate-800 rounded-none cursor-pointer text-left select-none transition-all duration-200;
+      @apply flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 p-3 md:p-4;
+      @apply bg-slate-900 border border-slate-800 rounded-none cursor-pointer text-left select-none transition-all duration-200;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+
+      // Desktop sidebar : pleine largeur
+      @apply md:flex-row md:gap-4;
 
       &:hover {
         @apply border-cyan-500/50 -translate-y-0.5;
@@ -49,7 +54,7 @@ $neon-pink: #ec4899;
       }
 
       .btn-icon {
-        @apply text-3xl;
+        @apply text-2xl md:text-3xl;
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
       }
 
@@ -57,11 +62,11 @@ $neon-pink: #ec4899;
         @apply flex flex-col items-start min-w-0;
 
         .main-label {
-          @apply text-xs font-black uppercase tracking-widest text-slate-200;
+          @apply text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-200;
         }
 
         .sub-label {
-          @apply text-[9px] font-bold text-slate-500 mt-1 uppercase tracking-wider truncate max-w-full;
+          @apply text-[8px] md:text-[9px] font-bold text-slate-500 mt-0.5 md:mt-1 uppercase tracking-wider truncate max-w-full;
         }
       }
     }

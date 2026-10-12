@@ -1,8 +1,5 @@
-import type {
-    PublicTechnologyListed,
-    AdminTechnologyListed,
-    AdminPostListed
-} from '../../dtos'
+import type {PublicTechnologyListed, AdminTechnologyListed} from '../../dtos/core/stack.dto'
+import type {AdminPostListed} from '../../dtos/core/blog.dto'
 
 export interface FilterOptions {
     searchQuery: string

@@ -1,4 +1,5 @@
 import type {
+    AuthorListed,
     FeaturedPostListed,
     PublicPostListed,
     AdminPostListed,
@@ -12,6 +13,20 @@ import type {
 import {StrUtils} from '#utils'
 
 export default class BlogMapper {
+
+    static buildAuthorListed(profile: {
+        id: string
+        displayName: string
+        bio: string | null
+        photoId: string | null
+    }): AuthorListed {
+        return {
+            id: profile.id,
+            displayName: profile.displayName,
+            bio: profile.bio,
+            photoId: profile.photoId
+        }
+    }
 
     static buildFeaturedPostListed(post: any): FeaturedPostListed {
         return {
@@ -40,7 +55,7 @@ export default class BlogMapper {
         return posts.map(post => this.buildPublicPostListed(post))
     }
 
-    static buildPublicPostDetail(post: any): PublicPostDetail {
+    static buildPublicPostDetail(post: any, author: AuthorListed | null = null): PublicPostDetail {
         return {
             id: post.id,
             slug: post.slug,
@@ -50,7 +65,8 @@ export default class BlogMapper {
             imageId: post.imageId,
             tags: post.tags || [],
             mainTag: post.tags?.[0] || '',
-            publishAt: post.publishAt || post.updatedAt
+            publishAt: post.publishAt || post.updatedAt,
+            author
         }
     }
 
@@ -86,7 +102,7 @@ export default class BlogMapper {
         }
     }
 
-    static toSavePostDTO(formBean: EditPostFormBean, idPost: string): EditPost {
+    static toSavePostDTO(formBean: EditPostFormBean, idPost: string, authorId: string | null): EditPost {
         const slug = StrUtils.slugify(formBean.title, idPost)
 
         let contentBlocks: any[] = []
@@ -126,7 +142,7 @@ export default class BlogMapper {
                 imageId: formBean.imageId || null,
                 status,
                 tags: tagsList,
-                authorIds: Array.isArray(formBean.authorIds) ? formBean.authorIds : [],
+                authorId,
                 publishAt: finalPublishAt,
                 hasBeenPublished: formBean.hasBeenPublished === true,
                 isFeatured: Boolean(formBean.isFeatured)
@@ -143,7 +159,7 @@ export default class BlogMapper {
             imageId: post.imageId || null,
             status: post.status,
             tags: post.tags || [],
-            authorIds: post.authorIds || [],
+            authorId: post.authorId || null,
             publishAt: post.publishAt ? new Date(post.publishAt).toISOString() : null,
             hasBeenPublished: post.hasBeenPublished,
             isFeatured: post.isFeatured
@@ -158,7 +174,7 @@ export default class BlogMapper {
             imageId: null,
             status: 'DRAFT',
             tags: [],
-            authorIds: [],
+            authorId: null,
             publishAt: null,
             hasBeenPublished: false,
             isFeatured: false

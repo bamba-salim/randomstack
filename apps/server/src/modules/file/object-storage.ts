@@ -1,19 +1,17 @@
-import {
-    S3Client,
-    PutObjectCommand,
-    DeleteObjectCommand,
-    GetObjectCommand,
-    HeadObjectCommand
-} from '@aws-sdk/client-s3'
-import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
 import type {Readable} from 'stream'
+
+type S3Module = typeof import('@aws-sdk/client-s3')
+type PresignerModule = typeof import('@aws-sdk/s3-request-presigner')
 
 /**
  * Client S3-compatible (Railway Buckets / R2 / S3).
  * Si les variables S3_* manquent → mode local (disque) pour le dev.
+ * Import SDK en lazy : le serveur démarre même si le package n'est pas encore installé.
  */
 export default class ObjectStorage {
-    private static client: S3Client | null = null
+    private static client: import('@aws-sdk/client-s3').S3Client | null = null
+    private static s3: S3Module | null = null
+    private static presigner: PresignerModule | null = null
 
     static isEnabled(): boolean {
         return Boolean(
@@ -24,9 +22,18 @@ export default class ObjectStorage {
         )
     }
 
-    private static getClient(): S3Client {
+    private static async loadSdk(): Promise<{s3: S3Module; presigner: PresignerModule}> {
+        if (!this.s3 || !this.presigner) {
+            this.s3 = await import('@aws-sdk/client-s3')
+            this.presigner = await import('@aws-sdk/s3-request-presigner')
+        }
+        return {s3: this.s3, presigner: this.presigner}
+    }
+
+    private static async getClient() {
+        const {s3} = await this.loadSdk()
         if (!this.client) {
-            this.client = new S3Client({
+            this.client = new s3.S3Client({
                 endpoint: process.env['S3_ENDPOINT'],
                 region: process.env['S3_REGION'] || 'auto',
                 credentials: {
@@ -48,7 +55,9 @@ export default class ObjectStorage {
         body: Buffer,
         contentType: string
     ): Promise<void> {
-        await this.getClient().send(new PutObjectCommand({
+        const {s3} = await this.loadSdk()
+        const client = await this.getClient()
+        await client.send(new s3.PutObjectCommand({
             Bucket: this.bucket(),
             Key: key,
             Body: body,
@@ -57,7 +66,9 @@ export default class ObjectStorage {
     }
 
     static async deleteObject(key: string): Promise<void> {
-        await this.getClient().send(new DeleteObjectCommand({
+        const {s3} = await this.loadSdk()
+        const client = await this.getClient()
+        await client.send(new s3.DeleteObjectCommand({
             Bucket: this.bucket(),
             Key: key
         }))
@@ -65,7 +76,9 @@ export default class ObjectStorage {
 
     static async exists(key: string): Promise<boolean> {
         try {
-            await this.getClient().send(new HeadObjectCommand({
+            const {s3} = await this.loadSdk()
+            const client = await this.getClient()
+            await client.send(new s3.HeadObjectCommand({
                 Bucket: this.bucket(),
                 Key: key
             }))
@@ -77,11 +90,13 @@ export default class ObjectStorage {
 
     /** URL présignée GET (egress bucket gratuit côté Railway). */
     static async getSignedGetUrl(key: string, expiresInSeconds = 3600): Promise<string> {
-        const command = new GetObjectCommand({
+        const {s3, presigner} = await this.loadSdk()
+        const client = await this.getClient()
+        const command = new s3.GetObjectCommand({
             Bucket: this.bucket(),
             Key: key
         })
-        return getSignedUrl(this.getClient(), command, {expiresIn: expiresInSeconds})
+        return presigner.getSignedUrl(client, command, {expiresIn: expiresInSeconds})
     }
 
     static async getObjectStream(key: string): Promise<{
@@ -90,7 +105,9 @@ export default class ObjectStorage {
         contentLength?: number
     } | null> {
         try {
-            const result = await this.getClient().send(new GetObjectCommand({
+            const {s3} = await this.loadSdk()
+            const client = await this.getClient()
+            const result = await client.send(new s3.GetObjectCommand({
                 Bucket: this.bucket(),
                 Key: key
             }))

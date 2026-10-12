@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 import BlogModel from './blog.model'
 import BlogMapper from './blog.mapper'
 import BlogAction from './blog.action'
+import {UserModel} from '#user'
 
 export default class BlogController {
 
@@ -66,17 +67,37 @@ export default class BlogController {
 
             // Barrière de sécurité Preview / Statut
             const session = (req as any).session
-            const isAuthorizedAdmin = session?.userId && ['ADMIN', 'EDITOR', 'MODERATOR'].includes(session.userRole)
+            const isAuthorizedAdmin = session?.userId && ['ADMIN', 'EDITOR', 'AUTHOR', 'MODERATOR'].includes(session.userRole)
 
             if (post.status !== 'PUBLISHED' && (!isPreview || !isAuthorizedAdmin)) {
                 res.status(404).json({ error: 'Article introuvable.' })
                 return
             }
 
-            res.json(BlogMapper.buildPublicPostDetail(post))
+            const profile = await UserModel.findProfileById(post.authorId)
+            const author = profile ? BlogMapper.buildAuthorListed(profile) : null
+
+            res.json(BlogMapper.buildPublicPostDetail(post, author))
         } catch (error: any) {
             console.error('[BlogController] Erreur fetchPostBySlug :', error.message || error)
             res.status(500).json({ error: "Erreur lors de la récupération de l'article." })
+        }
+    }
+
+    /**
+     * Articles publiés du même auteur
+     * Cible : GET /fetch-posts/author/:authorId
+     */
+    static async fetchPostsByAuthor(req: Request, res: Response): Promise<void> {
+        try {
+            const {authorId} = req.params
+            const excludePostId = typeof req.query['exclude'] === 'string' ? req.query['exclude'] : undefined
+
+            const posts = await BlogModel.fetchPublishedPostsByAuthor(authorId, excludePostId, 4)
+            res.json(BlogMapper.buildPublicPostListedList(posts))
+        } catch (error: any) {
+            console.error('[BlogController] Erreur fetchPostsByAuthor :', error.message || error)
+            res.status(500).json({error: "Erreur lors de la récupération des articles de l'auteur."})
         }
     }
 
@@ -96,7 +117,7 @@ export default class BlogController {
             }
 
             // 2. Algorithme des 3 articles similaires
-            const similarPosts = await BlogModel.fetchSimilarPosts(currentPost.id, currentPost.tags, 3)
+            const similarPosts = await BlogModel.fetchSimilarPosts(currentPost.id, currentPost.tags, 4)
 
             // 3. Transformation en PublicPostListed pour le client
             res.json(BlogMapper.buildPublicPostListedList(similarPosts))

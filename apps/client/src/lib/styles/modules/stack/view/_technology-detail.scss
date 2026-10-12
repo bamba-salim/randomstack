@@ -1,6 +1,38 @@
 // --- FICHE DÉTAILLÉE D'UNE TECHNOLOGIE ---
+.tech-detail-page {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  align-items: start;
+
+  // Tablette+ : un seul rail à droite (rien sur mobile)
+  @media (min-width: 768px) {
+    grid-template-columns: minmax(0, 1fr) 140px;
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: minmax(0, 1fr) 160px;
+  }
+}
+
+.tech-detail-ad {
+  display: none;
+
+  @media (min-width: 768px) {
+    display: block;
+    width: 140px;
+    position: sticky;
+    top: 5.5rem;
+  }
+
+  @media (min-width: 1200px) {
+    width: 160px;
+  }
+}
+
 .tech-detail-layout {
-  @apply flex flex-col gap-8 w-full text-left;
+  @apply flex flex-col gap-8 w-full text-left min-w-0;
 
   // 1. En-tête : Image gauche + Table métadonnées droite
   .detail-top-section {

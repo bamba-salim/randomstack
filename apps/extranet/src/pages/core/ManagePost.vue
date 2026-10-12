@@ -1,13 +1,26 @@
 <script setup lang="ts">
 import {ref, onMounted, computed} from 'vue'
-import {fetchPosts} from '#services'
-import {Sidebar, PostTable} from '#components' // Importation sémantique 🚀
-import type {AdminPostListed} from '@randomstack/commons'
-import {PostFilter} from '#utils'// Import de l'ordonnanceur commun 🚀
+import {fetchPosts, getMe} from '#services'
+import {PostTable} from '#components'
+import type {AdminPostListed, Role} from '@randomstack/commons'
+import {PostFilter} from '#utils'
 
 const posts = ref<AdminPostListed[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
+const role = ref<Role | null>(null)
+
+const canCreatePost = computed(() =>
+  role.value === 'ADMIN' || role.value === 'EDITOR' || role.value === 'AUTHOR'
+)
+const isReadOnly = computed(() => role.value === 'MODERATOR')
+
+const subtitle = computed(() => {
+  if (role.value === 'AUTHOR') return 'Tes articles uniquement (brouillons, publiés, programmés).'
+  if (role.value === 'EDITOR') return 'Tous les articles — contenu, statut et à la une.'
+  if (role.value === 'MODERATOR') return 'Tous les articles — consultation seule (signalements bientôt).'
+  return 'Rédigez, programmez et gérez les articles du blog de RANDOMSTACK'
+})
 
 // --- ÉTATS RÉACTIFS DES FILTRES ET DE LA PAGINATION ---
 const searchQuery = ref('')
@@ -56,7 +69,9 @@ const loadData = async () => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  const me = await getMe()
+  role.value = me?.role ?? null
   loadData()
 })
 </script>
@@ -66,10 +81,9 @@ onMounted(() => {
   <header class="main-header">
     <div>
       <h1 class="header-title">Gestion des actualités</h1>
-      <p class="header-sub">Rédigez, programmez et gérez les articles du blog de RANDOMSTACK</p>
+      <p class="header-sub">{{ subtitle }}</p>
     </div>
-    <!-- Bouton sémantique de création d'un article 🚀 -->
-    <router-link to="/edit-post" class="add-btn">
+    <router-link v-if="canCreatePost" to="/edit-post" class="add-btn">
       + Rédiger un Article
     </router-link>
   </header>
@@ -117,7 +131,7 @@ onMounted(() => {
     </div>
 
     <!-- TABLEAU D'ADMINISTRATION DES ARTICLES 🚀 -->
-    <PostTable :posts="paginatedPosts"/>
+    <PostTable :posts="paginatedPosts" :read-only="isReadOnly"/>
 
     <!-- PAGINATION D'ARCADE WP-STYLE -->
     <div class="pagination-container">

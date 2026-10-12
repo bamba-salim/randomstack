@@ -1,0 +1,118 @@
+.ad-slot {
+  width: 100%;
+  border: 1px solid var(--color-border-standard);
+  background: #fff;
+  border-radius: 2px;
+  overflow: hidden;
+  text-align: left;
+
+  &__label {
+    display: block;
+    padding: 0.35rem 0.6rem;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8c8f94;
+    background: var(--color-surface-soft);
+    border-bottom: 1px solid var(--color-border-standard);
+  }
+
+  &__link {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+
+    &:hover .ad-slot__image {
+      opacity: 0.92;
+    }
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    transition: opacity 0.15s ease;
+  }
+
+  &__sponsor {
+    padding: 0.45rem 0.6rem;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-text-body);
+    border-top: 1px solid var(--color-border-standard);
+  }
+
+  &__placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: center;
+    justify-content: center;
+    min-height: 90px;
+    padding: 1rem;
+    font-size: 11px;
+    font-weight: 700;
+    color: #8c8f94;
+    background: repeating-linear-gradient(
+      -45deg,
+      #f6f8fa,
+      #f6f8fa 8px,
+      #fff 8px,
+      #fff 16px
+    );
+  }
+
+  &__hint {
+    font-size: 9px;
+    font-weight: 600;
+    color: #a7aaad;
+
+    code {
+      font-size: 9px;
+    }
+  }
+
+  &--banner {
+    .ad-slot__image {
+      max-height: 120px;
+      object-fit: contain;
+      background: var(--color-surface-soft);
+    }
+
+    .ad-slot__placeholder {
+      min-height: 72px;
+    }
+  }
+
+  &--home-sidebar .ad-slot__image {
+    max-height: 200px;
+  }
+
+  &--rail {
+    width: 160px;
+
+    .ad-slot__image {
+      min-height: 280px;
+      max-height: 480px;
+      object-fit: cover;
+    }
+
+    .ad-slot__placeholder {
+      min-height: 280px;
+      writing-mode: horizontal-tb;
+      padding: 1.25rem 0.5rem;
+      text-align: center;
+    }
+  }
+
+  &--article-rail-left,
+  &--article-rail-right,
+  &--technology-sidebar {
+    &.ad-slot--rail .ad-slot__image {
+      min-height: 320px;
+    }
+  }
+}

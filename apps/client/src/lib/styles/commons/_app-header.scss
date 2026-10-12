@@ -3,11 +3,14 @@ $neon-cyan: #06b6d4;
 $neon-pink: #ec4899;
 
 .app-header {
-  @apply sticky top-0 left-0 right-0 h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-center z-40 px-4 sm:px-6 shrink-0;
+  @apply sticky top-0 left-0 right-0 h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-center z-40 shrink-0;
+  padding-left: var(--container-padding, 1rem);
+  padding-right: var(--container-padding, 1rem);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 
   .header-container {
-    @apply flex items-center justify-between w-full max-w-5xl;
+    @apply flex items-center justify-between w-full;
+    max-width: var(--container-max-width, 1440px);
   }
 
   .logo-area {

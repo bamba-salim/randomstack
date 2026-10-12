@@ -2,9 +2,12 @@
 import type { AdminPostListed } from '@randomstack/commons'
 import { fileUrl } from '#services'
 
-defineProps<{
+withDefaults(defineProps<{
   posts: AdminPostListed[]
-}>()
+  readOnly?: boolean
+}>(), {
+  readOnly: false
+})
 </script>
 
 <template>
@@ -48,7 +51,7 @@ defineProps<{
         </td>
         <td class="text-right">
           <router-link :to="`/edit-post/${post.id}`" class="edit-btn">
-            Éditer
+            {{ readOnly ? 'Voir' : 'Éditer' }}
           </router-link>
         </td>
       </tr>

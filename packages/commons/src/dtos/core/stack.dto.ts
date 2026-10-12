@@ -1,5 +1,5 @@
 import type {Category} from '../../constants'
-import type {TechnologyVersion} from '../../interfaces'
+import type {TechnologyVersion} from '../../interfaces/core/technology.interface'
 
 /** Formulaire création / édition techno (extranet) */
 export interface EditTechnologyFormBean {

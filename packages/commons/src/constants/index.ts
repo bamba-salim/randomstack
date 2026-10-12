@@ -22,6 +22,7 @@ export const TECHNOLOGY_CATEGORY = {
 
 export const USER_ROLE = {
     USER: 'USER',
+    AUTHOR: 'AUTHOR',
     MODERATOR: 'MODERATOR',
     EDITOR: 'EDITOR',
     ADMIN: 'ADMIN'

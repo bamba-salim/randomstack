@@ -7,16 +7,48 @@ import BlogMapper from './blog.mapper'
 
 import type {EditPostFormBean} from '@randomstack/commons'
 
+type SessionInfo = {userId?: string; userRole?: string}
+
 export default class AdminBlogController {
+
+    private static session(req: Request): SessionInfo {
+        const session = (req as any).session
+        return {
+            userId: session?.userId,
+            userRole: session?.userRole
+        }
+    }
+
+    /** Lecture : AUTHOR = ses articles ; EDITOR / MODERATOR / ADMIN = tous */
+    private static canReadPost(session: SessionInfo, authorId: string | null | undefined): boolean {
+        if (!session.userId) return false
+        if (session.userRole === 'ADMIN' || session.userRole === 'EDITOR' || session.userRole === 'MODERATOR') {
+            return true
+        }
+        if (session.userRole === 'AUTHOR') return authorId === session.userId
+        return false
+    }
+
+    /** Écriture : AUTHOR = ses articles ; EDITOR / ADMIN = tous ; MODERATOR = non */
+    private static canWritePost(session: SessionInfo, authorId: string | null | undefined): boolean {
+        if (!session.userId) return false
+        if (session.userRole === 'ADMIN' || session.userRole === 'EDITOR') return true
+        if (session.userRole === 'AUTHOR') return authorId === session.userId
+        return false
+    }
+
+    private static canFeature(session: SessionInfo): boolean {
+        return session.userRole === 'ADMIN' || session.userRole === 'EDITOR'
+    }
 
     /**
      * Initialisation du formulaire Extranet (FormBean)
-     * Fournit un FormBean vide pour la création ou pré-rempli pour la modification
      * Cible : GET /ws/fetch-post-form-data / GET /ws/fetch-post-form-data/:id
      */
     static async fetchEditPostInitialData(req: Request, res: Response): Promise<void> {
         try {
             const {id} = req.params
+            const session = AdminBlogController.session(req)
             let formBean = BlogMapper.getInitialFormBean()
 
             if (id) {
@@ -25,7 +57,17 @@ export default class AdminBlogController {
                     res.status(404).json({error: 'Article introuvable.'})
                     return
                 }
+                if (!AdminBlogController.canReadPost(session, post.authorId)) {
+                    res.status(403).json({error: 'Accès refusé à cet article.'})
+                    return
+                }
                 formBean = BlogMapper.fromDBToClientFormBean(post)
+            } else {
+                if (session.userRole === 'MODERATOR') {
+                    res.status(403).json({error: 'Un modérateur ne peut pas créer d’article.'})
+                    return
+                }
+                formBean.authorId = session.userId || null
             }
 
             res.json(formBean)
@@ -37,61 +79,95 @@ export default class AdminBlogController {
 
     /**
      * Sauvegarde d'un article (Création ou Édition)
-     * Gère les règles de publication, permaliens immuables et remplacement d'image
-     * Cible : POST /api/admin/posts / PUT /api/admin/posts/:id
+     * - AUTHOR : ses articles, pas d'à la une, pas de changement d'auteur
+     * - EDITOR : tous, à la une exclusive, pas de changement d'auteur
+     * - ADMIN : tous + auteur + à la une
      */
     static async savePost(req: Request, res: Response): Promise<void> {
         try {
             const {id} = req.params
             const targetId = id || crypto.randomUUID()
             const formBean = req.body as EditPostFormBean
+            const session = AdminBlogController.session(req)
+            const sessionUserId = session.userId
+            const isAdmin = session.userRole === 'ADMIN'
+
+            if (!sessionUserId) {
+                res.status(401).json({error: 'Session requise.'})
+                return
+            }
 
             const {status: reqStatus} = formBean
             let finalStatus = reqStatus
             let hasBeenPublishedFlag = formBean.hasBeenPublished || false
+            let authorId: string | null = sessionUserId
+            let existingPost: Awaited<ReturnType<typeof BlogModel.fetchPostById>> | null = null
 
             if (id) {
-                const existingPost = await BlogModel.fetchPostById(id)
+                existingPost = await BlogModel.fetchPostById(id)
                 if (!existingPost) {
                     res.status(404).json({error: 'Article introuvable.'})
                     return
                 }
 
-                hasBeenPublishedFlag = existingPost.hasBeenPublished
+                if (!AdminBlogController.canWritePost(session, existingPost.authorId)) {
+                    res.status(403).json({error: 'Accès refusé à cet article.'})
+                    return
+                }
 
-                // Nettoyage de l'ancienne image si elle a été remplacée
+                hasBeenPublishedFlag = existingPost.hasBeenPublished
+                authorId = existingPost.authorId || sessionUserId
+
+                if (isAdmin && formBean.authorId) {
+                    authorId = formBean.authorId
+                }
+
                 if (existingPost.imageId && existingPost.imageId !== formBean.imageId) {
                     await FileAction.delete(existingPost.imageId).catch((err) =>
                         console.warn('[AdminBlogController] Échec suppression ancienne image :', err)
                     )
                 }
 
-                // Règle métier : interdiction de replanifier un article déjà publié
                 if (hasBeenPublishedFlag && reqStatus === 'SCHEDULED') {
                     res.status(400).json({error: 'Un article déjà publié ne peut plus être planifié.'})
                     return
                 }
 
-                // Règle métier : rétrograde en brouillon si on modifie sans republier
                 if (existingPost.status === 'PUBLISHED' && reqStatus !== 'PUBLISHED') {
                     finalStatus = 'DRAFT'
                 }
+            } else {
+                if (!AdminBlogController.canWritePost(session, sessionUserId)) {
+                    res.status(403).json({error: 'Accès refusé.'})
+                    return
+                }
+                if (isAdmin && formBean.authorId) {
+                    authorId = formBean.authorId
+                }
+            }
+
+            // À la une : EDITOR + ADMIN uniquement ; sinon on conserve l'existant
+            if (!AdminBlogController.canFeature(session)) {
+                formBean.isFeatured = existingPost ? Boolean(existingPost.isFeatured) : false
             }
 
             if (finalStatus === 'PUBLISHED') {
                 hasBeenPublishedFlag = true
             }
 
-            // Transformation sécurisée du FormBean en DTO BDD via le Mapper
             const saveDTO = BlogMapper.toSavePostDTO({
                 ...formBean,
                 status: finalStatus,
                 hasBeenPublished: hasBeenPublishedFlag
-            }, targetId)
+            }, targetId, authorId)
 
             const result = id
                 ? await BlogModel.updatePost(id, saveDTO)
                 : await BlogModel.createPost(saveDTO)
+
+            if (formBean.isFeatured) {
+                await BlogModel.clearOtherFeatured(result.id)
+            }
 
             res.json(BlogMapper.buildSavePostResponse(result))
         } catch (error: any) {
@@ -101,12 +177,13 @@ export default class AdminBlogController {
     }
 
     /**
-     * Liste complète des articles pour la table d'administration (hors DELETED)
-     * Cible : GET /api/admin/posts
+     * Liste articles admin — AUTHOR : les siens ; EDITOR / MODERATOR / ADMIN : tous
      */
-    static async fetchPosts(_req: Request, res: Response): Promise<void> {
+    static async fetchPosts(req: Request, res: Response): Promise<void> {
         try {
-            const posts = await BlogModel.fetchAllAdminPosts()
+            const session = AdminBlogController.session(req)
+            const authorFilter = session.userRole === 'AUTHOR' ? session.userId : undefined
+            const posts = await BlogModel.fetchAllAdminPosts(authorFilter)
             res.json(BlogMapper.buildAdminPostListedList(posts))
         } catch (error: any) {
             console.error('[AdminBlogController] Erreur fetchPosts :', error.message || error)
@@ -114,16 +191,18 @@ export default class AdminBlogController {
         }
     }
 
-    /**
-     * Soft delete d'un article (passage au statut DELETED)
-     * Cible : DELETE /api/admin/posts/:id
-     */
     static async deletePost(req: Request, res: Response): Promise<void> {
         try {
             const {id} = req.params
+            const session = AdminBlogController.session(req)
             const existing = await BlogModel.fetchPostById(id)
             if (!existing) {
                 res.status(404).json({error: 'Article introuvable.'})
+                return
+            }
+
+            if (!AdminBlogController.canWritePost(session, existing.authorId)) {
+                res.status(403).json({error: 'Accès refusé à cet article.'})
                 return
             }
 
@@ -135,11 +214,6 @@ export default class AdminBlogController {
         }
     }
 
-    /**
-     * Inspection et audit des blocs d'images contenus dans les articles
-     * Utilisé pour la maintenance et la détection d'orphelins
-     * Cible : GET /api/admin/posts/contents-audit
-     */
     static async fetchPostsContents(_req: Request, res: Response): Promise<void> {
         try {
             const rawPosts = await BlogModel.getPostsContents()
