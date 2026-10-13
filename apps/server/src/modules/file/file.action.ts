@@ -1,12 +1,13 @@
 import crypto from 'crypto'
 import path from 'path'
 
-import type {FILE_TYPE, TABLE, FileType, FileRecord} from '@randomstack/commons'
+import {FILE_TYPE, TABLE, type FileType, type FileRecord} from '@randomstack/commons'
 
 import FileModel from './file.model.js'
 import FileUtils from './file.utils.js'
 import FileMapper from './file.mapper.js'
 import ObjectStorage from './object-storage.js'
+import ImageCompress from './image-compress.js'
 
 export default class FileAction {
     static async save(
@@ -17,15 +18,32 @@ export default class FileAction {
         altText?: string,
         mimeType?: string
     ) {
-        const ext = path.extname(originalName).toLowerCase() || '.bin'
+        let buffer = fileBuffer
+        let name = originalName
+        let resolvedMime = mimeType || 'application/octet-stream'
+        let ext = path.extname(originalName).toLowerCase() || '.bin'
+
+        if (type === FILE_TYPE.IMAGE || resolvedMime.startsWith('image/')) {
+            const compressed = await ImageCompress.maybeCompress(buffer, name, resolvedMime)
+            buffer = compressed.buffer
+            name = compressed.originalName
+            resolvedMime = compressed.mimeType
+            ext = compressed.extension
+            if (compressed.compressed) {
+                const pct = Math.round((1 - compressed.bytesAfter / compressed.bytesBefore) * 100)
+                console.log(
+                    `[FileAction] Image compressée WebP q90 : ${compressed.bytesBefore} → ${compressed.bytesAfter} octets (−${pct}%)`
+                )
+            }
+        }
+
         const targetId = crypto.randomUUID()
         const objectKey = FileUtils.buildObjectKey(category, type, targetId, ext)
-        const resolvedMime = mimeType || 'application/octet-stream'
 
         if (ObjectStorage.isEnabled()) {
-            await ObjectStorage.putObject(objectKey, fileBuffer, resolvedMime)
+            await ObjectStorage.putObject(objectKey, buffer, resolvedMime)
         } else {
-            const saved = FileUtils.saveUploadLocal(fileBuffer, objectKey)
+            const saved = FileUtils.saveUploadLocal(buffer, objectKey)
             if (!saved) {
                 throw new Error('Échec de la sauvegarde physique du fichier.')
             }
@@ -37,7 +55,7 @@ export default class FileAction {
             category as any,
             ext,
             resolvedMime,
-            fileBuffer.length,
+            buffer.length,
             altText ? altText : null
         )
 

@@ -9,6 +9,7 @@ import BlockRenderer from './components/BlockRenderer.vue'
 import AuthorCard from './components/AuthorCard.vue'
 import AuthorArticlesSection from './components/AuthorArticlesSection.vue'
 import RelatedArticlesSection from './components/RelatedArticlesSection.vue'
+import CommentsSection from './components/CommentsSection.vue'
 
 const route = useRoute()
 const post = ref<PublicPostDetail | null>(null)
@@ -16,6 +17,16 @@ const relatedPosts = ref<PublicPostListed[]>([])
 const authorPosts = ref<PublicPostListed[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
+const liveCommentsCount = ref<number | null>(null)
+
+const commentsCountLabel = computed(() => {
+  const n = liveCommentsCount.value ?? post.value?.commentsCount ?? 0
+  return `${n} commentaire${n > 1 ? 's' : ''}`
+})
+
+const onCommentsCountChange = (n: number) => {
+  liveCommentsCount.value = n
+}
 
 const primaryAuthor = computed<AuthorListed | null>(() => post.value?.author ?? null)
 
@@ -30,11 +41,13 @@ const loadArticle = async (slug: string) => {
   error.value = null
   relatedPosts.value = []
   authorPosts.value = []
+  liveCommentsCount.value = null
 
   const isPreview = route.query['preview'] === 'true'
 
   try {
     post.value = await fetchPostBySlug(slug, isPreview)
+    liveCommentsCount.value = post.value.commentsCount
     try {
       relatedPosts.value = await fetchSimilarPosts(slug)
     } catch {
@@ -95,6 +108,7 @@ watch(() => route.params['slug'], (slug) => {
           <h1 class="page-title">{{ post.title }}</h1>
           <div class="page-meta">
             <span v-if="post.publishAt">Publié le {{ formatDate(post.publishAt) }}</span>
+            <span>{{ commentsCountLabel }}</span>
             <span v-if="route.query['preview'] === 'true'" class="badge badge--primary">
               Mode Prévisualisation
             </span>
@@ -133,6 +147,11 @@ watch(() => route.params['slug'], (slug) => {
         </div>
 
         <AuthorCard v-if="primaryAuthor" :author="primaryAuthor"/>
+
+        <CommentsSection
+            :post-id="post.id"
+            @count-change="onCommentsCountChange"
+        />
 
         <AuthorArticlesSection
             v-if="authorPosts.length > 0"

@@ -207,7 +207,10 @@ export default class BlogModel extends BaseModel {
      */
     static async fetchPostBySlug(slug: string) {
         return await this.db.post.findUnique({
-            where: { slug }
+            where: {slug},
+            include: {
+                _count: {select: {comments: true}}
+            }
         })
     }
 

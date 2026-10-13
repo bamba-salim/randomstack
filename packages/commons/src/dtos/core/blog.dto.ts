@@ -68,6 +68,7 @@ export interface PublicPostDetail {
     mainTag: string
     publishAt: string | Date | null
     author: AuthorListed | null
+    commentsCount: number
 }
 
 export interface PublishedPostsResponse {

@@ -1,5 +1,6 @@
 import {Router} from 'express'
-import {BlogController} from './blog'
+import {AuthMiddleware} from '#middlewares'
+import {BlogController, CommentController} from './blog'
 import {FileController} from './file'
 import {StackController, TechnologyController} from './stack'
 import multer from 'multer'
@@ -37,10 +38,27 @@ export default class WebService {
         router.get('/fetch-similar-posts/:slug', BlogController.fetchSimilarPosts)
         router.get('/fetch-post/:slug', BlogController.fetchPostBySlug)
 
+        // Commentaires
+        router.get('/fetch-comments/:postId', CommentController.fetchComments)
+        router.post(
+            '/create-comment',
+            AuthMiddleware.isAuthenticated,
+            CommentController.createComment
+        )
+        router.post(
+            '/vote-comment/:id',
+            AuthMiddleware.isAuthenticated,
+            CommentController.voteComment
+        )
+        router.delete(
+            '/delete-comment/:id',
+            AuthMiddleware.isAuthenticated,
+            CommentController.deleteComment
+        )
+
         // Fichiers
         router.get('/files/:id', FileController.getFile)
         router.post('/upload-file', upload.single('file'), FileController.upload)
-
 
         return router
     }

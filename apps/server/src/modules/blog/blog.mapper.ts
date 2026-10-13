@@ -66,7 +66,8 @@ export default class BlogMapper {
             tags: post.tags || [],
             mainTag: post.tags?.[0] || '',
             publishAt: post.publishAt || post.updatedAt,
-            author
+            author,
+            commentsCount: post._count?.comments ?? post.commentsCount ?? 0
         }
     }
 

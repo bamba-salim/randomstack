@@ -26,6 +26,7 @@
 @use './modules/blog/components/article-cards';
 @use './modules/blog/components/article-content';
 @use './modules/blog/components/author-card';
+@use './modules/blog/components/comments-section';
 @use './modules/blog/view/article-detail';
 
 @use './modules/stack/components/blacklist-drawer';

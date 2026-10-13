@@ -10,6 +10,10 @@ import type {
     PublicPostListed,
     PublishedPostsResponse,
     SharedStackListed,
+    CommentsListResponse,
+    CreateCommentResponse,
+    VoteCommentResponse,
+    CommentVoteType,
     FileType,
     Table
 } from '@randomstack/commons'
@@ -99,6 +103,28 @@ export const fetchPostsByAuthor = async (
 ): Promise<PublicPostListed[]> => {
     const query = excludePostId ? `?exclude=${encodeURIComponent(excludePostId)}` : ''
     return await ApiClient.get<PublicPostListed[]>(`/fetch-posts/author/${authorId}${query}`)
+}
+
+export const fetchComments = async (postId: string): Promise<CommentsListResponse> => {
+    return await ApiClient.get<CommentsListResponse>(`/fetch-comments/${postId}`)
+}
+
+export const createComment = async (
+    postId: string,
+    content: string
+): Promise<CreateCommentResponse> => {
+    return await ApiClient.post<CreateCommentResponse>('/create-comment', {postId, content})
+}
+
+export const voteComment = async (
+    commentId: string,
+    vote: CommentVoteType | null
+): Promise<VoteCommentResponse> => {
+    return await ApiClient.post<VoteCommentResponse>(`/vote-comment/${commentId}`, {vote})
+}
+
+export const deleteComment = async (commentId: string): Promise<{success: boolean}> => {
+    return await ApiClient.delete<{success: boolean}>(`/delete-comment/${commentId}`)
 }
 
 export const uploadFile = async (

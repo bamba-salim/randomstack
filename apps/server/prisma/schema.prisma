@@ -39,6 +39,11 @@ enum FileType {
   OTHER
 }
 
+enum VoteType {
+  LIKE
+  DISLIKE
+}
+
 model Technology {
   id         String     @id @default(uuid())
   name       String     @unique
@@ -95,6 +100,7 @@ model User {
   updatedAt     DateTime     @updatedAt
   savedStacks   SavedStack[]
   comments      Comment[]
+  commentVotes  CommentVote[]
   profile       UserProfile?
   authoredPosts Post[]
 }
@@ -149,10 +155,10 @@ model Post {
   @@index([authorId])
 }
 
-// Nouveau modèle de Commentaires V2.5/V3 🚀
+// Commentaires publics (like/dislike réservés aux comptes connectés)
 model Comment {
   id        String   @id @default(uuid())
-  content   String   @db.Text // Texte uniquement
+  content   String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -161,6 +167,26 @@ model Comment {
 
   postId String
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  votes CommentVote[]
+
+  @@index([postId])
+  @@index([userId])
+}
+
+model CommentVote {
+  id        String   @id @default(uuid())
+  type      VoteType
+  createdAt DateTime @default(now())
+
+  commentId String
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId])
+  @@index([commentId])
 }
 
 model File {

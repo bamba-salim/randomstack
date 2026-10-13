@@ -37,4 +37,16 @@ export default class ApiClient {
         }
         return await response.json()
     }
+
+    static async delete<T>(endpoint: string): Promise<T> {
+        const response = await fetch(`${this.baseUrl}${endpoint}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        })
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({} as {error?: string}))
+            throw new Error(errorData.error || `HTTP Error: ${response.status}`)
+        }
+        return await response.json()
+    }
 }
