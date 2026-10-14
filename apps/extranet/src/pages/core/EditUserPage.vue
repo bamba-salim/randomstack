@@ -1,19 +1,33 @@
 <script setup lang="ts">
 import {ref, onMounted, computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import {fetchUserById, updateUserRole, fileUrl, getMe} from '#services'
+import {fetchUserById, updateUserRole, createUser, fileUrl, getMe} from '#services'
+import {BaseInput} from '#components'
+import {toast} from '../../lib/toast'
 import type {AdminUserDetail, Role} from '@randomstack/commons'
 
 const route = useRoute()
 const router = useRouter()
+
+const userId = computed(() => {
+  const id = route.params['id']
+  return typeof id === 'string' && id.length > 0 ? id : undefined
+})
+const isCreateMode = computed(() => !userId.value)
 
 const user = ref<AdminUserDetail | null>(null)
 const selectedRole = ref<Role>('USER')
 const actorRole = ref<Role | null>(null)
 const loading = ref(true)
 const saving = ref(false)
-const errorMsg = ref<string | null>(null)
-const successMsg = ref<string | null>(null)
+const loadError = ref<string | null>(null)
+
+const createForm = ref({
+  email: '',
+  password: '',
+  displayName: '',
+  role: 'USER' as Role
+})
 
 const isAdmin = computed(() => actorRole.value === 'ADMIN')
 const isModerator = computed(() => actorRole.value === 'MODERATOR')
@@ -21,6 +35,7 @@ const isEditor = computed(() => actorRole.value === 'EDITOR')
 
 /** MODERATOR : USER ↔ AUTHOR ; ADMIN : tous les rôles ; EDITOR : lecture seule */
 const canChangeRole = computed(() => {
+  if (isCreateMode.value) return isAdmin.value
   if (!user.value) return false
   if (isAdmin.value) return true
   return isModerator.value && (user.value.role === 'USER' || user.value.role === 'AUTHOR')
@@ -35,6 +50,14 @@ const roles = computed<Role[]>(() => {
 const initials = computed(() => (user.value?.displayName || '?').substring(0, 2).toUpperCase())
 const roleDirty = computed(() => user.value != null && selectedRole.value !== user.value.role)
 
+const pageTitle = computed(() => (isCreateMode.value ? 'Nouvel utilisateur' : 'Fiche utilisateur'))
+const pageSub = computed(() => {
+  if (isCreateMode.value) return 'Créer un compte avec un rôle défini'
+  if (isEditor.value) return 'Fiche auteur — profil et articles (lecture seule)'
+  if (isModerator.value && !isAdmin.value) return 'Consultation — bascule USER ↔ AUTHOR'
+  return 'Consultation du profil — seul le rôle est modifiable'
+})
+
 const formatDate = (value: string | Date) =>
   new Date(value).toLocaleDateString('fr-FR', {
     day: 'numeric',
@@ -42,63 +65,96 @@ const formatDate = (value: string | Date) =>
     year: 'numeric'
   })
 
-onMounted(async () => {
-  const id = route.params['id'] as string
-  if (!id) {
-    errorMsg.value = 'Utilisateur introuvable.'
-    loading.value = false
+const handleCreate = async () => {
+  if (!isAdmin.value || saving.value) return
+
+  const displayName = createForm.value.displayName.trim()
+  const email = createForm.value.email.trim()
+  const password = createForm.value.password
+
+  if (!displayName || !email || !password) {
+    toast.error('Nom, email et mot de passe sont requis.')
+    return
+  }
+  if (password.length < 8) {
+    toast.error('Le mot de passe doit contenir au moins 8 caractères.')
     return
   }
 
+  saving.value = true
   try {
-    const me = await getMe()
-    actorRole.value = me?.role ?? null
-    user.value = await fetchUserById(id)
+    const result = await createUser({
+      email,
+      password,
+      displayName,
+      role: createForm.value.role
+    })
+    toast.success('Utilisateur créé.')
+    await router.replace(`/edit-user/${result.user.id}`)
+    user.value = await fetchUserById(result.user.id)
     selectedRole.value = user.value.role
-  } catch {
-    errorMsg.value = 'Impossible de charger cet utilisateur.'
+  } catch (err: any) {
+    toast.error(err?.message || 'Impossible de créer l’utilisateur.')
   } finally {
-    loading.value = false
+    saving.value = false
   }
-})
+}
 
 const handleSaveRole = async () => {
   if (!user.value || saving.value || !canChangeRole.value) return
 
   if (selectedRole.value === user.value.role) {
-    errorMsg.value = 'Modifie le rôle avant d’enregistrer.'
-    successMsg.value = null
+    toast.info('Modifie le rôle avant d’enregistrer.')
     return
   }
 
   saving.value = true
-  successMsg.value = null
-  errorMsg.value = null
-
   try {
     const result = await updateUserRole(user.value.id, selectedRole.value)
     user.value = {...user.value, role: result.user.role}
     selectedRole.value = result.user.role
-    successMsg.value = `Rôle mis à jour : ${result.user.role}`
+    toast.success(`Rôle mis à jour : ${result.user.role}`)
   } catch (err: any) {
-    errorMsg.value = err?.message || 'Échec de la mise à jour du rôle.'
+    toast.error(err?.message || 'Échec de la mise à jour du rôle.')
   } finally {
     saving.value = false
   }
 }
+
+onMounted(async () => {
+  loading.value = true
+  loadError.value = null
+
+  try {
+    const me = await getMe()
+    actorRole.value = me?.role ?? null
+
+    if (isCreateMode.value) {
+      if (!isAdmin.value) {
+        loadError.value = 'Seul un administrateur peut créer un utilisateur.'
+        return
+      }
+      selectedRole.value = 'USER'
+      return
+    }
+
+    user.value = await fetchUserById(userId.value!)
+    selectedRole.value = user.value.role
+  } catch {
+    loadError.value = isCreateMode.value
+      ? 'Impossible d’initialiser le formulaire.'
+      : 'Impossible de charger cet utilisateur.'
+  } finally {
+    loading.value = false
+  }
+})
 </script>
 
 <template>
   <header class="main-header">
     <div>
-      <h1 class="header-title">Fiche utilisateur</h1>
-      <p class="header-sub">
-        {{ isEditor
-          ? 'Fiche auteur — profil et articles (lecture seule)'
-          : isModerator && !isAdmin
-            ? 'Consultation — bascule USER ↔ AUTHOR'
-            : 'Consultation du profil — seul le rôle est modifiable' }}
-      </p>
+      <h1 class="header-title">{{ pageTitle }}</h1>
+      <p class="header-sub">{{ pageSub }}</p>
     </div>
     <button type="button" class="edit-btn" @click="router.push('/manage-user')">
       ← Retour à la liste
@@ -106,12 +162,40 @@ const handleSaveRole = async () => {
   </header>
 
   <div v-if="loading" class="loading-text">Chargement…</div>
-  <div v-else-if="errorMsg && !user" class="error-box">{{ errorMsg }}</div>
+  <div v-else-if="loadError && !user && !isCreateMode" class="error-box">{{ loadError }}</div>
+  <div v-else-if="loadError && isCreateMode" class="error-box">{{ loadError }}</div>
 
+  <!-- Création -->
+  <form
+      v-else-if="isCreateMode && isAdmin"
+      class="form-page-container max-w-lg"
+      @submit.prevent="handleCreate"
+  >
+    <BaseInput v-model="createForm.displayName" label="Nom d’affichage" required/>
+    <BaseInput v-model="createForm.email" label="Email" type="email" required/>
+    <BaseInput
+        v-model="createForm.password"
+        label="Mot de passe (min. 8 caractères)"
+        type="password"
+        required
+    />
+
+    <div class="form-group mb-2">
+      <label class="form-label">Rôle</label>
+      <select v-model="createForm.role" class="form-input" required>
+        <option v-for="role in roles" :key="role" :value="role">{{ role }}</option>
+      </select>
+    </div>
+
+    <div class="form-actions border-t border-[#c3c4c7] pt-6 mt-4 flex gap-3">
+      <button type="submit" class="save-btn" :disabled="saving">
+        {{ saving ? 'Création…' : 'Créer l’utilisateur' }}
+      </button>
+    </div>
+  </form>
+
+  <!-- Édition / consultation -->
   <div v-else-if="user" class="form-page-container user-detail">
-    <div v-if="errorMsg" class="error-box mb-4">{{ errorMsg }}</div>
-    <div v-if="successMsg" class="success-box mb-4">{{ successMsg }}</div>
-
     <section class="user-detail__card">
       <div class="user-detail__identity">
         <div class="user-detail__photo">

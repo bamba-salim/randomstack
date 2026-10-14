@@ -144,11 +144,15 @@ model Post {
   content          Json
   status           PostStatus @default(DRAFT)
   tags             String[]
+  /// Sources / crédits (URLs ou libellés), gérées comme les tags
+  sources          String[]   @default([])
   hasBeenPublished Boolean    @default(false)
-  isFeatured       Boolean    @default(false) // <-- NOUVEAU : Article à la une 🌟
+  isFeatured       Boolean    @default(false)
   authorId         String?
   author           User?      @relation(fields: [authorId], references: [id], onDelete: SetNull)
   publishAt        DateTime?
+  /// Rempli au soft-delete ; purge hard après 90 jours (cron)
+  deletedAt        DateTime?
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
   comments         Comment[]
@@ -160,6 +164,8 @@ model Post {
   @@index([slug])
   @@index([shareCode])
   @@index([authorId])
+  @@index([status, publishAt])
+  @@index([deletedAt])
 }
 
 /** Marque-page / article favori (compte connecté) */

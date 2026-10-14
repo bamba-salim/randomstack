@@ -2,21 +2,21 @@
 import {ref} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import {login} from '#services'
+import {toast} from '../../../lib/toast'
 
 const router = useRouter()
 const route = useRoute()
 const email = ref('')
 const password = ref('')
-const errorMsg = ref<string | null>(null)
 const loading = ref(false)
 
 const handleLogin = async () => {
   if (loading.value) return
-  errorMsg.value = null
   loading.value = true
 
   try {
     await login({email: email.value, password: password.value})
+    toast.success('Connexion réussie.')
     // Open redirect : uniquement chemins internes (`/foo`), jamais `//evil.com`
     const raw = typeof route.query['redirect'] === 'string' ? route.query['redirect'] : '/profile'
     const redirect =
@@ -25,7 +25,7 @@ const handleLogin = async () => {
         : '/profile'
     await router.push(redirect)
   } catch (err: any) {
-    errorMsg.value = err.message || 'Connexion impossible.'
+    toast.error(err.message || 'Connexion impossible.')
   } finally {
     loading.value = false
   }
@@ -40,10 +40,6 @@ const handleLogin = async () => {
         <h1 class="auth-card__title">Connexion</h1>
         <p class="auth-card__lead">Accède à ton profil RandomStack.</p>
       </header>
-
-      <div v-if="errorMsg" class="auth-card__error" role="alert">
-        {{ errorMsg }}
-      </div>
 
       <form class="auth-form" @submit.prevent="handleLogin">
         <label class="auth-form__field">

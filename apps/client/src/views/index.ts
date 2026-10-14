@@ -16,6 +16,7 @@ import EncyclopediaView from './modules/stack/EncyclopediaView.vue'
 import TechnologyDetailView from './modules/stack/TechnologyDetailView.vue'
 
 import ArticleDetailView from './modules/blog/ArticleDetailView.vue'
+import ArticlePreviewView from './modules/blog/ArticlePreviewView.vue'
 import PostShareView from './modules/blog/PostShareView.vue'
 import TagPostsView from './modules/blog/TagPostsView.vue'
 
@@ -75,6 +76,12 @@ const router = createRouter({
                     path: 'post/:shareCode',
                     name: 'post-share',
                     component: PostShareView
+                },
+                {
+                    /** Preview staff (brouillon / planifié / archivé) */
+                    path: 'preview/:shareCode',
+                    name: 'article-preview',
+                    component: ArticlePreviewView
                 },
                 {
                     /** URL canonique de l’article */

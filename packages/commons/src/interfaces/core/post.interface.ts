@@ -21,10 +21,12 @@ export interface Post {
     imageId: string | null
     status: PostStatus
     tags: string[]
+    sources: string[]
     hasBeenPublished: boolean
     isFeatured: boolean
     authorId: string | null
     publishAt: string | Date | null
+    deletedAt?: string | Date | null
     createdAt: string | Date
     updatedAt: string | Date
 }

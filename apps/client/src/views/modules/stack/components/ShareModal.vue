@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import {ref, computed} from 'vue'
+import {toast} from '../../../../lib/toast'
 
 const props = defineProps<{
   isOpen: boolean
@@ -17,14 +18,18 @@ const shareLinkUrl = computed(() => {
   return `${window.location.origin}/draft/${props.shareCode}`
 })
 
-const copyShareLink = () => {
+const copyShareLink = async () => {
   if (!shareLinkUrl.value) return
-  navigator.clipboard.writeText(shareLinkUrl.value).then(() => {
+  try {
+    await navigator.clipboard.writeText(shareLinkUrl.value)
     copiedSuccess.value = true
+    toast.success('Lien copié.')
     setTimeout(() => {
       copiedSuccess.value = false
     }, 2000)
-  })
+  } catch {
+    toast.error('Impossible de copier le lien.')
+  }
 }
 </script>
 

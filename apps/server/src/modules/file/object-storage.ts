@@ -74,6 +74,28 @@ export default class ObjectStorage {
         }))
     }
 
+    /** Copie S3 puis suppression source (migration naming). */
+    static async moveObject(fromKey: string, toKey: string): Promise<boolean> {
+        try {
+            const {s3} = await this.loadSdk()
+            const client = await this.getClient()
+            const bucket = this.bucket()
+            await client.send(new s3.CopyObjectCommand({
+                Bucket: bucket,
+                CopySource: `${bucket}/${fromKey}`,
+                Key: toKey
+            }))
+            await client.send(new s3.DeleteObjectCommand({
+                Bucket: bucket,
+                Key: fromKey
+            }))
+            return true
+        } catch (error: any) {
+            console.error('[ObjectStorage] Échec moveObject :', error.message || error)
+            return false
+        }
+    }
+
     static async exists(key: string): Promise<boolean> {
         try {
             const {s3} = await this.loadSdk()

@@ -4,7 +4,8 @@ import {useRouter} from 'vue-router'
 import {logout, fetchTechnologies} from '#services'
 // Importation propre du filtre et des types depuis le module commun ! 🚀
 import {TechnologyFilter, type AdminTechnologyListed} from '@randomstack/commons'
-import {TechnologyTable} from "#components"
+import {TechnologyTable} from '#components'
+import {toast} from '../../lib/toast'
 
 const router = useRouter()
 const technologies = ref<AdminTechnologyListed[]>([])
@@ -61,9 +62,10 @@ const loadData = async () => {
 const handleLogout = async () => {
   try {
     await logout()
+    toast.success('Déconnexion.')
     router.push('/login')
   } catch {
-    alert("Erreur déconnexion.")
+    toast.error('Erreur déconnexion.')
   }
 }
 

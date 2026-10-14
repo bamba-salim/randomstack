@@ -6,6 +6,7 @@ import {Sidebar, ParagraphManager, BaseInput, BaseToggle} from '#components'
 
 import {saveTechnology, fetchTechnologies, fetchTechnologyFormData, uploadFile, fileUrl} from '#services'
 import {TechnologyFilter} from '@randomstack/commons'
+import {toast} from '../../lib/toast'
 
 import type {AdminTechnologyListed, EditTechnologyFormBean} from '@randomstack/commons'
 
@@ -16,7 +17,7 @@ const isEditMode = ref(false)
 const techId = ref<string | undefined>(undefined)
 
 const loading = ref(false)
-const errorMsg = ref<string | null>(null)
+const loadError = ref<string | null>(null)
 
 const formBean = ref<EditTechnologyFormBean | null>(null)
 
@@ -55,7 +56,7 @@ const handleLogoUpload = async (e: Event) => {
     const {idFile} = await uploadFile(file, 'IMAGE', 'technology')
     formBean.value.logo = idFile
   } catch {
-    alert("Erreur lors de l'upload du logo.")
+    toast.error("Erreur lors de l'upload du logo.")
   } finally {
     loading.value = false
   }
@@ -63,14 +64,14 @@ const handleLogoUpload = async (e: Event) => {
 
 const handleSave = async () => {
   if (!formBean.value || loading.value) return
-  errorMsg.value = null
   loading.value = true
 
   try {
     await saveTechnology(formBean.value, techId.value)
+    toast.success('Technologie enregistrée.')
     router.push('/dashboard')
   } catch (err: any) {
-    errorMsg.value = err.message || "Erreur lors de l'enregistrement."
+    toast.error(err.message || "Erreur lors de l'enregistrement.")
   } finally {
     loading.value = false
   }
@@ -95,7 +96,7 @@ onMounted(async () => {
     selectedLanguageDropdown.value = flatFormBean.language || ''
     isCustomLanguage.value = false
   } catch {
-    errorMsg.value = "Impossible d'initialiser le formulaire."
+    loadError.value = "Impossible d'initialiser le formulaire."
   } finally {
     loading.value = false
   }
@@ -118,8 +119,8 @@ onMounted(async () => {
     Initialisation du formulaire...
   </div>
 
-  <div v-else-if="errorMsg" class="error-box">
-    {{ errorMsg }}
+  <div v-else-if="loadError" class="error-box">
+    {{ loadError }}
   </div>
 
   <!-- Le formulaire ne s'affiche qu'une fois le FormBean initialisé par l'API 🚀 -->

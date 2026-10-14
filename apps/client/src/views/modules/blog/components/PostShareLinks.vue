@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {ref, computed} from 'vue'
+import {toast} from '../../../../lib/toast'
 
 const props = defineProps<{
   shareUrl: string
@@ -64,11 +65,12 @@ const copyLink = async () => {
   try {
     await navigator.clipboard.writeText(props.shareUrl)
     copied.value = true
+    toast.success('Lien copié.')
     window.setTimeout(() => {
       copied.value = false
     }, 2000)
   } catch {
-    // ignore
+    toast.error('Impossible de copier le lien.')
   }
 }
 </script>

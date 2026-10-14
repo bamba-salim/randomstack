@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import {ToastHost} from './lib/toast'
+
 const onContextMenu = (e: MouseEvent) => {
   const target = e.target as HTMLElement | null
   if (target?.closest?.('img')) {
@@ -10,6 +12,7 @@ const onContextMenu = (e: MouseEvent) => {
 <template>
   <div class="app-root" @contextmenu="onContextMenu">
     <router-view/>
+    <ToastHost/>
   </div>
 </template>
 

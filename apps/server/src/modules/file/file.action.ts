@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import path from 'path'
+import fs from 'fs'
 
 import {FILE_TYPE, TABLE, type FileType, type FileRecord} from '@randomstack/commons'
 
@@ -67,6 +68,31 @@ export default class FileAction {
         return FileUtils.getPublicApiPath(file.id)
     }
 
+    /**
+     * Résout la clé stockage (nouveau naming, sinon legacy).
+     * Migre silencieusement legacy → `{id}{ext}` si trouvé.
+     */
+    static async resolveStorageKey(file: FileRecord): Promise<string | null> {
+        const modern = FileUtils.buildObjectKeyFromFile(file)
+        const legacy = FileUtils.buildLegacyObjectKeyFromFile(file)
+
+        if (ObjectStorage.isEnabled()) {
+            if (await ObjectStorage.exists(modern)) return modern
+            if (await ObjectStorage.exists(legacy)) {
+                const moved = await ObjectStorage.moveObject(legacy, modern)
+                return moved ? modern : legacy
+            }
+            return null
+        }
+
+        if (FileUtils.localExists(modern)) return modern
+        if (FileUtils.localExists(legacy)) {
+            FileUtils.renameLocal(legacy, modern)
+            return FileUtils.localExists(modern) ? modern : legacy
+        }
+        return null
+    }
+
     static async getSignedOrLocalPath(id: string): Promise<
         | {kind: 'redirect'; url: string}
         | {kind: 'local'; absolutePath: string; mimeType: string}
@@ -75,16 +101,17 @@ export default class FileAction {
         const file = await FileModel.getFileById(id)
         if (!file) return null
 
-        const objectKey = FileUtils.buildObjectKeyFromFile(file as FileRecord)
+        const objectKey = await FileAction.resolveStorageKey(file as FileRecord)
+        if (!objectKey) return null
 
         if (ObjectStorage.isEnabled()) {
-            const exists = await ObjectStorage.exists(objectKey)
-            if (!exists) return null
             const url = await ObjectStorage.getSignedGetUrl(objectKey, 3600)
             return {kind: 'redirect', url}
         }
 
         const absolutePath = FileUtils.resolveLocalAbsolutePath(objectKey)
+        if (!fs.existsSync(absolutePath)) return null
+
         return {
             kind: 'local',
             absolutePath,
@@ -97,12 +124,16 @@ export default class FileAction {
             const fileRecord = await FileModel.getFileById(id)
             if (!fileRecord) return false
 
-            const objectKey = FileUtils.buildObjectKeyFromFile(fileRecord as FileRecord)
+            const file = fileRecord as FileRecord
+            const modern = FileUtils.buildObjectKeyFromFile(file)
+            const legacy = FileUtils.buildLegacyObjectKeyFromFile(file)
 
             if (ObjectStorage.isEnabled()) {
-                await ObjectStorage.deleteObject(objectKey)
+                await ObjectStorage.deleteObject(modern).catch(() => undefined)
+                await ObjectStorage.deleteObject(legacy).catch(() => undefined)
             } else {
-                FileUtils.deleteLocal(objectKey)
+                FileUtils.deleteLocal(modern)
+                FileUtils.deleteLocal(legacy)
             }
 
             await FileModel.deleteFile(id)
@@ -111,6 +142,48 @@ export default class FileAction {
             console.error('[FileAction] Erreur lors de la suppression :', error.message || error)
             return false
         }
+    }
+
+    /** Migre tous les fichiers encore au naming legacy vers `{id}{ext}`. */
+    static async migrateLegacyNaming(): Promise<{migrated: number; skipped: number}> {
+        const files = await FileModel.listAll()
+        let migrated = 0
+        let skipped = 0
+
+        for (const row of files) {
+            const file = row as FileRecord
+            const modern = FileUtils.buildObjectKeyFromFile(file)
+            const legacy = FileUtils.buildLegacyObjectKeyFromFile(file)
+
+            if (ObjectStorage.isEnabled()) {
+                const hasModern = await ObjectStorage.exists(modern)
+                if (hasModern) {
+                    skipped += 1
+                    continue
+                }
+                const hasLegacy = await ObjectStorage.exists(legacy)
+                if (!hasLegacy) {
+                    skipped += 1
+                    continue
+                }
+                if (await ObjectStorage.moveObject(legacy, modern)) migrated += 1
+                else skipped += 1
+                continue
+            }
+
+            if (FileUtils.localExists(modern)) {
+                skipped += 1
+                continue
+            }
+            if (!FileUtils.localExists(legacy)) {
+                skipped += 1
+                continue
+            }
+            if (FileUtils.renameLocal(legacy, modern)) migrated += 1
+            else skipped += 1
+        }
+
+        return {migrated, skipped}
     }
 
     static async savePostImage(file: {buffer: Buffer; originalname: string; mimetype?: string}) {

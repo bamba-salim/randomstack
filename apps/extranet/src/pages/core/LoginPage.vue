@@ -2,24 +2,23 @@
 import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {login} from '#services'
+import {toast} from '../../lib/toast'
 
 const router = useRouter()
 const email = ref('')
 const password = ref('')
-const errorMsg = ref<string | null>(null)
 const loading = ref(false)
 
 const handleLogin = async () => {
   if (loading.value) return
-  errorMsg.value = null
   loading.value = true
 
   try {
     const user = await login({email: email.value, password: password.value})
+    toast.success('Connexion réussie.')
     router.push(user.role === 'ADMIN' || user.role === 'EDITOR' ? '/dashboard' : '/manage-post')
   } catch (err: any) {
-    // Affiche l'erreur précise (ex: "Ce compte n'existe pas." ou "Mot de passe incorrect")
-    errorMsg.value = err.message || "Une erreur est survenue lors de la connexion."
+    toast.error(err.message || 'Une erreur est survenue lors de la connexion.')
   } finally {
     loading.value = false
   }
@@ -35,10 +34,6 @@ const handleLogin = async () => {
 
     <!-- CARTE DE CONNEXION WORDPRESS STYLE -->
     <div class="login-card">
-
-      <div v-if="errorMsg" class="error-box">
-        <strong>Erreur :</strong> {{ errorMsg }}
-      </div>
 
       <form @submit.prevent="handleLogin">
 

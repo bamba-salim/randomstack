@@ -87,6 +87,13 @@ export const fetchPostBySlug = async (slug: string): Promise<PublicPostDetail> =
     return await ApiClient.get<PublicPostDetail>(`/fetch-post/${encodeURIComponent(slug)}`)
 }
 
+/** Prévisualisation staff (cookie session). */
+export const fetchPostPreview = async (shareCode: string): Promise<PublicPostDetail> => {
+    return await ApiClient.get<PublicPostDetail>(
+        `/fetch-post-preview/${encodeURIComponent(shareCode)}`
+    )
+}
+
 /** Charge la page de partage `/post/:shareCode`. */
 export const resolvePostShareCode = async (shareCode: string): Promise<PostShareResolved> => {
     return await ApiClient.get<PostShareResolved>(

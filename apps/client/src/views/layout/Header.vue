@@ -2,6 +2,7 @@
 import {ref, computed, watch, onMounted, onBeforeUnmount} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import {getMe, logout, fileUrl} from '#services'
+import {toast} from '../../lib/toast'
 import type {SessionUserLite} from '@randomstack/commons'
 
 const router = useRouter()
@@ -41,6 +42,7 @@ const handleLogout = async () => {
   isMobileMenuOpen.value = false
   await logout()
   user.value = null
+  toast.success('Déconnexion.')
   await router.push('/')
 }
 

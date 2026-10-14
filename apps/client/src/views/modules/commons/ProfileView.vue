@@ -13,6 +13,7 @@ import {
 import type {SessionUserLite, PublicPostListed} from '@randomstack/commons'
 import {FILE_TYPE, TABLE} from '@randomstack/commons'
 import {getAdminNavLinks} from '../../../lib/admin-nav'
+import {toast} from '../../../lib/toast'
 import PostCard from '../blog/components/PostCard.vue'
 
 type LinkDraft = {label: string; url: string}
@@ -22,8 +23,7 @@ const user = ref<SessionUserLite | null>(null)
 const loading = ref(true)
 const saving = ref(false)
 const uploading = ref(false)
-const errorMsg = ref<string | null>(null)
-const successMsg = ref<string | null>(null)
+const loadError = ref<string | null>(null)
 
 const displayName = ref('')
 const bio = ref('')
@@ -68,7 +68,7 @@ onMounted(async () => {
     hydrateForm(user.value)
     await loadFavorites()
   } catch {
-    errorMsg.value = 'Impossible de charger le profil.'
+    loadError.value = 'Impossible de charger le profil.'
   } finally {
     loading.value = false
   }
@@ -80,8 +80,9 @@ const handleRemoveFavorite = async (post: PublicPostListed) => {
   try {
     await toggleFavorite(post.id)
     favorites.value = favorites.value.filter(f => f.id !== post.id)
+    toast.success('Retiré des favoris.')
   } catch {
-    // ignore
+    toast.error('Impossible de retirer ce favori.')
   } finally {
     removingFavoriteId.value = null
   }
@@ -92,7 +93,6 @@ const handleToggleFavoritesPublic = async () => {
   const next = !favoritesPublic.value
   favoritesPublic.value = next
   saving.value = true
-  errorMsg.value = null
   try {
     user.value = await updateProfile({
       displayName: displayName.value.trim() || user.value.displayName || 'User',
@@ -108,12 +108,14 @@ const handleToggleFavoritesPublic = async () => {
         .filter(l => l.label && l.url)
     })
     hydrateForm(user.value)
-    successMsg.value = next
-      ? 'Tes favoris sont visibles sur ton profil public.'
-      : 'Tes favoris sont maintenant privés.'
+    toast.success(
+      next
+        ? 'Tes favoris sont visibles sur ton profil public.'
+        : 'Tes favoris sont maintenant privés.'
+    )
   } catch (err: any) {
     favoritesPublic.value = !next
-    errorMsg.value = err?.message || 'Impossible de mettre à jour la visibilité.'
+    toast.error(err?.message || 'Impossible de mettre à jour la visibilité.')
   } finally {
     saving.value = false
   }
@@ -132,12 +134,12 @@ const handlePhotoUpload = async (event: Event) => {
   if (!file) return
 
   uploading.value = true
-  errorMsg.value = null
   try {
     const {idFile} = await uploadFile(file, FILE_TYPE.IMAGE, TABLE.USER)
     photoId.value = idFile
+    toast.success('Photo mise à jour.')
   } catch (err: any) {
-    errorMsg.value = err?.message || 'Échec de l’upload de la photo.'
+    toast.error(err?.message || 'Échec de l’upload de la photo.')
   } finally {
     uploading.value = false
   }
@@ -146,12 +148,10 @@ const handlePhotoUpload = async (event: Event) => {
 const handleSave = async () => {
   if (saving.value) return
   if (!photoId.value) {
-    errorMsg.value = 'Une photo de profil est obligatoire.'
+    toast.error('Une photo de profil est obligatoire.')
     return
   }
   saving.value = true
-  errorMsg.value = null
-  successMsg.value = null
 
   try {
     user.value = await updateProfile({
@@ -168,9 +168,9 @@ const handleSave = async () => {
         .filter(l => l.label && l.url)
     })
     hydrateForm(user.value)
-    successMsg.value = 'Profil mis à jour.'
+    toast.success('Profil mis à jour.')
   } catch (err: any) {
-    errorMsg.value = err?.message || 'Impossible d’enregistrer le profil.'
+    toast.error(err?.message || 'Impossible d’enregistrer le profil.')
   } finally {
     saving.value = false
   }
@@ -178,6 +178,7 @@ const handleSave = async () => {
 
 const handleLogout = async () => {
   await logout()
+  toast.success('Déconnexion.')
   await router.push('/login')
 }
 </script>
@@ -186,7 +187,7 @@ const handleLogout = async () => {
   <main class="auth-page auth-page--wide profile-page">
     <div v-if="loading" class="loading-state">Chargement du profil…</div>
 
-    <div v-else-if="errorMsg && !user" class="error-state">{{ errorMsg }}</div>
+    <div v-else-if="loadError && !user" class="error-state">{{ loadError }}</div>
 
     <template v-else-if="user">
     <form class="profile-card profile-card--edit" @submit.prevent="handleSave">
@@ -198,9 +199,6 @@ const handleLogout = async () => {
           Voir mon profil public →
         </router-link>
       </header>
-
-      <div v-if="errorMsg" class="auth-card__error" role="alert">{{ errorMsg }}</div>
-      <div v-if="successMsg" class="profile-card__success" role="status">{{ successMsg }}</div>
 
       <section v-if="adminLinks.length > 0" class="profile-card__admin">
         <h2 class="profile-card__section-title">Administration</h2>

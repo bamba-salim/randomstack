@@ -126,6 +126,7 @@ services:
       - "${EXTRANET_PORT}:5175"
     environment:
       VITE_API_URL: ${VITE_API_URL}
+      VITE_CLIENT_URL: ${VITE_CLIENT_URL:-http://localhost:5173}
     depends_on:
       - server
     command: npm run dev --workspace=apps/extranet -- --host

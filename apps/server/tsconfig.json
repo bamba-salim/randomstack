@@ -23,7 +23,6 @@
 
       "#modules": ["./src/modules/index.ts"],
 
-      "#action-support": ["./src/lib/action-support/index.ts"],
       "#db": ["./src/lib/db/index.ts"],
       "#interfaces": ["./src/lib/interfaces/index.ts"],
       "#middlewares": ["./src/lib/middlewares/index.ts"],

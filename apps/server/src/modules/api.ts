@@ -48,6 +48,11 @@ export default class Api {
             AuthMiddleware.permit('ADMIN', 'EDITOR', 'AUTHOR'),
             AdminBlogController.deletePost
         )
+        router.delete(
+            '/purge-post/:id',
+            AuthMiddleware.permit('ADMIN'),
+            AdminBlogController.purgePost
+        )
         router.get(
             '/fetch-posts-contents',
             AuthMiddleware.permit('ADMIN'),

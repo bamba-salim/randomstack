@@ -54,7 +54,7 @@ onMounted(async () => {
           : 'Consultez les comptes, rôles, articles et liens portfolio' }}
       </p>
     </div>
-    <router-link v-if="isAdmin" to="/create-user" class="add-btn">
+    <router-link v-if="isAdmin" to="/edit-user" class="add-btn">
       + Créer un utilisateur
     </router-link>
   </header>

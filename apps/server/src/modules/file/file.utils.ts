@@ -14,21 +14,46 @@ export default class FileUtils {
         return cleaned
     }
 
-    /** Clé objet S3 / chemin relatif disque : uploads/{CATEGORY}/{TYPE}/{CATEGORY}-{id}{ext} */
-    static buildObjectKey(category: string, type: string, id: string, extension: string): string {
-        const cat = this.safeSegment(category)
-        const typ = this.safeSegment(type)
+    private static safeId(id: string): string {
         const safeId = String(id || '').replace(/[^a-zA-Z0-9_-]/g, '')
         if (!safeId) {
             throw new Error('Identifiant fichier invalide.')
         }
+        return safeId
+    }
+
+    private static safeExt(extension: string): string {
         const extRaw = extension.startsWith('.') ? extension.toLowerCase() : `.${extension.toLowerCase()}`
-        const ext = extRaw.replace(/[^a-z0-9.]/g, '') || '.bin'
+        return extRaw.replace(/[^a-z0-9.]/g, '') || '.bin'
+    }
+
+    /**
+     * Clé objet actuelle : uploads/{CATEGORY}/{TYPE}/{id}{ext}
+     * (anciennement `{CATEGORY}-{id}{ext}`)
+     */
+    static buildObjectKey(category: string, type: string, id: string, extension: string): string {
+        const cat = this.safeSegment(category)
+        const typ = this.safeSegment(type)
+        const safeId = this.safeId(id)
+        const ext = this.safeExt(extension)
+        return `uploads/${cat}/${typ}/${safeId}${ext}`
+    }
+
+    /** Ancien format : uploads/{CATEGORY}/{TYPE}/{CATEGORY}-{id}{ext} */
+    static buildLegacyObjectKey(category: string, type: string, id: string, extension: string): string {
+        const cat = this.safeSegment(category)
+        const typ = this.safeSegment(type)
+        const safeId = this.safeId(id)
+        const ext = this.safeExt(extension)
         return `uploads/${cat}/${typ}/${cat}-${safeId}${ext}`
     }
 
     static buildObjectKeyFromFile(file: FileRecord): string {
         return this.buildObjectKey(String(file.category), String(file.type), file.id, file.extension)
+    }
+
+    static buildLegacyObjectKeyFromFile(file: FileRecord): string {
+        return this.buildLegacyObjectKey(String(file.category), String(file.type), file.id, file.extension)
     }
 
     /** URL stable exposée aux fronts (gate API, pas l’URL bucket). */
@@ -85,6 +110,36 @@ export default class FileUtils {
             throw new Error('Chemin fichier hors zone autorisée.')
         }
         return absolutePath
+    }
+
+    static localExists(objectKey: string): boolean {
+        try {
+            return fs.existsSync(this.resolveLocalAbsolutePath(objectKey))
+        } catch {
+            return false
+        }
+    }
+
+    /** Renomme un fichier local (legacy → nouveau naming). */
+    static renameLocal(fromKey: string, toKey: string): boolean {
+        try {
+            const from = this.resolveLocalAbsolutePath(fromKey)
+            const to = this.resolveLocalAbsolutePath(toKey)
+            if (!fs.existsSync(from)) return false
+            if (fs.existsSync(to)) {
+                fs.unlinkSync(from)
+                return true
+            }
+            const dir = path.dirname(to)
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, {recursive: true})
+            }
+            fs.renameSync(from, to)
+            return true
+        } catch (error: any) {
+            console.error('[FileUtils] Échec rename local :', error.message || error)
+            return false
+        }
     }
 
     static deleteLocal(objectKey: string): boolean {

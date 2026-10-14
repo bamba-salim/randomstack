@@ -10,6 +10,7 @@ import {
   fileUrl
 } from '#services'
 import {Breadcrumbs, AdSlot} from '#components'
+import {toast} from '../../../lib/toast'
 import type {AuthorListed, PublicPostDetail, PublicPostListed} from '@randomstack/commons'
 
 import BlockRenderer from './components/BlockRenderer.vue'
@@ -65,8 +66,9 @@ const handleToggleFavorite = async () => {
   try {
     const result = await toggleFavorite(post.value.id)
     post.value = {...post.value, isFavorite: result.isFavorite}
+    toast.success(result.isFavorite ? 'Ajouté aux favoris.' : 'Retiré des favoris.')
   } catch {
-    // silencieux — l'UI reste cohérente
+    toast.error('Impossible de mettre à jour les favoris.')
   } finally {
     favoriteBusy.value = false
   }
@@ -217,6 +219,22 @@ watch(() => route.params['slug'], (slug) => {
             #{{ tag }}
           </router-link>
         </div>
+
+        <section v-if="post.sources?.length" class="mt-8 pt-6 border-t border-[#c3c4c7] w-full text-left">
+          <h2 class="text-sm font-extrabold uppercase tracking-widest text-slate-500 mb-3">Sources</h2>
+          <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+            <li v-for="source in post.sources" :key="source">
+              <a
+                  v-if="/^https?:\/\//i.test(source)"
+                  :href="source"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-[#2271b1] hover:underline"
+              >{{ source }}</a>
+              <span v-else>{{ source }}</span>
+            </li>
+          </ul>
+        </section>
 
         <AuthorCard v-if="primaryAuthor" :author="primaryAuthor"/>
 

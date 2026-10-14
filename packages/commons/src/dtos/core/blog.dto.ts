@@ -5,20 +5,17 @@ import type {PostContentBlock} from '../../interfaces/core/post.interface'
 export interface EditPostFormBean {
     id?: string
     title: string
-    /**
-     * Segment d’URL canonique `/{tag}/{slug}` — modifiable.
-     * Vide à la création → généré depuis le titre.
-     */
+    /** Généré côté serveur à la sauvegarde (pas saisi en UI). */
     slug?: string
-    /**
-     * Permalien de partage `/post/{shareCode}` — lecture seule (jamais modifié).
-     */
+    /** Permalien — jamais exposé en édition UI. */
     shareCode?: string
     summary: string
     content: PostContentBlock[]
     imageId?: string | null
     status: PostStatus
     tags: string[]
+    /** Sources / crédits (texte libre, comme les tags sans suggestions). */
+    sources: string[]
     /** Rempli à la création ; modifiable uniquement par ADMIN */
     authorId: string | null
     publishAt?: string | null
@@ -30,7 +27,6 @@ export interface EditPostFormBean {
 export interface PublicPostListed {
     id: string
     slug: string
-    /** Lien de partage : `/post/{shareCode}` → redirige vers le slug */
     shareCode: string
     title: string
     image: string | null
@@ -38,7 +34,7 @@ export interface PublicPostListed {
     publishAt: string | Date | null
 }
 
-/** Liste à la une (home) — URL canonique : `/{mainTag}/{slug}` */
+/** Liste à la une (home) */
 export interface FeaturedPostListed {
     id: string
     slug: string
@@ -69,9 +65,10 @@ export interface AdminPostListed {
     tags: string[]
     imageId: string | null
     publishAt?: string | null
+    shareCode?: string
 }
 
-/** Auteur exposé sur la fiche article (card + articles associés) */
+/** Auteur exposé sur la fiche article */
 export interface AuthorListed {
     id: string
     displayName: string
@@ -79,7 +76,7 @@ export interface AuthorListed {
     photoId: string | null
 }
 
-/** Page article publique — URL canonique : `/{mainTag}/{slug}` */
+/** Page article publique */
 export interface PublicPostDetail {
     id: string
     slug: string
@@ -89,12 +86,14 @@ export interface PublicPostDetail {
     content: PostContentBlock[]
     imageId: string | null
     tags: string[]
+    sources: string[]
     mainTag: string
     publishAt: string | Date | null
     author: AuthorListed | null
     commentsCount: number
-    /** Présent si l'utilisateur est connecté */
     isFavorite?: boolean
+    /** true si chargé en mode prévisualisation staff */
+    isPreview?: boolean
 }
 
 export interface PublishedPostsResponse {

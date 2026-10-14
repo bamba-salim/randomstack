@@ -42,6 +42,12 @@ export default class WebService {
         router.get('/fetch-similar-posts/:slug', BlogController.fetchSimilarPosts)
         /** Lecture canonique : /tag/slug */
         router.get('/fetch-post/:slug', BlogController.fetchPostBySlug)
+        /** Preview staff (session) */
+        router.get(
+            '/fetch-post-preview/:shareCode',
+            AuthMiddleware.isAuthenticated,
+            BlogController.fetchPostPreview
+        )
         /** Page de partage : /post/shareCode */
         router.get('/fetch-post-by-code/:shareCode', BlogController.fetchPostByShareCode)
 

@@ -11,7 +11,6 @@ import PostForm from './core/EditPostPage.vue'
 import ManagePost from './core/ManagePost.vue'
 import ManageUser from './core/ManageUser.vue'
 import EditUserPage from './core/EditUserPage.vue'
-import CreateUserPage from './core/CreateUserPage.vue'
 
 const homeForRole = (role?: string) =>
     role === 'ADMIN' || role === 'EDITOR' ? '/dashboard' : '/manage-post'
@@ -65,13 +64,11 @@ const router = createRouter({
                 },
                 {
                     path: 'create-user',
-                    name: 'create-user',
-                    component: CreateUserPage,
-                    meta: {requiresRoles: ['ADMIN']}
+                    redirect: '/edit-user'
                 },
                 {
-                    path: 'edit-user/:id',
-                    name: 'user-detail',
+                    path: 'edit-user/:id?',
+                    name: 'user-form',
                     component: EditUserPage,
                     meta: {requiresRoles: ['ADMIN', 'MODERATOR', 'EDITOR']}
                 }
@@ -109,6 +106,12 @@ router.beforeEach(async (to, _from, next) => {
 
     if (requiredRoles && !hasRole(user?.role, requiredRoles)) {
         next(homeForRole(user?.role))
+        return
+    }
+
+    // Création utilisateur : ADMIN uniquement (`/edit-user` sans id)
+    if (to.name === 'user-form' && !to.params['id'] && user?.role !== 'ADMIN') {
+        next('/manage-user')
         return
     }
 

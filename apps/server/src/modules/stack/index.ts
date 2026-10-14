@@ -1,4 +1,5 @@
 export {default as SeedAction} from './actions/seed.action'
+export {default as CleanExpiredSharesAction} from './actions/clean-expired-shares.action'
 export {default as StackModel} from './models/stack.model'
 export {default as TechnologyModel} from './models/technology.model'
 export {default as DrawAction} from './actions/draw.action'

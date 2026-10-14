@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import {ToastHost} from './lib/toast'
+
 /** Empêche le clic droit / menu contextuel sur les images (toute l’app). */
 const onContextMenu = (e: MouseEvent) => {
   const target = e.target as HTMLElement | null
@@ -11,6 +13,7 @@ const onContextMenu = (e: MouseEvent) => {
 <template>
   <div class="app-root" @contextmenu="onContextMenu">
     <router-view/>
+    <ToastHost/>
   </div>
 </template>
 

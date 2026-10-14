@@ -36,17 +36,13 @@
       "development": "./src/lib/middlewares/index.ts",
       "default": "./dist/lib/middlewares/index.js"
     },
-    "#action-support": {
-      "development": "./src/action-support/index.ts",
-      "default": "./dist/action-support/index.js"
-    },
     "#utils": {
-      "development": "./src/utils/index.ts",
-      "default": "./dist/utils/index.js"
+      "development": "./src/lib/utils/index.ts",
+      "default": "./dist/lib/utils/index.js"
     },
     "#scheduler": {
       "development": "./src/core/scheduler/index.ts",
-      "default": "./src/core/scheduler/index.js"
+      "default": "./dist/core/scheduler/index.js"
     }
   },
   "dependencies": {

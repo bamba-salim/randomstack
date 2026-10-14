@@ -5,7 +5,6 @@ import path from 'path'
 
 import {Database} from '#db'
 import {SessionMiddleware} from '#middlewares'
-import {CronJobs} from '#action-support'
 import {SeedAction} from '#stack'
 import {ObjectStorage} from '#file'
 
@@ -77,8 +76,7 @@ Database.checkConnection().then(async (connected) => {
     if (connected) {
         await SeedAction.execute()
 
-        CronJobs.boot()
-
+        // Les crons tournent dans le conteneur worker (`src/worker.ts` → #scheduler)
         app.listen(PORT, () => {
             const storageMode = ObjectStorage.isEnabled() ? 'Railway S3 bucket' : 'local disk (public/uploads)'
             console.log(`[Server] Prêt sur le port ${PORT} — fichiers: ${storageMode}`)

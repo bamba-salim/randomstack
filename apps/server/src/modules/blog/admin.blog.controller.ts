@@ -1,25 +1,25 @@
 import type {Request, Response} from 'express'
 import crypto from 'crypto'
 import {FileAction} from '#file'
+import type {EditPostFormBean, PostStatus} from '@randomstack/commons'
 
 import BlogModel from './blog.model'
 import BlogMapper from './blog.mapper'
 
-import type {EditPostFormBean} from '@randomstack/commons'
-
 type SessionInfo = {userId?: string; userRole?: string}
+
+const WRITE_STATUSES: PostStatus[] = ['DRAFT', 'PUBLISHED', 'SCHEDULED', 'ARCHIVED']
 
 export default class AdminBlogController {
 
     private static session(req: Request): SessionInfo {
-        const session = (req as any).session
+        const session = req.session as any
         return {
             userId: session?.userId,
             userRole: session?.userRole
         }
     }
 
-    /** Lecture : AUTHOR = ses articles ; EDITOR / MODERATOR / ADMIN = tous */
     private static canReadPost(session: SessionInfo, authorId: string | null | undefined): boolean {
         if (!session.userId) return false
         if (session.userRole === 'ADMIN' || session.userRole === 'EDITOR' || session.userRole === 'MODERATOR') {
@@ -29,7 +29,6 @@ export default class AdminBlogController {
         return false
     }
 
-    /** Écriture : AUTHOR = ses articles ; EDITOR / ADMIN = tous ; MODERATOR = non */
     private static canWritePost(session: SessionInfo, authorId: string | null | undefined): boolean {
         if (!session.userId) return false
         if (session.userRole === 'ADMIN' || session.userRole === 'EDITOR') return true
@@ -41,10 +40,6 @@ export default class AdminBlogController {
         return session.userRole === 'ADMIN' || session.userRole === 'EDITOR'
     }
 
-    /**
-     * Initialisation du formulaire Extranet (FormBean)
-     * Cible : GET /ws/fetch-post-form-data / GET /ws/fetch-post-form-data/:id
-     */
     static async fetchEditPostInitialData(req: Request, res: Response): Promise<void> {
         try {
             const {id} = req.params
@@ -77,12 +72,6 @@ export default class AdminBlogController {
         }
     }
 
-    /**
-     * Sauvegarde d'un article (Création ou Édition)
-     * - AUTHOR : ses articles, pas d'à la une, pas de changement d'auteur
-     * - EDITOR : tous, à la une exclusive, pas de changement d'auteur
-     * - ADMIN : tous + auteur + à la une
-     */
     static async savePost(req: Request, res: Response): Promise<void> {
         try {
             const {id} = req.params
@@ -97,8 +86,12 @@ export default class AdminBlogController {
                 return
             }
 
-            const {status: reqStatus} = formBean
-            let finalStatus = reqStatus
+            const reqStatus = formBean.status as PostStatus
+            if (!WRITE_STATUSES.includes(reqStatus)) {
+                res.status(400).json({error: 'Statut invalide.'})
+                return
+            }
+
             let hasBeenPublishedFlag = formBean.hasBeenPublished || false
             let authorId: string | null = sessionUserId
             let existingPost: Awaited<ReturnType<typeof BlogModel.fetchPostById>> | null = null
@@ -127,15 +120,6 @@ export default class AdminBlogController {
                         console.warn('[AdminBlogController] Échec suppression ancienne image :', err)
                     )
                 }
-
-                if (hasBeenPublishedFlag && reqStatus === 'SCHEDULED') {
-                    res.status(400).json({error: 'Un article déjà publié ne peut plus être planifié.'})
-                    return
-                }
-
-                if (existingPost.status === 'PUBLISHED' && reqStatus !== 'PUBLISHED') {
-                    finalStatus = 'DRAFT'
-                }
             } else {
                 if (!AdminBlogController.canWritePost(session, sessionUserId)) {
                     res.status(403).json({error: 'Accès refusé.'})
@@ -146,20 +130,42 @@ export default class AdminBlogController {
                 }
             }
 
-            // À la une : EDITOR + ADMIN uniquement ; sinon on conserve l'existant
+            if (reqStatus === 'DRAFT' && hasBeenPublishedFlag) {
+                res.status(400).json({error: 'Un article déjà publié ne peut plus repasser en brouillon.'})
+                return
+            }
+
+            if (reqStatus === 'SCHEDULED') {
+                if (!formBean.publishAt) {
+                    res.status(400).json({error: 'Une date de publication est requise pour planifier.'})
+                    return
+                }
+                if (new Date(formBean.publishAt) <= new Date()) {
+                    res.status(400).json({error: 'La date de planification doit être dans le futur.'})
+                    return
+                }
+                if (hasBeenPublishedFlag) {
+                    res.status(400).json({error: 'Un article déjà publié ne peut plus être planifié.'})
+                    return
+                }
+            }
+
             if (!AdminBlogController.canFeature(session)) {
                 formBean.isFeatured = existingPost ? Boolean(existingPost.isFeatured) : false
             }
 
-            if (finalStatus === 'PUBLISHED') {
+            if (reqStatus === 'PUBLISHED') {
                 hasBeenPublishedFlag = true
             }
 
-            // shareCode figé à vie ; slug éditable (unicité vérifiée)
+            if (reqStatus === 'ARCHIVED' || reqStatus === 'DRAFT') {
+                formBean.isFeatured = false
+            }
+
             const saveDTO = BlogMapper.toSavePostDTO(
                 {
                     ...formBean,
-                    status: finalStatus,
+                    status: reqStatus,
                     hasBeenPublished: hasBeenPublishedFlag
                 },
                 targetId,
@@ -177,7 +183,7 @@ export default class AdminBlogController {
                 ? await BlogModel.updatePost(id, saveDTO)
                 : await BlogModel.createPost(saveDTO)
 
-            if (formBean.isFeatured) {
+            if (formBean.isFeatured && reqStatus === 'PUBLISHED') {
                 await BlogModel.clearOtherFeatured(result.id)
             }
 
@@ -192,14 +198,11 @@ export default class AdminBlogController {
         }
     }
 
-    /**
-     * Liste articles admin — AUTHOR : les siens ; EDITOR / MODERATOR / ADMIN : tous
-     */
     static async fetchPosts(req: Request, res: Response): Promise<void> {
         try {
             const session = AdminBlogController.session(req)
             const authorFilter = session.userRole === 'AUTHOR' ? session.userId : undefined
-            const posts = await BlogModel.fetchAllAdminPosts(authorFilter)
+            const posts = await BlogModel.fetchAllAdminPosts(authorFilter, true)
             res.json(BlogMapper.buildAdminPostListedList(posts))
         } catch (error: any) {
             console.error('[AdminBlogController] Erreur fetchPosts :', error.message || error)
@@ -207,6 +210,7 @@ export default class AdminBlogController {
         }
     }
 
+    /** Soft-delete (corbeille). */
     static async deletePost(req: Request, res: Response): Promise<void> {
         try {
             const {id} = req.params
@@ -227,6 +231,34 @@ export default class AdminBlogController {
         } catch (error: any) {
             console.error('[AdminBlogController] Échec deletePost :', error.message || error)
             res.status(500).json({error: 'Erreur lors de la suppression.'})
+        }
+    }
+
+    /** Hard-delete définitif — ADMIN uniquement. */
+    static async purgePost(req: Request, res: Response): Promise<void> {
+        try {
+            const {id} = req.params
+            const session = AdminBlogController.session(req)
+            if (session.userRole !== 'ADMIN') {
+                res.status(403).json({error: 'Seul un administrateur peut supprimer définitivement.'})
+                return
+            }
+
+            const existing = await BlogModel.fetchPostById(id)
+            if (!existing) {
+                res.status(404).json({error: 'Article introuvable.'})
+                return
+            }
+
+            if (existing.imageId) {
+                await FileAction.delete(existing.imageId).catch(() => undefined)
+            }
+
+            await BlogModel.hardDeletePost(id)
+            res.json(BlogMapper.buildSuccessAck())
+        } catch (error: any) {
+            console.error('[AdminBlogController] Échec purgePost :', error.message || error)
+            res.status(500).json({error: 'Erreur lors de la suppression définitive.'})
         }
     }
 

@@ -2,17 +2,16 @@
 import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {register} from '#services'
+import {toast} from '../../../lib/toast'
 
 const router = useRouter()
 const displayName = ref('')
 const email = ref('')
 const password = ref('')
-const errorMsg = ref<string | null>(null)
 const loading = ref(false)
 
 const handleRegister = async () => {
   if (loading.value) return
-  errorMsg.value = null
   loading.value = true
 
   try {
@@ -21,9 +20,10 @@ const handleRegister = async () => {
       password: password.value,
       displayName: displayName.value.trim() || undefined
     })
+    toast.success('Compte créé.')
     await router.push('/profile')
   } catch (err: any) {
-    errorMsg.value = err.message || 'Inscription impossible.'
+    toast.error(err.message || 'Inscription impossible.')
   } finally {
     loading.value = false
   }
@@ -38,10 +38,6 @@ const handleRegister = async () => {
         <h1 class="auth-card__title">Créer un compte</h1>
         <p class="auth-card__lead">Rejoins RandomStack en quelques secondes.</p>
       </header>
-
-      <div v-if="errorMsg" class="auth-card__error" role="alert">
-        {{ errorMsg }}
-      </div>
 
       <form class="auth-form" @submit.prevent="handleRegister">
         <label class="auth-form__field">

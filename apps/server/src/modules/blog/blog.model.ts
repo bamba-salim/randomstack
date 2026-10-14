@@ -184,13 +184,13 @@ export default class BlogModel extends BaseModel {
     // =========================================================================
 
     /**
-     * Récupère les articles non purgés pour l'extranet.
-     * Si `authorId` est fourni (AUTHOR), restreint à ses articles.
+     * Articles extranet. `includeDeleted` : corbeille visible (filtre UI).
+     * Si `authorId` (AUTHOR) : restreint à ses articles.
      */
-    static async fetchAllAdminPosts(authorId?: string) {
+    static async fetchAllAdminPosts(authorId?: string, includeDeleted = true) {
         return await this.db.post.findMany({
             where: {
-                status: {not: 'DELETED'},
+                ...(includeDeleted ? {} : {status: {not: 'DELETED'}}),
                 ...(authorId ? {authorId} : {})
             },
             orderBy: {createdAt: 'desc'}
@@ -272,23 +272,52 @@ export default class BlogModel extends BaseModel {
         })
     }
 
-    /**
-     * Soft delete : déplace l'article dans la corbeille sans le détruire
-     */
+    /** Soft delete → corbeille (purge hard après 90j via cron). */
     static async softDeletePost(id: string) {
         return await this.db.post.update({
-            where: { id },
-            data: { status: 'DELETED' }
+            where: {id},
+            data: {
+                status: 'DELETED',
+                deletedAt: new Date(),
+                isFeatured: false
+            }
         })
     }
 
-    /**
-     * Audit de maintenance : récupère le contenu JSON de tous les posts
-     * (Utilisé par les action-support pour détecter les fichiers orphelins)
-     */
+    /** Suppression définitive (ADMIN uniquement). */
+    static async hardDeletePost(id: string) {
+        return await this.db.post.delete({where: {id}})
+    }
+
+    /** Posts soft-deleted depuis plus de `olderThan`. */
+    static async fetchExpiredSoftDeleted(olderThan: Date) {
+        return await this.db.post.findMany({
+            where: {
+                status: 'DELETED',
+                deletedAt: {lt: olderThan, not: null}
+            },
+            select: {id: true, imageId: true, content: true}
+        })
+    }
+
+    /** Publie les articles planifiés dont publishAt est passé. */
+    static async publishDueScheduled() {
+        return await this.db.post.updateMany({
+            where: {
+                status: 'SCHEDULED',
+                publishAt: {lte: new Date()}
+            },
+            data: {
+                status: 'PUBLISHED',
+                hasBeenPublished: true
+            }
+        })
+    }
+
+    /** Audit admin : contenus JSON de tous les posts. */
     static async getPostsContents() {
         return await this.db.post.findMany({
-            select: { content: true }
+            select: {content: true}
         })
     }
 }

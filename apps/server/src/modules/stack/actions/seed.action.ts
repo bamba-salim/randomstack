@@ -143,6 +143,6 @@ export default class SeedAction {
             passwordHash,
             displayName: account.displayName
         })
-        console.log(`[Seed] 👤 Compte ${account.role} synchronisé : ${email}`)
+        // console.log(`[Seed] 👤 Compte ${account.role} synchronisé : ${email}`)
     }
 }

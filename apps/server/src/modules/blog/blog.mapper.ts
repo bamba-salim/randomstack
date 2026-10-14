@@ -74,7 +74,8 @@ export default class BlogMapper {
     static buildPublicPostDetail(
         post: any,
         author: AuthorListed | null = null,
-        isFavorite = false
+        isFavorite = false,
+        isPreview = false
     ): PublicPostDetail {
         return {
             id: post.id,
@@ -85,11 +86,13 @@ export default class BlogMapper {
             content: post.content || [],
             imageId: post.imageId,
             tags: post.tags || [],
+            sources: post.sources || [],
             mainTag: post.tags?.[0] || '',
             publishAt: post.publishAt || post.updatedAt,
             author,
             commentsCount: post._count?.comments ?? post.commentsCount ?? 0,
-            isFavorite
+            isFavorite,
+            isPreview
         }
     }
 
@@ -100,7 +103,8 @@ export default class BlogMapper {
             status: post.status,
             tags: post.tags || [],
             imageId: post.imageId,
-            publishAt: post.publishAt
+            publishAt: post.publishAt,
+            shareCode: post.shareCode
         }
     }
 
@@ -125,6 +129,16 @@ export default class BlogMapper {
         }
     }
 
+    private static normalizeStringList(raw: unknown): string[] {
+        if (Array.isArray(raw)) {
+            return raw.map(t => String(t).trim()).filter(Boolean)
+        }
+        if (typeof raw === 'string' && raw.trim() !== '') {
+            return raw.split(',').map(t => t.trim()).filter(Boolean)
+        }
+        return []
+    }
+
     static toSavePostDTO(
         formBean: EditPostFormBean,
         idPost: string,
@@ -132,9 +146,8 @@ export default class BlogMapper {
         shareCode?: string
     ): EditPost {
         const title = String(formBean.title || '').trim()
-        const customSlug = StrUtils.kebabName(String(formBean.slug || '').trim())
-        // Slug éditable ; fallback auto titre+id. shareCode figé (passé en update, généré en create).
-        const slug = customSlug || StrUtils.slugify(title, idPost)
+        // Slug toujours dérivé du titre à la sauvegarde (unique via id)
+        const slug = StrUtils.slugify(title, idPost)
 
         let contentBlocks: any[] = []
         if (typeof formBean.content === 'string') {
@@ -147,14 +160,8 @@ export default class BlogMapper {
             contentBlocks = formBean.content
         }
 
-        let tagsList: string[] = []
-        const rawTags = formBean.tags as unknown
-
-        if (Array.isArray(rawTags)) {
-            tagsList = rawTags.map(t => String(t).trim()).filter(Boolean)
-        } else if (typeof rawTags === 'string' && rawTags.trim() !== '') {
-            tagsList = rawTags.split(',').map((t: string) => t.trim()).filter(Boolean)
-        }
+        const tagsList = this.normalizeStringList(formBean.tags)
+        const sourcesList = this.normalizeStringList(formBean.sources)
 
         const status = (formBean.status as PostStatus) || 'DRAFT'
         let finalPublishAt = formBean.publishAt ? new Date(formBean.publishAt) : null
@@ -174,10 +181,12 @@ export default class BlogMapper {
                 imageId: formBean.imageId || null,
                 status,
                 tags: tagsList,
+                sources: sourcesList,
                 authorId,
                 publishAt: finalPublishAt,
                 hasBeenPublished: formBean.hasBeenPublished === true,
-                isFeatured: Boolean(formBean.isFeatured)
+                isFeatured: Boolean(formBean.isFeatured),
+                deletedAt: null
             }
         }
     }
@@ -193,6 +202,7 @@ export default class BlogMapper {
             imageId: post.imageId || null,
             status: post.status,
             tags: post.tags || [],
+            sources: post.sources || [],
             authorId: post.authorId || null,
             publishAt: post.publishAt ? new Date(post.publishAt).toISOString() : null,
             hasBeenPublished: post.hasBeenPublished,
@@ -203,13 +213,12 @@ export default class BlogMapper {
     static getInitialFormBean(): EditPostFormBean {
         return {
             title: '',
-            slug: '',
-            shareCode: undefined,
             summary: '',
             content: [],
             imageId: null,
             status: 'DRAFT',
             tags: [],
+            sources: [],
             authorId: null,
             publishAt: null,
             hasBeenPublished: false,

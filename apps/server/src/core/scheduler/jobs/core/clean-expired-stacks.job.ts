@@ -1,15 +1,13 @@
-import type { ScheduledJob } from '@randomstack/commons'
-// Remarque : pointera vers ton action de nettoyage existante ou future
-// import CleanExpiredStacksAction from '#action-support/stack/clean-expired-stacks.action'
+import type {ScheduledJob} from '@randomstack/commons'
+import {CleanExpiredSharesAction} from '#stack'
 
 export const cleanExpiredStacksJob: ScheduledJob = {
-    name: 'Nettoyage des Stacks Expirées (7 jours)',
-    schedule: '0 0 * * *', // Tous les jours à minuit
+    name: 'Nettoyage des partages stack expirés (7 jours)',
+    schedule: '0 0 * * *',
     enabled: true,
 
     async run() {
-        // Appel de l'action de maintenance
-        // await CleanExpiredStacksAction.run()
-        console.log('[ACTION] Vérification et purge des SavedStacks expirées en BDD...')
+        const {deleted} = await CleanExpiredSharesAction.run()
+        console.log(`[ACTION] ${deleted} lien(s) de partage stack purgé(s).`)
     }
 }

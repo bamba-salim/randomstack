@@ -15,6 +15,7 @@ import type {
   CommentVoteType,
   SessionUserLite
 } from '@randomstack/commons'
+import {toast} from '../../../../lib/toast'
 
 const props = defineProps<{
   postId: string
@@ -30,7 +31,6 @@ const data = ref<CommentsListResponse | null>(null)
 const loading = ref(true)
 const submitting = ref(false)
 const draft = ref('')
-const errorMsg = ref<string | null>(null)
 const votingId = ref<string | null>(null)
 
 const isLoggedIn = computed(() => Boolean(me.value))
@@ -57,13 +57,12 @@ const canDelete = (comment: PublicCommentListed) => {
 
 const load = async () => {
   loading.value = true
-  errorMsg.value = null
   try {
     me.value = await getMe()
     data.value = await fetchComments(props.postId)
     emit('count-change', data.value.commentsCount)
   } catch {
-    errorMsg.value = 'Impossible de charger les commentaires.'
+    toast.error('Impossible de charger les commentaires.')
   } finally {
     loading.value = false
   }
@@ -85,7 +84,6 @@ const handleSubmit = async () => {
   if (!content || submitting.value) return
 
   submitting.value = true
-  errorMsg.value = null
   try {
     const result = await createComment(props.postId, content)
     if (!data.value) {
@@ -99,8 +97,9 @@ const handleSubmit = async () => {
     }
     draft.value = ''
     emit('count-change', data.value.commentsCount)
+    toast.success('Commentaire publié.')
   } catch (err: any) {
-    errorMsg.value = err?.message || 'Publication impossible.'
+    toast.error(err?.message || 'Publication impossible.')
   } finally {
     submitting.value = false
   }
@@ -118,7 +117,7 @@ const handleVote = async (comment: PublicCommentListed, vote: CommentVoteType) =
     const result = await voteComment(comment.id, next)
     replaceComment(result.comment)
   } catch (err: any) {
-    errorMsg.value = err?.message || 'Vote impossible.'
+    toast.error(err?.message || 'Vote impossible.')
   } finally {
     votingId.value = null
   }
@@ -132,8 +131,9 @@ const handleDelete = async (comment: PublicCommentListed) => {
     data.value.comments = data.value.comments.filter(c => c.id !== comment.id)
     data.value.commentsCount = data.value.comments.length
     emit('count-change', data.value.commentsCount)
+    toast.success('Commentaire supprimé.')
   } catch (err: any) {
-    errorMsg.value = err?.message || 'Suppression impossible.'
+    toast.error(err?.message || 'Suppression impossible.')
   }
 }
 
@@ -149,8 +149,6 @@ watch(() => props.postId, load)
         <span>{{ data.commentsCount }} commentaire{{ data.commentsCount > 1 ? 's' : '' }}</span>
       </div>
     </header>
-
-    <div v-if="errorMsg" class="comments-section__error">{{ errorMsg }}</div>
 
     <form class="comments-section__form" @submit.prevent="handleSubmit">
       <label class="comments-section__label" for="comment-draft">Ton avis</label>

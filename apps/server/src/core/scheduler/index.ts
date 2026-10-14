@@ -1,6 +1,6 @@
 import cron from 'node-cron'
-import { registeredJobs } from './jobs'
-import type { ScheduledTask } from '@randomstack/commons'
+import {registeredJobs} from './jobs'
+import type {ScheduledTask} from '@randomstack/commons'
 
 const runningTasks: ScheduledTask[] = []
 
@@ -31,7 +31,6 @@ export const initScheduler = (): void => {
     }
 }
 
-// Permet d'arrêter proprement les crons si le conteneur s'éteint
 export const stopScheduler = (): void => {
     console.log('[SCHEDULER] Arrêt de toutes les tâches planifiées...')
     runningTasks.forEach(task => task.stop())

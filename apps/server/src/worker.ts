@@ -1,6 +1,7 @@
-import { initScheduler, stopScheduler } from '#scheduler'
-// Import de ton instance Prisma existante (ex: '#db' ou './lib/db')
-// import prisma from '#db'
+import './load-env.js'
+
+import {Database} from '#db'
+import {initScheduler, stopScheduler} from '#scheduler'
 
 async function bootstrapWorker() {
     console.log('==================================================')
@@ -8,9 +9,13 @@ async function bootstrapWorker() {
     console.log('==================================================')
 
     try {
-        // 1. Initialiser le planificateur de tâches
-        initScheduler()
+        const connected = await Database.checkConnection()
+        if (!connected) {
+            console.error('[WORKER] Impossible de se connecter à PostgreSQL.')
+            process.exit(1)
+        }
 
+        initScheduler()
         console.log('[WORKER] En attente des déclenchements programmés...')
     } catch (error) {
         console.error('[WORKER CRITICAL] Échec du démarrage du worker :', error)
@@ -18,11 +23,9 @@ async function bootstrapWorker() {
     }
 }
 
-// --- GESTION DE L'ARRÊT GRACIEUX (DOCKER STOP / SIGTERM) ---
 const handleShutdown = async (signal: string) => {
     console.log(`\n[WORKER] Signal ${signal} reçu. Arrêt gracieux en cours...`)
     stopScheduler()
-    // await prisma.$disconnect()
     console.log('[WORKER] Arrêt complet.')
     process.exit(0)
 }
@@ -30,4 +33,4 @@ const handleShutdown = async (signal: string) => {
 process.on('SIGTERM', () => handleShutdown('SIGTERM'))
 process.on('SIGINT', () => handleShutdown('SIGINT'))
 
-bootstrapWorker()
+void bootstrapWorker()

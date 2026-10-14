@@ -83,6 +83,14 @@ export const savePost = async (
     return await ApiClient.post(endpoint, payload)
 }
 
+export const deletePost = async (id: string): Promise<{success: boolean}> => {
+    return await ApiClient.delete<{success: boolean}>(`/ws/delete-post/${id}`)
+}
+
+export const purgePost = async (id: string): Promise<{success: boolean}> => {
+    return await ApiClient.delete<{success: boolean}>(`/ws/purge-post/${id}`)
+}
+
 export const fetchTags = async (): Promise<string[]> => {
     return await ApiClient.get<string[]>('/ws/fetch-tags')
 }

@@ -18,6 +18,7 @@ import BlacklistDrawer from './components/BlacklistDrawer.vue'
 import HistoryDrawer from './components/HistoryDrawer.vue'
 import ShareModal from './components/ShareModal.vue'
 import {CookieBanner} from '#components'
+import {toast} from '../../../lib/toast'
 
 const route = useRoute()
 const router = useRouter()
@@ -146,7 +147,7 @@ const handleDraw = async () => {
       loading.value = false
     }
   } catch {
-    alert("Erreur réseau lors de la génération.")
+    toast.error('Erreur réseau lors de la génération.')
     loading.value = false
   }
 }
@@ -171,10 +172,11 @@ const handleShare = async () => {
     const data = await saveShare(payload)
     if (data.success) {
       shareCodeGenerated.value = data.shareCode
-      showShareModal.value = true  // Ouvre la modale avec le code de partage
+      showShareModal.value = true
+      toast.success('Lien de partage généré.')
     }
   } catch {
-    alert("Impossible de générer le lien de partage.")
+    toast.error('Impossible de générer le lien de partage.')
   } finally {
     loading.value = false
   }
@@ -214,7 +216,7 @@ onMounted(async () => {
         return  // On s'arrête ici, pas besoin de charger l'historique
       } catch {
         // Lien expiré ou invalide → retour à la page de tirage normale
-        alert("Ce lien de partage a expiré ou n'existe pas. Chargement de l'historique normal.")
+        toast.info('Ce lien de partage a expiré ou n’existe pas. Chargement de l’historique.')
         router.replace('/draft')
       }
     }

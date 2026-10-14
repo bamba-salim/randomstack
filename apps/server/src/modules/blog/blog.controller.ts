@@ -85,6 +85,49 @@ export default class BlogController {
     }
 
     /**
+     * Prévisualisation staff (brouillon / planifié / archivé).
+     * Cible : GET /fetch-post-preview/:shareCode
+     */
+    static async fetchPostPreview(req: Request, res: Response): Promise<void> {
+        try {
+            const {shareCode} = req.params
+            const session = (req as any).session
+            const role = session?.userRole as string | undefined
+            const userId = session?.userId as string | undefined
+
+            const staff = ['ADMIN', 'EDITOR', 'AUTHOR', 'MODERATOR']
+            if (!userId || !role || !staff.includes(role)) {
+                res.status(403).json({error: 'Prévisualisation réservée au staff.'})
+                return
+            }
+
+            if (!shareCode) {
+                res.status(400).json({error: 'Code article manquant.'})
+                return
+            }
+
+            const post = await BlogModel.fetchPostByShareCode(shareCode)
+            if (!post || post.status === 'DELETED') {
+                res.status(404).json({error: 'Article introuvable.'})
+                return
+            }
+
+            if (role === 'AUTHOR' && post.authorId !== userId) {
+                res.status(403).json({error: 'Tu ne peux prévisualiser que tes articles.'})
+                return
+            }
+
+            const profile = await UserModel.findProfileById(post.authorId)
+            const author = profile ? BlogMapper.buildAuthorListed(profile) : null
+
+            res.json(BlogMapper.buildPublicPostDetail(post, author, false, true))
+        } catch (error: any) {
+            console.error('[BlogController] Erreur fetchPostPreview :', error.message || error)
+            res.status(500).json({error: 'Erreur lors de la prévisualisation.'})
+        }
+    }
+
+    /**
      * Données de la page de partage `/post/:shareCode`.
      * Cible : GET /fetch-post-by-code/:shareCode
      */

@@ -2,6 +2,7 @@
 import {ref, onMounted} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import {logout, getMe} from '#services'
+import {toast} from '../../../toast'
 import type {Role} from '@randomstack/commons'
 
 const router = useRouter()
@@ -28,9 +29,10 @@ onMounted(async () => {
 const handleLogout = async () => {
   try {
     await logout()
+    toast.success('Déconnexion.')
     router.push('/login')
   } catch {
-    alert('Erreur déconnexion.')
+    toast.error('Erreur déconnexion.')
   }
 }
 </script>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {ref} from 'vue'
 import {uploadFile, fileUrl} from '#services'
+import {toast} from '../../../toast'
 import {type PostContentBlock, type BlockType, FILE_TYPE, TABLE, BLOCK_TYPE} from '@randomstack/commons'
 
 const block = defineModel<PostContentBlock>({required: true})
@@ -77,7 +78,7 @@ const handleImageUpload = async (event: Event, col?: 'left' | 'right') => {
       update('value', idFile)
     }
   } catch {
-    alert("Erreur lors de l'upload de l'image.")
+    toast.error("Erreur lors de l'upload de l'image.")
   }
 }
 
