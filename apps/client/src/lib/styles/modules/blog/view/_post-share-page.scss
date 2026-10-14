@@ -1,0 +1,61 @@
+.post-share-page {
+  @apply w-full max-w-2xl mx-auto text-left;
+
+  &__eyebrow {
+    @apply m-0 mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400;
+  }
+
+  &__heading {
+    @apply m-0 mb-6 text-2xl sm:text-3xl font-extrabold text-[#1d2327] tracking-tight;
+    font-family: var(--font-serif, Georgia, serif);
+  }
+
+  &__card {
+    @apply w-full border border-[#c3c4c7] bg-white overflow-hidden mb-8;
+  }
+
+  &__cover {
+    @apply w-full bg-[#f6f8fa] border-b border-[#c3c4c7];
+
+    img {
+      @apply w-full h-auto max-h-64 object-cover block;
+    }
+  }
+
+  &__body {
+    @apply p-5 sm:p-6 flex flex-col items-start gap-2;
+  }
+
+  &__title {
+    @apply m-0 text-xl sm:text-2xl font-extrabold text-[#1d2327] leading-snug;
+    font-family: var(--font-serif, Georgia, serif);
+  }
+
+  &__meta {
+    @apply m-0 text-[10px] font-bold uppercase tracking-widest text-slate-400;
+  }
+
+  &__summary {
+    @apply m-0 mt-1 text-sm text-slate-600 leading-relaxed;
+  }
+
+  &__read {
+    @apply mt-3;
+  }
+
+  &__actions {
+    @apply border border-[#c3c4c7] bg-[#f6f8fa] p-5 sm:p-6;
+  }
+
+  &__actions-title {
+    @apply m-0 mb-1 text-sm font-extrabold text-[#1d2327];
+  }
+
+  &__hint {
+    @apply m-0 mb-4 text-[11px] text-slate-500 leading-relaxed;
+
+    code {
+      @apply text-[10px] font-bold text-slate-600 bg-white border border-[#c3c4c7] px-1 py-0.5;
+    }
+  }
+}
