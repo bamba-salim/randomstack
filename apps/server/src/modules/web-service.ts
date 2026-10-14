@@ -1,8 +1,9 @@
 import {Router} from 'express'
-import {AuthMiddleware} from '#middlewares'
-import {BlogController, CommentController} from './blog'
+import {AuthMiddleware, RateLimitMiddleware} from '#middlewares'
+import {BlogController, CommentController, FavoriteController} from './blog'
 import {FileController} from './file'
 import {StackController, TechnologyController} from './stack'
+import {AuthController} from '#user'
 import multer from 'multer'
 
 
@@ -30,13 +31,19 @@ export default class WebService {
         router.get('/fetch-technologies', TechnologyController.fetchTechnologies)
         router.get('/fetch-technology-by-slug/:slug', TechnologyController.fetchTechnologyBySlug)
 
+        // Profils publics
+        router.get('/fetch-profile/:id', AuthController.fetchPublicProfile)
+
         // Blog
         router.get('/fetch-posts', BlogController.fetchPublishedPosts)
         router.get('/fetch-posts/tag/:tag', BlogController.fetchPostsByTag)
         router.get('/fetch-posts/author/:authorId', BlogController.fetchPostsByAuthor)
         router.get('/fetch-tags', BlogController.fetchUniqueTags)
         router.get('/fetch-similar-posts/:slug', BlogController.fetchSimilarPosts)
+        /** Lecture canonique : /tag/slug */
         router.get('/fetch-post/:slug', BlogController.fetchPostBySlug)
+        /** Page de partage : /post/shareCode */
+        router.get('/fetch-post-by-code/:shareCode', BlogController.fetchPostByShareCode)
 
         // Commentaires
         router.get('/fetch-comments/:postId', CommentController.fetchComments)
@@ -56,9 +63,26 @@ export default class WebService {
             CommentController.deleteComment
         )
 
-        // Fichiers
+        // Favoris / marque-pages
+        router.get(
+            '/fetch-favorites',
+            AuthMiddleware.isAuthenticated,
+            FavoriteController.fetchFavorites
+        )
+        router.post(
+            '/toggle-favorite/:postId',
+            AuthMiddleware.isAuthenticated,
+            FavoriteController.toggleFavorite
+        )
+
+        // Fichiers (upload public durci : allowlist + rate-limit ; lecture par UUID)
         router.get('/files/:id', FileController.getFile)
-        router.post('/upload-file', upload.single('file'), FileController.upload)
+        router.post(
+            '/upload-file',
+            RateLimitMiddleware.upload,
+            upload.single('file'),
+            FileController.upload
+        )
 
         return router
     }

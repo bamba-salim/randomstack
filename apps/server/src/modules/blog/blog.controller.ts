@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 import BlogModel from './blog.model'
 import BlogMapper from './blog.mapper'
 import BlogAction from './blog.action'
+import FavoriteModel from './favorite.model'
 import {UserModel} from '#user'
 
 export default class BlogController {
@@ -50,37 +51,61 @@ export default class BlogController {
     }
 
     /**
-     * Lecture d'un article spécifique par son slug
-     * Barrière de sécurité : 404 si non publié, sauf si admin connecté en mode preview
-     * Cible : GET /api/posts/:slug
+     * Lecture publique canonique par slug (`/tag/slug`).
+     * Cible : GET /fetch-post/:slug
      */
     static async fetchPostBySlug(req: Request, res: Response): Promise<void> {
         try {
-            const { slug } = req.params
-            const isPreview = req.query['preview'] === 'true'
+            const {slug} = req.params
+            if (!slug) {
+                res.status(400).json({error: 'Slug manquant.'})
+                return
+            }
 
-            const post = await BlogModel.fetchPostBySlug(slug)
+            const post = await BlogModel.fetchPublishedPostBySlug(slug)
             if (!post) {
-                res.status(404).json({ error: 'Article introuvable.' })
+                res.status(404).json({error: 'Article introuvable.'})
                 return
             }
 
-            // Barrière de sécurité Preview / Statut
             const session = (req as any).session
-            const isAuthorizedAdmin = session?.userId && ['ADMIN', 'EDITOR', 'AUTHOR', 'MODERATOR'].includes(session.userRole)
-
-            if (post.status !== 'PUBLISHED' && (!isPreview || !isAuthorizedAdmin)) {
-                res.status(404).json({ error: 'Article introuvable.' })
-                return
-            }
-
             const profile = await UserModel.findProfileById(post.authorId)
             const author = profile ? BlogMapper.buildAuthorListed(profile) : null
 
-            res.json(BlogMapper.buildPublicPostDetail(post, author))
+            let isFavorite = false
+            if (session?.userId) {
+                isFavorite = await FavoriteModel.isFavorite(session.userId, post.id)
+            }
+
+            res.json(BlogMapper.buildPublicPostDetail(post, author, isFavorite))
         } catch (error: any) {
             console.error('[BlogController] Erreur fetchPostBySlug :', error.message || error)
-            res.status(500).json({ error: "Erreur lors de la récupération de l'article." })
+            res.status(500).json({error: "Erreur lors de la récupération de l'article."})
+        }
+    }
+
+    /**
+     * Données de la page de partage `/post/:shareCode`.
+     * Cible : GET /fetch-post-by-code/:shareCode
+     */
+    static async fetchPostByShareCode(req: Request, res: Response): Promise<void> {
+        try {
+            const {shareCode} = req.params
+            if (!shareCode) {
+                res.status(400).json({error: 'Code article manquant.'})
+                return
+            }
+
+            const post = await BlogModel.fetchPublishedPostByShareCode(shareCode)
+            if (!post) {
+                res.status(404).json({error: 'Article introuvable.'})
+                return
+            }
+
+            res.json(BlogMapper.buildPostShareResolved(post))
+        } catch (error: any) {
+            console.error('[BlogController] Erreur fetchPostByShareCode :', error.message || error)
+            res.status(500).json({error: "Erreur lors de la résolution du lien de partage."})
         }
     }
 
@@ -102,28 +127,24 @@ export default class BlogController {
     }
 
     /**
-     * Recommandations : Articles similaires par tags partagés (avec fallback sur les récents)
-     * Cible : GET /api/posts/:slug/similar
+     * Recommandations : articles similaires par tags (fallback récents)
+     * Cible : GET /fetch-similar-posts/:slug
      */
     static async fetchSimilarPosts(req: Request, res: Response): Promise<void> {
         try {
-            const { slug } = req.params
+            const {slug} = req.params
 
-            // 1. Récupère l'article de référence
             const currentPost = await BlogModel.fetchPublishedPostBySlug(slug)
             if (!currentPost) {
-                res.status(404).json({ error: 'Article introuvable.' })
+                res.status(404).json({error: 'Article introuvable.'})
                 return
             }
 
-            // 2. Algorithme des 3 articles similaires
             const similarPosts = await BlogModel.fetchSimilarPosts(currentPost.id, currentPost.tags, 4)
-
-            // 3. Transformation en PublicPostListed pour le client
             res.json(BlogMapper.buildPublicPostListedList(similarPosts))
         } catch (error: any) {
             console.error('[BlogController] Erreur fetchSimilarPosts :', error.message || error)
-            res.status(500).json({ error: 'Erreur lors de la récupération des articles similaires.' })
+            res.status(500).json({error: 'Erreur lors de la récupération des articles similaires.'})
         }
     }
 

@@ -155,11 +155,23 @@ export default class AdminBlogController {
                 hasBeenPublishedFlag = true
             }
 
-            const saveDTO = BlogMapper.toSavePostDTO({
-                ...formBean,
-                status: finalStatus,
-                hasBeenPublished: hasBeenPublishedFlag
-            }, targetId, authorId)
+            // shareCode figé à vie ; slug éditable (unicité vérifiée)
+            const saveDTO = BlogMapper.toSavePostDTO(
+                {
+                    ...formBean,
+                    status: finalStatus,
+                    hasBeenPublished: hasBeenPublishedFlag
+                },
+                targetId,
+                authorId,
+                existingPost?.shareCode
+            )
+
+            const slugTaken = await BlogModel.isSlugTaken(saveDTO.post.slug, id || undefined)
+            if (slugTaken) {
+                res.status(409).json({error: 'Ce slug est déjà utilisé par un autre article.'})
+                return
+            }
 
             const result = id
                 ? await BlogModel.updatePost(id, saveDTO)
@@ -172,6 +184,10 @@ export default class AdminBlogController {
             res.json(BlogMapper.buildSavePostResponse(result))
         } catch (error: any) {
             console.error('[AdminBlogController] Échec savePost :', error.message || error)
+            if (error?.code === 'P2002') {
+                res.status(409).json({error: 'Ce slug est déjà utilisé par un autre article.'})
+                return
+            }
             res.status(500).json({error: "Erreur lors de la sauvegarde de l'article."})
         }
     }

@@ -3,12 +3,28 @@ import path from 'path'
 import type {FileRecord} from '@randomstack/commons'
 
 export default class FileUtils {
+    /** Ne garde que [A-Z0-9_-] pour bloquer `../` dans category/type. */
+    private static safeSegment(value: string): string {
+        const cleaned = String(value || '')
+            .toUpperCase()
+            .replace(/[^A-Z0-9_-]/g, '')
+        if (!cleaned) {
+            throw new Error('Segment de chemin fichier invalide.')
+        }
+        return cleaned
+    }
+
     /** Clé objet S3 / chemin relatif disque : uploads/{CATEGORY}/{TYPE}/{CATEGORY}-{id}{ext} */
     static buildObjectKey(category: string, type: string, id: string, extension: string): string {
-        const cat = category.toUpperCase()
-        const typ = type.toUpperCase()
-        const ext = extension.startsWith('.') ? extension.toLowerCase() : `.${extension.toLowerCase()}`
-        return `uploads/${cat}/${typ}/${cat}-${id}${ext}`
+        const cat = this.safeSegment(category)
+        const typ = this.safeSegment(type)
+        const safeId = String(id || '').replace(/[^a-zA-Z0-9_-]/g, '')
+        if (!safeId) {
+            throw new Error('Identifiant fichier invalide.')
+        }
+        const extRaw = extension.startsWith('.') ? extension.toLowerCase() : `.${extension.toLowerCase()}`
+        const ext = extRaw.replace(/[^a-z0-9.]/g, '') || '.bin'
+        return `uploads/${cat}/${typ}/${cat}-${safeId}${ext}`
     }
 
     static buildObjectKeyFromFile(file: FileRecord): string {
@@ -47,7 +63,7 @@ export default class FileUtils {
     /** Fallback local quand S3_* n’est pas configuré. */
     static saveUploadLocal(fileBuffer: Buffer, objectKey: string): string | null {
         try {
-            const absolutePath = path.resolve(process.cwd(), 'public', objectKey)
+            const absolutePath = this.resolveLocalAbsolutePath(objectKey)
             const dir = path.dirname(absolutePath)
 
             if (!fs.existsSync(dir)) {
@@ -63,7 +79,12 @@ export default class FileUtils {
     }
 
     static resolveLocalAbsolutePath(objectKey: string): string {
-        return path.resolve(process.cwd(), 'public', objectKey)
+        const root = path.resolve(process.cwd(), 'public')
+        const absolutePath = path.resolve(root, objectKey)
+        if (!absolutePath.startsWith(root + path.sep) && absolutePath !== root) {
+            throw new Error('Chemin fichier hors zone autorisée.')
+        }
+        return absolutePath
     }
 
     static deleteLocal(objectKey: string): boolean {

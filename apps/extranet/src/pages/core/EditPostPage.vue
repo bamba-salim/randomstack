@@ -190,6 +190,34 @@ onMounted(async () => {
       </div>
 
       <BaseInput v-model="formBean.title" label="Titre" required />
+
+      <div class="form-group">
+        <label class="form-label">Slug (URL publique)</label>
+        <input
+            v-model="formBean.slug"
+            type="text"
+            class="form-input"
+            :disabled="isReadOnly"
+            placeholder="ex: mon-article (vide = généré depuis le titre)"
+        />
+        <p class="text-[10px] text-slate-500 mt-1">
+          URL canonique : <code>/{tag}/{slug}</code> — modifiable. Laisse vide à la création pour auto-générer.
+        </p>
+      </div>
+
+      <div v-if="formBean.shareCode" class="form-group">
+        <label class="form-label">Permalink (partage)</label>
+        <input
+            :value="`/post/${formBean.shareCode}`"
+            type="text"
+            class="form-input bg-[#f6f8fa]"
+            readonly
+        />
+        <p class="text-[10px] text-slate-500 mt-1">
+          Lien permanent non modifiable — reste valide même si le slug change.
+        </p>
+      </div>
+
       <div class="form-group col-span-2 flex ">
         <label class="form-label">Résumé court</label>
         <textarea

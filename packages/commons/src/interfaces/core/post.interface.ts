@@ -14,6 +14,8 @@ export interface Post {
     id: string
     title: string
     slug: string
+    /** Permalien public opaque */
+    shareCode: string
     summary: string
     content: PostContentBlock[]
     imageId: string | null

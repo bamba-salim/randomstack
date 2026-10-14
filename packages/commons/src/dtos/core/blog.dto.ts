@@ -5,6 +5,15 @@ import type {PostContentBlock} from '../../interfaces/core/post.interface'
 export interface EditPostFormBean {
     id?: string
     title: string
+    /**
+     * Segment d’URL canonique `/{tag}/{slug}` — modifiable.
+     * Vide à la création → généré depuis le titre.
+     */
+    slug?: string
+    /**
+     * Permalien de partage `/post/{shareCode}` — lecture seule (jamais modifié).
+     */
+    shareCode?: string
     summary: string
     content: PostContentBlock[]
     imageId?: string | null
@@ -17,24 +26,38 @@ export interface EditPostFormBean {
     isFeatured: boolean
 }
 
-/** Liste publique (grille blog / similar) */
+/** Liste publique (grille blog / similar) — URL canonique : `/{mainTag}/{slug}` */
 export interface PublicPostListed {
     id: string
     slug: string
+    /** Lien de partage : `/post/{shareCode}` → redirige vers le slug */
+    shareCode: string
     title: string
     image: string | null
     mainTag: string
     publishAt: string | Date | null
 }
 
-/** Liste à la une (home) */
+/** Liste à la une (home) — URL canonique : `/{mainTag}/{slug}` */
 export interface FeaturedPostListed {
     id: string
     slug: string
+    shareCode: string
     title: string
     summary: string
     image: string | null
     mainTag: string
+    publishAt: string | Date | null
+}
+
+/** Page / résolution du lien de partage `/post/:shareCode` */
+export interface PostShareResolved {
+    shareCode: string
+    slug: string
+    mainTag: string
+    title: string
+    summary: string
+    image: string | null
     publishAt: string | Date | null
 }
 
@@ -56,10 +79,11 @@ export interface AuthorListed {
     photoId: string | null
 }
 
-/** Page article publique */
+/** Page article publique — URL canonique : `/{mainTag}/{slug}` */
 export interface PublicPostDetail {
     id: string
     slug: string
+    shareCode: string
     title: string
     summary: string
     content: PostContentBlock[]
@@ -69,6 +93,8 @@ export interface PublicPostDetail {
     publishAt: string | Date | null
     author: AuthorListed | null
     commentsCount: number
+    /** Présent si l'utilisateur est connecté */
+    isFavorite?: boolean
 }
 
 export interface PublishedPostsResponse {

@@ -1,6 +1,7 @@
 export * from './core/auth.dto'
 export * from './core/blog.dto'
 export * from './core/comment.dto'
+export * from './core/favorite.dto'
 export * from './core/stack.dto'
 export * from './core/user.dto'
 export * from './core/file.dto'

@@ -1,4 +1,5 @@
 import type {Role} from '../../constants'
+import type {PublicPostListed} from './blog.dto'
 
 /** Formulaire login */
 export interface LoginFormBean {
@@ -29,6 +30,7 @@ export interface SessionUserLite {
     displayName: string | null
     bio: string | null
     photoId: string | null
+    favoritesPublic: boolean
     links: ProfileLinkListed[]
 }
 
@@ -37,6 +39,7 @@ export interface EditProfileFormBean {
     displayName: string
     bio?: string | null
     photoId?: string | null
+    favoritesPublic?: boolean
     links: Array<{
         label: string
         url: string
@@ -52,4 +55,18 @@ export interface SessionUserResponse {
 /** Ack générique (logout, delete…) */
 export interface SuccessAck {
     success: true
+}
+
+/** Profil public (page /u/:id) */
+export interface PublicProfileListed {
+    id: string
+    displayName: string
+    bio: string | null
+    photoId: string | null
+    links: ProfileLinkListed[]
+    favoritesPublic: boolean
+    /** Rempli uniquement si favoritesPublic */
+    favorites: PublicPostListed[]
+    /** Articles publiés dont l'utilisateur est l'auteur */
+    posts: PublicPostListed[]
 }

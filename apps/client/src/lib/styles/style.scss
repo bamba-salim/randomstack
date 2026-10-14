@@ -27,7 +27,9 @@
 @use './modules/blog/components/article-content';
 @use './modules/blog/components/author-card';
 @use './modules/blog/components/comments-section';
+@use './modules/blog/components/post-share-modal';
 @use './modules/blog/view/article-detail';
+@use './modules/blog/view/post-share-page';
 
 @use './modules/stack/components/blacklist-drawer';
 @use './modules/stack/components/history-drawer';

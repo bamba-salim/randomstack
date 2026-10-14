@@ -43,7 +43,12 @@ export default class ImageCompress {
             }
         }
 
-        if (resolvedMime === 'image/svg+xml' || resolvedMime === 'image/gif') {
+        // SVG : jamais stocké tel quel (XSS si servi inline)
+        if (resolvedMime === 'image/svg+xml' || ext === '.svg') {
+            throw new Error('Les fichiers SVG ne sont pas autorisés.')
+        }
+
+        if (resolvedMime === 'image/gif') {
             return {
                 buffer: fileBuffer,
                 mimeType: resolvedMime,

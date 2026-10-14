@@ -1,12 +1,16 @@
 import session from 'express-session'
 import type {RequestHandler} from 'express'
+import crypto from 'crypto'
 
-/** Cookie session site public (client) */
-export const CLIENT_SESSION_COOKIE = 'rs.client.sid'
-/** Cookie session extranet (admin) */
-export const ADMIN_SESSION_COOKIE = 'rs.admin.sid'
+/** Cookie session unique (client + extranet) */
+export const SESSION_COOKIE = 'rs.sid'
 
-const sharedCookieOptions = {
+/** @deprecated — alias de SESSION_COOKIE */
+export const CLIENT_SESSION_COOKIE = SESSION_COOKIE
+/** @deprecated — alias de SESSION_COOKIE */
+export const ADMIN_SESSION_COOKIE = SESSION_COOKIE
+
+const cookieOptions = {
     secure: process.env['NODE_ENV'] === 'production' && process.env['COOKIE_SECURE'] !== 'false'
         ? true
         : false,
@@ -16,25 +20,48 @@ const sharedCookieOptions = {
     path: '/'
 }
 
-function buildSession(name: string, saveUninitialized: boolean): RequestHandler {
+function resolveSessionSecret(): string {
+    const fromEnv = process.env['SESSION_SECRET']?.trim()
+    const isProd = process.env['NODE_ENV'] === 'production'
+
+    if (fromEnv && fromEnv.length >= 32) {
+        return fromEnv
+    }
+
+    if (isProd) {
+        console.error(
+            '[Session] SESSION_SECRET manquant ou trop court (< 32 caractères). Refus de démarrer en production.'
+        )
+        process.exit(1)
+    }
+
+    // Dev uniquement : secret éphémère (sessions invalidées à chaque restart)
+    const ephemeral = crypto.randomBytes(48).toString('hex')
+    console.warn(
+        '[Session] SESSION_SECRET absent/court — secret éphémère de dev généré. Définis SESSION_SECRET (>= 32) pour la stabilité.'
+    )
+    return ephemeral
+}
+
+const SESSION_SECRET = resolveSessionSecret()
+
+function buildSession(saveUninitialized: boolean): RequestHandler {
     return session({
-        name,
-        secret: process.env['SESSION_SECRET'] || 'randomstack-v0-session-secret',
+        name: SESSION_COOKIE,
+        secret: SESSION_SECRET,
         resave: false,
         saveUninitialized,
-        cookie: sharedCookieOptions
+        cookie: cookieOptions
     })
 }
 
 export default class SessionMiddleware {
-    /** Historique tirage + auth client */
-    static readonly client = buildSession(CLIENT_SESSION_COOKIE, true)
+    /** Session partagée site public + extranet */
+    static readonly config = buildSession(true)
 
-    /** Auth extranet + /ws */
-    static readonly admin = buildSession(ADMIN_SESSION_COOKIE, false)
+    /** @deprecated — utiliser `.config` */
+    static readonly client = SessionMiddleware.config
 
-    /** @deprecated — préférer `.client` / `.admin` */
-    static get config() {
-        return SessionMiddleware.client
-    }
+    /** @deprecated — utiliser `.config` */
+    static readonly admin = SessionMiddleware.config
 }

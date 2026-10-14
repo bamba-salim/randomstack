@@ -12,6 +12,10 @@ export type AdPlacement =
     | 'article-rail-right'
     | 'technology-sidebar'
     | 'tag-inline'
+    | 'profile-header'
+    | 'profile-rail-left'
+    | 'profile-rail-right'
+    | 'profile-footer'
 
 export interface HouseAd {
     href: string
@@ -28,7 +32,11 @@ export const HOUSE_ADS: Record<AdPlacement, HouseAd | null> = {
     'article-rail-left': null,
     'article-rail-right': null,
     'technology-sidebar': null,
-    'tag-inline': null
+    'tag-inline': null,
+    'profile-header': null,
+    'profile-rail-left': null,
+    'profile-rail-right': null,
+    'profile-footer': null
 }
 
 export function getHouseAd(placement: AdPlacement): HouseAd | null {

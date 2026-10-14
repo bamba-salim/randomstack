@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import {ref, computed, onMounted, watch} from 'vue'
-import {useRoute} from 'vue-router'
-import {fetchPostBySlug, fetchSimilarPosts, fetchPostsByAuthor, fileUrl} from '#services'
+import {useRoute, useRouter} from 'vue-router'
+import {
+  fetchPostBySlug,
+  fetchSimilarPosts,
+  fetchPostsByAuthor,
+  toggleFavorite,
+  getMe,
+  fileUrl
+} from '#services'
 import {Breadcrumbs, AdSlot} from '#components'
 import type {AuthorListed, PublicPostDetail, PublicPostListed} from '@randomstack/commons'
 
@@ -10,18 +17,27 @@ import AuthorCard from './components/AuthorCard.vue'
 import AuthorArticlesSection from './components/AuthorArticlesSection.vue'
 import RelatedArticlesSection from './components/RelatedArticlesSection.vue'
 import CommentsSection from './components/CommentsSection.vue'
+import PostShareModal from './components/PostShareModal.vue'
 
 const route = useRoute()
+const router = useRouter()
 const post = ref<PublicPostDetail | null>(null)
 const relatedPosts = ref<PublicPostListed[]>([])
 const authorPosts = ref<PublicPostListed[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 const liveCommentsCount = ref<number | null>(null)
+const favoriteBusy = ref(false)
+const shareModalOpen = ref(false)
 
 const commentsCountLabel = computed(() => {
   const n = liveCommentsCount.value ?? post.value?.commentsCount ?? 0
   return `${n} commentaire${n > 1 ? 's' : ''}`
+})
+
+const shareUrl = computed(() => {
+  if (!post.value?.shareCode || typeof window === 'undefined') return ''
+  return `${window.location.origin}/post/${post.value.shareCode}`
 })
 
 const onCommentsCountChange = (n: number) => {
@@ -36,17 +52,36 @@ const formatDate = (dateString: string | Date) => {
   })
 }
 
+const handleToggleFavorite = async () => {
+  if (!post.value || favoriteBusy.value) return
+
+  const me = await getMe()
+  if (!me) {
+    await router.push({path: '/login', query: {redirect: route.fullPath}})
+    return
+  }
+
+  favoriteBusy.value = true
+  try {
+    const result = await toggleFavorite(post.value.id)
+    post.value = {...post.value, isFavorite: result.isFavorite}
+  } catch {
+    // silencieux — l'UI reste cohérente
+  } finally {
+    favoriteBusy.value = false
+  }
+}
+
 const loadArticle = async (slug: string) => {
   loading.value = true
   error.value = null
   relatedPosts.value = []
   authorPosts.value = []
   liveCommentsCount.value = null
-
-  const isPreview = route.query['preview'] === 'true'
+  shareModalOpen.value = false
 
   try {
-    post.value = await fetchPostBySlug(slug, isPreview)
+    post.value = await fetchPostBySlug(slug)
     liveCommentsCount.value = post.value.commentsCount
     try {
       relatedPosts.value = await fetchSimilarPosts(slug)
@@ -105,7 +140,44 @@ watch(() => route.params['slug'], (slug) => {
         ]"/>
 
         <header class="page-header page-header--flush mt-4">
-          <h1 class="page-title">{{ post.title }}</h1>
+          <div class="page-header__row">
+            <h1 class="page-title">{{ post.title }}</h1>
+            <div class="page-header__actions">
+              <button
+                  type="button"
+                  class="article-icon-btn"
+                  title="Partager"
+                  aria-label="Partager l’article"
+                  @click="shareModalOpen = true"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="18" cy="5" r="3"/>
+                  <circle cx="6" cy="12" r="3"/>
+                  <circle cx="18" cy="19" r="3"/>
+                  <path d="M8.6 13.5l6.8 3.9M15.4 6.6l-6.8 3.9"/>
+                </svg>
+              </button>
+              <button
+                  type="button"
+                  class="article-icon-btn"
+                  :class="{ 'is-active': post.isFavorite }"
+                  :disabled="favoriteBusy"
+                  :title="post.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+                  :aria-label="post.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+                  @click="handleToggleFavorite"
+              >
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    :fill="post.isFavorite ? 'currentColor' : 'none'"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                  <path d="M12 17.3l-6.18 3.25 1.18-6.88L2 8.97l6.91-1L12 1.5l3.09 6.47 6.91 1-5 4.7 1.18 6.88z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
           <div class="page-meta">
             <span v-if="post.publishAt">Publié le {{ formatDate(post.publishAt) }}</span>
             <span>{{ commentsCountLabel }}</span>
@@ -166,6 +238,13 @@ watch(() => route.params['slug'], (slug) => {
       <aside class="article-rail article-rail--right" aria-label="Publicité">
         <AdSlot placement="article-rail-right" variant="rail"/>
       </aside>
+
+      <PostShareModal
+          :is-open="shareModalOpen"
+          :share-url="shareUrl"
+          :title="post.title"
+          @close="shareModalOpen = false"
+      />
 
     </div>
 

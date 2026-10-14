@@ -17,7 +17,12 @@ const handleLogin = async () => {
 
   try {
     await login({email: email.value, password: password.value})
-    const redirect = typeof route.query['redirect'] === 'string' ? route.query['redirect'] : '/profile'
+    // Open redirect : uniquement chemins internes (`/foo`), jamais `//evil.com`
+    const raw = typeof route.query['redirect'] === 'string' ? route.query['redirect'] : '/profile'
+    const redirect =
+      raw.startsWith('/') && !raw.startsWith('//') && !raw.includes('\\')
+        ? raw
+        : '/profile'
     await router.push(redirect)
   } catch (err: any) {
     errorMsg.value = err.message || 'Connexion impossible.'

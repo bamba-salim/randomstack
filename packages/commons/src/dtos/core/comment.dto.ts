@@ -21,8 +21,6 @@ export interface PublicCommentListed {
 
 export interface CommentsListResponse {
     commentsCount: number
-    likesCount: number
-    dislikesCount: number
     comments: PublicCommentListed[]
 }
 

@@ -50,8 +50,6 @@ export default class CommentMapper {
         const listed = comments.map(c => this.buildPublicCommentListed(c, viewerUserId))
         return {
             commentsCount: listed.length,
-            likesCount: listed.reduce((sum, c) => sum + c.likesCount, 0),
-            dislikesCount: listed.reduce((sum, c) => sum + c.dislikesCount, 0),
             comments: listed
         }
     }

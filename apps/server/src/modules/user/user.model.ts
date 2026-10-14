@@ -8,6 +8,7 @@ export default class UserModel extends BaseModel {
         displayName: true,
         bio: true,
         photoId: true,
+        favoritesPublic: true,
         links: {
             orderBy: {sortOrder: 'asc' as const},
             select: {
@@ -44,12 +45,28 @@ export default class UserModel extends BaseModel {
         })
     }
 
+    /** Contexte auth léger (rafraîchissement rôle session). */
+    static async findAuthContext(id: string) {
+        return await this.db.user.findUnique({
+            where: {id},
+            select: {id: true, role: true}
+        })
+    }
+
+    static async updatePasswordHash(userId: string, passwordHash: string) {
+        await this.db.user.update({
+            where: {id: userId},
+            data: {passwordHash}
+        })
+    }
+
     static async updateOwnProfile(
         userId: string,
         data: {
             displayName: string
             bio: string | null
             photoId: string | null
+            favoritesPublic: boolean
             links: Array<{label: string; url: string; sortOrder: number}>
         }
     ) {
@@ -61,7 +78,8 @@ export default class UserModel extends BaseModel {
                 data: {
                     displayName: data.displayName,
                     bio: data.bio,
-                    photoId: data.photoId
+                    photoId: data.photoId,
+                    favoritesPublic: data.favoritesPublic
                 }
             })
 
@@ -147,6 +165,29 @@ export default class UserModel extends BaseModel {
                 displayName: true,
                 bio: true,
                 photoId: true
+            }
+        })
+    }
+
+    /** Profil public + liens portfolio */
+    static async findPublicProfileById(id: string) {
+        return await this.db.userProfile.findUnique({
+            where: {id},
+            select: {
+                id: true,
+                displayName: true,
+                bio: true,
+                photoId: true,
+                favoritesPublic: true,
+                links: {
+                    orderBy: {sortOrder: 'asc'},
+                    select: {
+                        id: true,
+                        label: true,
+                        url: true,
+                        sortOrder: true
+                    }
+                }
             }
         })
     }

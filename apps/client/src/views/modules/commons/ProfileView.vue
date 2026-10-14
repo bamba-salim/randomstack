@@ -1,10 +1,19 @@
 <script setup lang="ts">
 import {ref, computed, onMounted} from 'vue'
 import {useRouter} from 'vue-router'
-import {getMe, updateProfile, logout, uploadFile, fileUrl} from '#services'
-import type {SessionUserLite} from '@randomstack/commons'
+import {
+  getMe,
+  updateProfile,
+  logout,
+  uploadFile,
+  fileUrl,
+  fetchFavorites,
+  toggleFavorite
+} from '#services'
+import type {SessionUserLite, PublicPostListed} from '@randomstack/commons'
 import {FILE_TYPE, TABLE} from '@randomstack/commons'
 import {getAdminNavLinks} from '../../../lib/admin-nav'
+import PostCard from '../blog/components/PostCard.vue'
 
 type LinkDraft = {label: string; url: string}
 
@@ -19,7 +28,11 @@ const successMsg = ref<string | null>(null)
 const displayName = ref('')
 const bio = ref('')
 const photoId = ref<string | null>(null)
+const favoritesPublic = ref(false)
 const links = ref<LinkDraft[]>([])
+const favorites = ref<PublicPostListed[]>([])
+const favoritesLoading = ref(false)
+const removingFavoriteId = ref<string | null>(null)
 
 const initials = computed(() => (displayName.value || '?').substring(0, 2).toUpperCase())
 const adminLinks = computed(() => getAdminNavLinks(user.value?.role))
@@ -28,7 +41,20 @@ const hydrateForm = (sessionUser: SessionUserLite) => {
   displayName.value = sessionUser.displayName || ''
   bio.value = sessionUser.bio || ''
   photoId.value = sessionUser.photoId
+  favoritesPublic.value = Boolean(sessionUser.favoritesPublic)
   links.value = (sessionUser.links || []).map(l => ({label: l.label, url: l.url}))
+}
+
+const loadFavorites = async () => {
+  favoritesLoading.value = true
+  try {
+    const data = await fetchFavorites()
+    favorites.value = data.favorites
+  } catch {
+    favorites.value = []
+  } finally {
+    favoritesLoading.value = false
+  }
 }
 
 onMounted(async () => {
@@ -40,12 +66,58 @@ onMounted(async () => {
       return
     }
     hydrateForm(user.value)
+    await loadFavorites()
   } catch {
     errorMsg.value = 'Impossible de charger le profil.'
   } finally {
     loading.value = false
   }
 })
+
+const handleRemoveFavorite = async (post: PublicPostListed) => {
+  if (removingFavoriteId.value) return
+  removingFavoriteId.value = post.id
+  try {
+    await toggleFavorite(post.id)
+    favorites.value = favorites.value.filter(f => f.id !== post.id)
+  } catch {
+    // ignore
+  } finally {
+    removingFavoriteId.value = null
+  }
+}
+
+const handleToggleFavoritesPublic = async () => {
+  if (!user.value || saving.value) return
+  const next = !favoritesPublic.value
+  favoritesPublic.value = next
+  saving.value = true
+  errorMsg.value = null
+  try {
+    user.value = await updateProfile({
+      displayName: displayName.value.trim() || user.value.displayName || 'User',
+      bio: bio.value.trim() || null,
+      photoId: photoId.value,
+      favoritesPublic: next,
+      links: links.value
+        .map((l, i) => ({
+          label: l.label.trim(),
+          url: l.url.trim(),
+          sortOrder: i
+        }))
+        .filter(l => l.label && l.url)
+    })
+    hydrateForm(user.value)
+    successMsg.value = next
+      ? 'Tes favoris sont visibles sur ton profil public.'
+      : 'Tes favoris sont maintenant privés.'
+  } catch (err: any) {
+    favoritesPublic.value = !next
+    errorMsg.value = err?.message || 'Impossible de mettre à jour la visibilité.'
+  } finally {
+    saving.value = false
+  }
+}
 
 const addLink = () => {
   links.value.push({label: '', url: ''})
@@ -73,6 +145,10 @@ const handlePhotoUpload = async (event: Event) => {
 
 const handleSave = async () => {
   if (saving.value) return
+  if (!photoId.value) {
+    errorMsg.value = 'Une photo de profil est obligatoire.'
+    return
+  }
   saving.value = true
   errorMsg.value = null
   successMsg.value = null
@@ -82,6 +158,7 @@ const handleSave = async () => {
       displayName: displayName.value.trim(),
       bio: bio.value.trim() || null,
       photoId: photoId.value,
+      favoritesPublic: favoritesPublic.value,
       links: links.value
         .map((l, i) => ({
           label: l.label.trim(),
@@ -106,16 +183,20 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <main class="auth-page auth-page--wide">
+  <main class="auth-page auth-page--wide profile-page">
     <div v-if="loading" class="loading-state">Chargement du profil…</div>
 
     <div v-else-if="errorMsg && !user" class="error-state">{{ errorMsg }}</div>
 
-    <form v-else-if="user" class="profile-card profile-card--edit" @submit.prevent="handleSave">
+    <template v-else-if="user">
+    <form class="profile-card profile-card--edit" @submit.prevent="handleSave">
       <header class="profile-card__header">
         <p class="profile-card__eyebrow">Profil</p>
-        <h1 class="profile-card__title">Mon compte</h1>
+        <h1 class="profile-card__title">Modifier mon profil</h1>
         <p class="profile-card__email">{{ user.email }}</p>
+        <router-link v-if="user.id" :to="`/u/${user.id}`" class="profile-card__public-link">
+          Voir mon profil public →
+        </router-link>
       </header>
 
       <div v-if="errorMsg" class="auth-card__error" role="alert">{{ errorMsg }}</div>
@@ -149,23 +230,16 @@ const handleLogout = async () => {
         </div>
         <div class="profile-card__photo-actions">
           <label class="btn btn--secondary profile-card__upload">
-            {{ uploading ? 'Upload…' : 'Changer la photo' }}
+            {{ uploading ? 'Upload…' : (photoId ? 'Changer la photo' : 'Ajouter une photo') }}
             <input
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp,image/gif"
                 class="sr-only"
                 :disabled="uploading"
                 @change="handlePhotoUpload"
             />
           </label>
-          <button
-              v-if="photoId"
-              type="button"
-              class="btn btn--secondary"
-              @click="photoId = null"
-          >
-            Retirer
-          </button>
+          <p v-if="!photoId" class="profile-card__photo-hint">Photo obligatoire pour enregistrer le profil.</p>
         </div>
       </div>
 
@@ -222,5 +296,49 @@ const handleLogout = async () => {
         </button>
       </div>
     </form>
+
+    <section class="profile-card profile-card--favorites">
+      <header class="profile-card__header profile-card__favorites-head">
+        <div>
+          <h2 class="profile-card__section-title">Articles favoris</h2>
+          <p class="profile-card__admin-lead">
+            {{ favorites.length }} marque-page{{ favorites.length > 1 ? 's' : '' }}
+          </p>
+        </div>
+        <button
+            type="button"
+            class="favorites-visibility-btn"
+            :class="{ 'is-active': favoritesPublic }"
+            :disabled="saving"
+            :title="favoritesPublic ? 'Favoris visibles sur ton profil public' : 'Favoris privés'"
+            @click="handleToggleFavoritesPublic"
+        >
+          {{ favoritesPublic ? 'Favoris visibles' : 'Favoris privés' }}
+        </button>
+      </header>
+
+      <div v-if="favoritesLoading" class="profile-card__empty">Chargement…</div>
+      <div v-else-if="favorites.length === 0" class="profile-card__empty">
+        Aucun article enregistré. Sur un article, clique ★ Favori.
+      </div>
+      <ul v-else class="profile-favorites-list">
+        <li v-for="fav in favorites" :key="fav.id" class="profile-favorites-list__item">
+          <PostCard :post="fav"/>
+          <button
+              type="button"
+              class="profile-favorites-list__remove"
+              :disabled="removingFavoriteId === fav.id"
+              title="Retirer des favoris"
+              aria-label="Retirer des favoris"
+              @click.stop="handleRemoveFavorite(fav)"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/>
+            </svg>
+          </button>
+        </li>
+      </ul>
+    </section>
+    </template>
   </main>
 </template>

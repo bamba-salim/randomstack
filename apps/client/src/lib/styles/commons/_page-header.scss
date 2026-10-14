@@ -2,6 +2,10 @@
 .page-header {
   @apply flex flex-col gap-2 mb-8 border-b border-[#c3c4c7] pb-6 text-left w-full;
 
+  &__row {
+    @apply flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 w-full;
+  }
+
   .page-title {
     @apply text-3xl sm:text-4xl font-extrabold text-[#1d2327] tracking-tight leading-tight;
     font-family: var(--font-serif, 'Georgia', serif);

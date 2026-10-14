@@ -8,12 +8,16 @@ import type {
     ExcludeTechnologyLite,
     PublicPostDetail,
     PublicPostListed,
+    PostShareResolved,
     PublishedPostsResponse,
     SharedStackListed,
     CommentsListResponse,
     CreateCommentResponse,
     VoteCommentResponse,
     CommentVoteType,
+    PublicProfileListed,
+    FavoritesListResponse,
+    ToggleFavoriteResponse,
     FileType,
     Table
 } from '@randomstack/commons'
@@ -78,9 +82,16 @@ export const fetchTechnologyBySlug = async (slug: string): Promise<PublicTechnol
 
 // ─── Blog ────────────────────────────────────────────────────────────────────
 
-export const fetchPostBySlug = async (slug: string, isPreview: boolean = false): Promise<PublicPostDetail> => {
-    const query = isPreview ? '?preview=true' : ''
-    return await ApiClient.get<PublicPostDetail>(`/fetch-post/${slug}${query}`)
+/** Lecture article par slug (URL canonique `/{tag}/{slug}`). */
+export const fetchPostBySlug = async (slug: string): Promise<PublicPostDetail> => {
+    return await ApiClient.get<PublicPostDetail>(`/fetch-post/${encodeURIComponent(slug)}`)
+}
+
+/** Charge la page de partage `/post/:shareCode`. */
+export const resolvePostShareCode = async (shareCode: string): Promise<PostShareResolved> => {
+    return await ApiClient.get<PostShareResolved>(
+        `/fetch-post-by-code/${encodeURIComponent(shareCode)}`
+    )
 }
 
 export const fetchPublishedPosts = async (): Promise<PublishedPostsResponse> => {
@@ -93,7 +104,7 @@ export const fetchPostsByTag = async (tag: string): Promise<PublishedPostsRespon
 
 /** Similaires par tags, complétés par les derniers publiés (serveur). */
 export const fetchSimilarPosts = async (slug: string): Promise<PublicPostListed[]> => {
-    return await ApiClient.get<PublicPostListed[]>(`/fetch-similar-posts/${slug}`)
+    return await ApiClient.get<PublicPostListed[]>(`/fetch-similar-posts/${encodeURIComponent(slug)}`)
 }
 
 /** Articles publiés du même auteur (exclut l’article courant si `excludePostId`). */
@@ -125,6 +136,18 @@ export const voteComment = async (
 
 export const deleteComment = async (commentId: string): Promise<{success: boolean}> => {
     return await ApiClient.delete<{success: boolean}>(`/delete-comment/${commentId}`)
+}
+
+export const fetchPublicProfile = async (id: string): Promise<PublicProfileListed> => {
+    return await ApiClient.get<PublicProfileListed>(`/fetch-profile/${id}`)
+}
+
+export const fetchFavorites = async (): Promise<FavoritesListResponse> => {
+    return await ApiClient.get<FavoritesListResponse>('/fetch-favorites')
+}
+
+export const toggleFavorite = async (postId: string): Promise<ToggleFavoriteResponse> => {
+    return await ApiClient.post<ToggleFavoriteResponse>(`/toggle-favorite/${postId}`)
 }
 
 export const uploadFile = async (

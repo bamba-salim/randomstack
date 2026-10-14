@@ -1,17 +1,34 @@
 import type {Request, Response, NextFunction} from 'express'
+import UserModel from '../../../modules/user/user.model.js'
 
 export default class AuthMiddleware {
-    // Vérifie si l'utilisateur est simplement connecté en session 🚀
-    static isAuthenticated(req: Request, res: Response, next: NextFunction): void {
+    /**
+     * Session présente + rôle rechargé depuis la DB (évite un rôle figé 24h
+     * après rétrogradation / promotion).
+     */
+    static async isAuthenticated(req: Request, res: Response, next: NextFunction): Promise<void> {
         const session = req.session as any
         if (!session || !session.userId) {
             res.status(401).json({error: "Authentification requise. Veuillez vous connecter."})
             return
         }
-        next()
+
+        try {
+            const user = await UserModel.findAuthContext(session.userId)
+            if (!user) {
+                req.session.destroy(() => {
+                    res.status(401).json({error: 'Session invalide. Reconnecte-toi.'})
+                })
+                return
+            }
+
+            session.userRole = user.role
+            next()
+        } catch {
+            res.status(500).json({error: 'Impossible de vérifier la session.'})
+        }
     }
 
-    // Vérifie si l'utilisateur possède l'un des rôles autorisés 🚀
     static permit(...allowedRoles: string[]) {
         return (req: Request, res: Response, next: NextFunction): void => {
             const session = req.session as any

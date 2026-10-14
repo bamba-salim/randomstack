@@ -6,6 +6,81 @@
       max-width: 40rem;
     }
   }
+
+  &.profile-page {
+    @apply flex-col items-center gap-6 w-full;
+
+    .profile-card {
+      max-width: 56rem;
+      width: 100%;
+    }
+  }
+}
+
+.public-profile {
+  @apply flex flex-col gap-6;
+
+  &__favorites-grid {
+    @apply grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4;
+    justify-content: start;
+
+    .card {
+      @apply w-full max-w-[11rem];
+
+      .card-body {
+        @apply p-2.5;
+      }
+
+      .card-title {
+        @apply text-sm;
+      }
+
+      .card-cover-empty {
+        @apply text-lg;
+      }
+    }
+  }
+}
+
+.favorites-visibility-btn {
+  @apply shrink-0 px-3 py-1.5 text-xs font-black uppercase tracking-wider border border-[#c3c4c7] bg-white text-slate-600 hover:border-[#2271b1] hover:text-[#2271b1] disabled:opacity-50;
+
+  &.is-active {
+    @apply border-emerald-600 text-emerald-700 bg-emerald-50;
+  }
+}
+
+.profile-favorites-list {
+  @apply list-none m-0 p-0 grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4;
+  justify-content: start;
+
+  &__item {
+    @apply relative w-full max-w-[11rem];
+
+    .card {
+      @apply w-full;
+
+      .card-body {
+        @apply p-2.5;
+      }
+
+      .card-title {
+        @apply text-sm;
+      }
+
+      .card-cover-empty {
+        @apply text-lg;
+      }
+    }
+  }
+
+  &__remove {
+    @apply absolute top-1.5 right-1.5 z-10 flex items-center justify-center w-7 h-7 rounded-full bg-black/65 text-white border-0 cursor-pointer hover:bg-red-600 disabled:opacity-50 shadow-sm;
+
+    svg {
+      @apply w-3.5 h-3.5;
+    }
+  }
 }
 
 .auth-card,
@@ -127,6 +202,26 @@
     @apply text-sm text-slate-500 mt-0.5;
   }
 
+  &__public-link {
+    @apply inline-block mt-2 text-sm font-bold text-[#2271b1] hover:underline;
+  }
+
+  &__header--public {
+    @apply flex items-center gap-4;
+  }
+
+  &__bio {
+    @apply text-sm text-[#1d2327] whitespace-pre-wrap;
+  }
+
+  &__public-links {
+    @apply list-none m-0 p-0 flex flex-col gap-2;
+
+    a {
+      @apply text-sm font-bold text-[#2271b1] hover:underline;
+    }
+  }
+
   &__success {
     @apply px-3 py-2 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200;
     border-radius: 2px;
@@ -167,5 +262,13 @@
 
   &__actions {
     @apply flex flex-wrap gap-3 pt-2 border-t border-[#dcdcde];
+  }
+
+  &__favorites-head {
+    @apply flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between;
+  }
+
+  &--public-page {
+    max-width: none !important;
   }
 }

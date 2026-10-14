@@ -15,12 +15,18 @@ export default class CommentController {
         }
     }
 
-    /** GET /fetch-comments/:postId — public */
+    /** GET /fetch-comments/:postId — public, article publié uniquement */
     static async fetchComments(req: Request, res: Response): Promise<void> {
         try {
             const {postId} = req.params
             if (!postId) {
                 res.status(400).json({error: 'Identifiant article manquant.'})
+                return
+            }
+
+            const published = await CommentModel.postExistsPublished(postId)
+            if (!published) {
+                res.status(404).json({error: 'Article introuvable.'})
                 return
             }
 

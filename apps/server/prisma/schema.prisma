@@ -101,20 +101,23 @@ model User {
   savedStacks   SavedStack[]
   comments      Comment[]
   commentVotes  CommentVote[]
+  favorites     PostFavorite[]
   profile       UserProfile?
   authoredPosts Post[]
 }
 
 // Profil public (bio, photo, portfolio) — id = User.id
 model UserProfile {
-  id          String     @id
-  user        User       @relation(fields: [id], references: [id], onDelete: Cascade)
-  displayName String
-  bio         String?    @db.Text
-  photoId     String?
-  photo       File?      @relation(fields: [photoId], references: [id], onDelete: SetNull)
-  links       UserLink[]
-  updatedAt   DateTime   @updatedAt
+  id               String     @id
+  user             User       @relation(fields: [id], references: [id], onDelete: Cascade)
+  displayName      String
+  bio              String?    @db.Text
+  photoId          String?
+  photo            File?      @relation(fields: [photoId], references: [id], onDelete: SetNull)
+  /** Afficher la liste des favoris sur le profil public */
+  favoritesPublic  Boolean    @default(false)
+  links            UserLink[]
+  updatedAt        DateTime   @updatedAt
 }
 
 // Liens portfolio (GitHub, site, etc.)
@@ -135,6 +138,8 @@ model Post {
   id               String     @id @default(uuid())
   title            String
   slug             String     @unique
+  /// Lien de partage `/post/:shareCode` → redirige vers `/:tag/:slug`
+  shareCode        String     @unique
   summary          String     @db.Text
   content          Json
   status           PostStatus @default(DRAFT)
@@ -147,12 +152,30 @@ model Post {
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
   comments         Comment[]
+  favorites        PostFavorite[]
 
   imageId String?
   image   File?   @relation(fields: [imageId], references: [id], onDelete: SetNull)
 
   @@index([slug])
+  @@index([shareCode])
   @@index([authorId])
+}
+
+/** Marque-page / article favori (compte connecté) */
+model PostFavorite {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([userId])
+  @@index([postId])
 }
 
 // Commentaires publics (like/dislike réservés aux comptes connectés)

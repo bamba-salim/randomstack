@@ -1,6 +1,8 @@
 import type {
     EditProfileFormBean,
     ProfileLinkListed,
+    PublicPostListed,
+    PublicProfileListed,
     SessionUserLite,
     SessionUserResponse,
     SuccessAck
@@ -14,6 +16,7 @@ type SessionUserSource = {
         displayName: string
         bio: string | null
         photoId: string | null
+        favoritesPublic?: boolean
         links?: Array<{
             id: string
             label: string
@@ -47,6 +50,7 @@ export default class AuthMapper {
             displayName: user.profile?.displayName ?? null,
             bio: user.profile?.bio ?? null,
             photoId: user.profile?.photoId ?? null,
+            favoritesPublic: Boolean(user.profile?.favoritesPublic),
             links: (user.profile?.links || []).map(l => this.buildProfileLinkListed(l))
         }
     }
@@ -61,11 +65,36 @@ export default class AuthMapper {
         return {success: true}
     }
 
+    static buildPublicProfileListed(
+        profile: {
+            id: string
+            displayName: string
+            bio: string | null
+            photoId: string | null
+            favoritesPublic: boolean
+            links: Array<{id: string; label: string; url: string; sortOrder: number}>
+        },
+        favorites: PublicPostListed[] = [],
+        posts: PublicPostListed[] = []
+    ): PublicProfileListed {
+        return {
+            id: profile.id,
+            displayName: profile.displayName,
+            bio: profile.bio,
+            photoId: profile.photoId,
+            links: profile.links.map(l => this.buildProfileLinkListed(l)),
+            favoritesPublic: profile.favoritesPublic,
+            favorites: profile.favoritesPublic ? favorites : [],
+            posts
+        }
+    }
+
     static normalizeEditProfileFormBean(body: Partial<EditProfileFormBean>): EditProfileFormBean {
         const displayName = String(body.displayName || '').trim()
         const bioRaw = body.bio
         const bio = bioRaw == null ? null : String(bioRaw).trim() || null
         const photoId = body.photoId ? String(body.photoId) : null
+        const favoritesPublic = Boolean(body.favoritesPublic)
 
         const rawLinks = Array.isArray(body.links) ? body.links : []
         const links = rawLinks
@@ -76,6 +105,6 @@ export default class AuthMapper {
             }))
             .filter(link => link.label && link.url)
 
-        return {displayName, bio, photoId, links}
+        return {displayName, bio, photoId, favoritesPublic, links}
     }
 }

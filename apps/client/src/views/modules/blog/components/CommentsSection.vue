@@ -74,8 +74,6 @@ const replaceComment = (updated: PublicCommentListed) => {
   const idx = data.value.comments.findIndex(c => c.id === updated.id)
   if (idx === -1) return
   data.value.comments[idx] = updated
-  data.value.likesCount = data.value.comments.reduce((s, c) => s + c.likesCount, 0)
-  data.value.dislikesCount = data.value.comments.reduce((s, c) => s + c.dislikesCount, 0)
 }
 
 const handleSubmit = async () => {
@@ -93,8 +91,6 @@ const handleSubmit = async () => {
     if (!data.value) {
       data.value = {
         commentsCount: 1,
-        likesCount: 0,
-        dislikesCount: 0,
         comments: [result.comment]
       }
     } else {
@@ -135,8 +131,6 @@ const handleDelete = async (comment: PublicCommentListed) => {
     if (!data.value) return
     data.value.comments = data.value.comments.filter(c => c.id !== comment.id)
     data.value.commentsCount = data.value.comments.length
-    data.value.likesCount = data.value.comments.reduce((s, c) => s + c.likesCount, 0)
-    data.value.dislikesCount = data.value.comments.reduce((s, c) => s + c.dislikesCount, 0)
     emit('count-change', data.value.commentsCount)
   } catch (err: any) {
     errorMsg.value = err?.message || 'Suppression impossible.'
@@ -153,8 +147,6 @@ watch(() => props.postId, load)
       <h2 id="comments-heading" class="comments-section__title">Commentaires</h2>
       <div v-if="data" class="comments-section__stats">
         <span>{{ data.commentsCount }} commentaire{{ data.commentsCount > 1 ? 's' : '' }}</span>
-        <span>{{ data.likesCount }} like{{ data.likesCount > 1 ? 's' : '' }}</span>
-        <span>{{ data.dislikesCount }} dislike{{ data.dislikesCount > 1 ? 's' : '' }}</span>
       </div>
     </header>
 

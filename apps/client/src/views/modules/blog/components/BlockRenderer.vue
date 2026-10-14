@@ -1,37 +1,48 @@
 <script setup lang="ts">
-import { type PostContentBlock } from '@randomstack/commons'
-import { fileUrl } from '#services'
+import {computed} from 'vue'
+import {type PostContentBlock} from '@randomstack/commons'
+import {fileUrl} from '#services'
+import {sanitizeHtml} from '../../../../lib/sanitize-html'
 import BlockRenderer from './BlockRenderer.vue'
 
-defineProps<{ block: PostContentBlock }>()
+const props = defineProps<{block: PostContentBlock}>()
+
+const safeValue = computed(() => sanitizeHtml(props.block.value || ''))
+
+const listLines = computed(() =>
+    (props.block.value || '')
+        .split('\n')
+        .filter(l => l.trim() !== '')
+        .map(line => sanitizeHtml(line))
+)
 </script>
 
 <template>
-  <!-- TEXTE -->
-  <p v-if="block.type === 'TEXT'" v-html="block.value" class="blog-text-paragraph"></p>
+  <!-- TEXTE (HTML sanitisé anti-XSS) -->
+  <p v-if="block.type === 'TEXT'" class="blog-text-paragraph" v-html="safeValue"></p>
 
-  <!-- TITRES 🚀 -->
+  <!-- TITRES -->
   <h2 v-else-if="block.type === 'H2'" class="blog-h2">{{ block.value }}</h2>
   <h3 v-else-if="block.type === 'H3'" class="blog-h3">{{ block.value }}</h3>
 
-  <!-- CITATION 🚀 -->
+  <!-- CITATION -->
   <blockquote v-else-if="block.type === 'QUOTE'" class="blog-quote">
     "{{ block.value }}"
   </blockquote>
 
-  <!-- NOTE DE LA RÉDACTION (NDLR) 🚀 -->
+  <!-- NOTE DE LA RÉDACTION (NDLR) -->
   <div v-else-if="block.type === 'NDLR'" class="blog-ndlr">
     <span class="ndlr-badge">NDLR</span>
     <p class="ndlr-text">{{ block.value }}</p>
   </div>
 
-  <!-- LISTES (Découpe chaque saut de ligne en élément <li>) 🚀 -->
+  <!-- LISTES -->
   <ul v-else-if="block.type === 'LIST_UL'" class="blog-list ul">
-    <li v-for="(line, i) in block.value.split('\n').filter(l => l.trim() !== '')" :key="i" v-html="line"></li>
+    <li v-for="(line, i) in listLines" :key="i" v-html="line"></li>
   </ul>
 
   <ol v-else-if="block.type === 'LIST_OL'" class="blog-list ol">
-    <li v-for="(line, i) in block.value.split('\n').filter(l => l.trim() !== '')" :key="i" v-html="line"></li>
+    <li v-for="(line, i) in listLines" :key="i" v-html="line"></li>
   </ol>
 
   <!-- CODE SOURCE -->
@@ -42,13 +53,13 @@ defineProps<{ block: PostContentBlock }>()
 
   <!-- IMAGE -->
   <figure v-else-if="block.type === 'IMAGE'" class="blog-image-block">
-    <img :src="fileUrl(block.value)" :alt="block.caption || 'Illustration'" />
+    <img :src="fileUrl(block.value)" :alt="block.caption || 'Illustration'" draggable="false"/>
     <figcaption v-if="block.caption">{{ block.caption }}</figcaption>
   </figure>
 
   <!-- DOUBLE COLONNE RÉCURSIVE -->
   <div v-else-if="block.type === 'DOUBLE_CONTENT'" class="blog-double-column">
-    <div class="column"><BlockRenderer v-if="block.left" :block="block.left" /></div>
-    <div class="column"><BlockRenderer v-if="block.right" :block="block.right" /></div>
+    <div class="column"><BlockRenderer v-if="block.left" :block="block.left"/></div>
+    <div class="column"><BlockRenderer v-if="block.right" :block="block.right"/></div>
   </div>
 </template>

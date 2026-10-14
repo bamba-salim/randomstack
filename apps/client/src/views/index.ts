@@ -8,6 +8,7 @@ import HomeView from './modules/commons/HomeView.vue'
 import LoginView from './modules/commons/LoginView.vue'
 import RegisterView from './modules/commons/RegisterView.vue'
 import ProfileView from './modules/commons/ProfileView.vue'
+import PublicProfileView from './modules/commons/PublicProfileView.vue'
 
 import GeneratorView from './modules/stack/GeneratorView.vue'
 
@@ -15,6 +16,7 @@ import EncyclopediaView from './modules/stack/EncyclopediaView.vue'
 import TechnologyDetailView from './modules/stack/TechnologyDetailView.vue'
 
 import ArticleDetailView from './modules/blog/ArticleDetailView.vue'
+import PostShareView from './modules/blog/PostShareView.vue'
 import TagPostsView from './modules/blog/TagPostsView.vue'
 
 
@@ -54,6 +56,11 @@ const router = createRouter({
                     meta: {requiresAuth: true}
                 },
                 {
+                    path: 'u/:id',
+                    name: 'public-profile',
+                    component: PublicProfileView
+                },
+                {
                     path: 'encyclopedia',
                     name: 'encyclopedia',
                     component: EncyclopediaView
@@ -64,6 +71,13 @@ const router = createRouter({
                     component: TechnologyDetailView
                 },
                 {
+                    /** Permalien `/post/:shareCode` → redirige vers `/:tag/:slug` */
+                    path: 'post/:shareCode',
+                    name: 'post-share',
+                    component: PostShareView
+                },
+                {
+                    /** URL canonique de l’article */
                     path: ':tag/:slug',
                     name: 'article',
                     component: ArticleDetailView
@@ -88,7 +102,7 @@ router.beforeEach(async (to, _from, next) => {
         return
     }
 
-    const user = await getMe()
+    const user = await getMe(true)
 
     if (to.meta['requiresAuth'] && !user) {
         next({path: '/login', query: {redirect: to.fullPath}})

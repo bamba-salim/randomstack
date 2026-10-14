@@ -45,11 +45,26 @@ export default class BlogModel extends BaseModel {
     /**
      * Récupère un article publié via son permalien (slug) pour la lecture publique
      */
+    static async fetchPublishedPostByShareCode(shareCode: string) {
+        return await this.db.post.findFirst({
+            where: {
+                shareCode: shareCode.toUpperCase(),
+                status: 'PUBLISHED'
+            },
+            include: {
+                _count: {select: {comments: true}}
+            }
+        })
+    }
+
     static async fetchPublishedPostBySlug(slug: string) {
         return await this.db.post.findFirst({
             where: {
                 slug,
                 status: 'PUBLISHED'
+            },
+            include: {
+                _count: {select: {comments: true}}
             }
         })
     }
@@ -214,6 +229,16 @@ export default class BlogModel extends BaseModel {
         })
     }
 
+    /** Lecture publique / preview par shareCode (permalien). */
+    static async fetchPostByShareCode(shareCode: string) {
+        return await this.db.post.findUnique({
+            where: {shareCode: shareCode.toUpperCase()},
+            include: {
+                _count: {select: {comments: true}}
+            }
+        })
+    }
+
     /**
      * Création d'un article : insertion directe des données issues du FormBean/Mapper
      */
@@ -223,14 +248,26 @@ export default class BlogModel extends BaseModel {
         })
     }
 
+    /** True si un autre article utilise déjà ce slug. */
+    static async isSlugTaken(slug: string, excludeId?: string): Promise<boolean> {
+        const found = await this.db.post.findFirst({
+            where: {
+                slug,
+                ...(excludeId ? {id: {not: excludeId}} : {})
+            },
+            select: {id: true}
+        })
+        return Boolean(found)
+    }
+
     /**
-     * Modification d'un article : omet scrupuleusement l'id et le slug pour sanctuariser les permaliens
+     * Modification : slug modifiable, shareCode (permalien) jamais touché.
      */
     static async updatePost(id: string, payload: EditPost) {
-        const { id: _, slug: __, ...postData } = payload.post
+        const {id: _id, shareCode: _shareCode, ...postData} = payload.post
 
         return await this.db.post.update({
-            where: { id },
+            where: {id},
             data: postData as any
         })
     }

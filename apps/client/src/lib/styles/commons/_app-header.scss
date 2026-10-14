@@ -40,6 +40,42 @@ $neon-pink: #ec4899;
     }
   }
 
+  .user-menu {
+    @apply relative ml-1;
+
+    &__trigger {
+      @apply flex items-center justify-center w-9 h-9 rounded-full border border-slate-600 bg-slate-800 text-slate-200 overflow-hidden cursor-pointer p-0 hover:border-cyan-400 transition-colors;
+
+      &--guest {
+        @apply text-slate-300 no-underline;
+      }
+    }
+
+    &__icon {
+      @apply w-5 h-5;
+    }
+
+    &__avatar-img {
+      @apply w-full h-full object-cover;
+    }
+
+    &__avatar-fallback {
+      @apply text-[10px] font-black tracking-wide;
+    }
+
+    &__dropdown {
+      @apply absolute right-0 top-[calc(100%+0.5rem)] min-w-[11rem] py-1 bg-slate-900 border border-slate-700 shadow-xl z-50 normal-case tracking-normal;
+    }
+
+    &__item {
+      @apply w-full text-left px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white bg-transparent border-0 cursor-pointer;
+
+      &--danger {
+        @apply text-red-400 hover:text-red-300;
+      }
+    }
+  }
+
   .mobile-menu-toggle {
     @apply flex items-center justify-center p-2 text-slate-400 hover:text-slate-100 text-xl font-bold cursor-pointer sm:hidden bg-transparent border-0;
   }
@@ -60,6 +96,10 @@ $neon-pink: #ec4899;
 
       &.disabled {
         @apply text-slate-600 hover:text-slate-600 cursor-not-allowed border-transparent;
+      }
+
+      &--danger {
+        @apply text-red-400 hover:text-red-300;
       }
     }
   }

@@ -63,11 +63,10 @@ app.use(cors({
 
 app.use(express.json())
 
-// Sessions séparées : extranet (`rs.admin.sid`) ≠ site public (`rs.client.sid`)
-app.use('/ws', SessionMiddleware.admin, Api.routes)
-app.use('/auth/admin', SessionMiddleware.admin, AdminAuth.routes)
-
-app.use(SessionMiddleware.client)
+// Session unique client + extranet (`rs.sid`) — 2 navigateurs si comptes distincts
+app.use(SessionMiddleware.config)
+app.use('/ws', Api.routes)
+app.use('/auth/admin', AdminAuth.routes)
 app.use('/public', express.static(path.resolve(process.cwd(), 'public')))
 app.use('/', WebService.routes)
 app.use('/auth', Auth.routes)

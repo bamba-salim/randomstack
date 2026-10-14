@@ -4,6 +4,7 @@ import type {
     PublicPostListed,
     AdminPostListed,
     PublicPostDetail,
+    PostShareResolved,
     PublishedPostsResponse,
     SavePostResponse,
     EditPost,
@@ -32,6 +33,7 @@ export default class BlogMapper {
         return {
             id: post.id,
             slug: post.slug,
+            shareCode: post.shareCode,
             title: post.title,
             summary: post.summary,
             mainTag: post.tags?.[0] || '',
@@ -44,6 +46,7 @@ export default class BlogMapper {
         return {
             id: post.id,
             slug: post.slug,
+            shareCode: post.shareCode,
             title: post.title,
             mainTag: post.tags?.[0] || '',
             image: post.imageId,
@@ -51,14 +54,32 @@ export default class BlogMapper {
         }
     }
 
+    /** Données page de partage `/post/:shareCode`. */
+    static buildPostShareResolved(post: any): PostShareResolved {
+        return {
+            shareCode: post.shareCode,
+            slug: post.slug,
+            mainTag: post.tags?.[0] || 'post',
+            title: post.title,
+            summary: post.summary || '',
+            image: post.imageId || null,
+            publishAt: post.publishAt || post.updatedAt || null
+        }
+    }
+
     static buildPublicPostListedList(posts: any[]): PublicPostListed[] {
         return posts.map(post => this.buildPublicPostListed(post))
     }
 
-    static buildPublicPostDetail(post: any, author: AuthorListed | null = null): PublicPostDetail {
+    static buildPublicPostDetail(
+        post: any,
+        author: AuthorListed | null = null,
+        isFavorite = false
+    ): PublicPostDetail {
         return {
             id: post.id,
             slug: post.slug,
+            shareCode: post.shareCode,
             title: post.title,
             summary: post.summary,
             content: post.content || [],
@@ -67,7 +88,8 @@ export default class BlogMapper {
             mainTag: post.tags?.[0] || '',
             publishAt: post.publishAt || post.updatedAt,
             author,
-            commentsCount: post._count?.comments ?? post.commentsCount ?? 0
+            commentsCount: post._count?.comments ?? post.commentsCount ?? 0,
+            isFavorite
         }
     }
 
@@ -103,8 +125,16 @@ export default class BlogMapper {
         }
     }
 
-    static toSavePostDTO(formBean: EditPostFormBean, idPost: string, authorId: string | null): EditPost {
-        const slug = StrUtils.slugify(formBean.title, idPost)
+    static toSavePostDTO(
+        formBean: EditPostFormBean,
+        idPost: string,
+        authorId: string | null,
+        shareCode?: string
+    ): EditPost {
+        const title = String(formBean.title || '').trim()
+        const customSlug = StrUtils.kebabName(String(formBean.slug || '').trim())
+        // Slug éditable ; fallback auto titre+id. shareCode figé (passé en update, généré en create).
+        const slug = customSlug || StrUtils.slugify(title, idPost)
 
         let contentBlocks: any[] = []
         if (typeof formBean.content === 'string') {
@@ -136,8 +166,9 @@ export default class BlogMapper {
         return {
             post: {
                 id: idPost,
-                title: String(formBean.title || '').trim(),
+                title,
                 slug,
+                shareCode: shareCode || StrUtils.shareCode(),
                 summary: String(formBean.summary || '').trim(),
                 content: contentBlocks,
                 imageId: formBean.imageId || null,
@@ -155,6 +186,8 @@ export default class BlogMapper {
         return {
             id: post.id,
             title: post.title,
+            slug: post.slug,
+            shareCode: post.shareCode,
             summary: post.summary,
             content: post.content,
             imageId: post.imageId || null,
@@ -170,6 +203,8 @@ export default class BlogMapper {
     static getInitialFormBean(): EditPostFormBean {
         return {
             title: '',
+            slug: '',
+            shareCode: undefined,
             summary: '',
             content: [],
             imageId: null,

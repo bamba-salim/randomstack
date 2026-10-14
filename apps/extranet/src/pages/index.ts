@@ -87,7 +87,7 @@ const router = createRouter({
 router.beforeEach(async (to, _from, next) => {
     let user = null
     try {
-        user = await getMe()
+        user = await getMe(true)
     } catch {
         user = null
     }
