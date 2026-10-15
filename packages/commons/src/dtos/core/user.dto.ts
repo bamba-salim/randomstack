@@ -64,6 +64,8 @@ export interface UpdateUserRoleResponse {
 export interface CreateUserFormBean {
     email: string
     password: string
+    /** Confirmation UI — validée puis retirée avant persistance. */
+    passwordConfirm?: string
     displayName: string
     role: Role
 }

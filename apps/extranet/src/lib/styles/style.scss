@@ -1,5 +1,6 @@
 @use "tailwindcss";
 
+@use "layout/base";
 @use "layout/layout";
 @use "layout/form";
 
@@ -11,8 +12,6 @@
 @use "components/post-block-manager";
 @use "components/post-table";
 
-
 @use "pages/login";
 @use "pages/technology-form";
-@use "pages/edit-post";
 @use "pages/edit-user";

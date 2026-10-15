@@ -35,7 +35,7 @@
 
   // Le bouton bleu d'origine de wp-admin
   .login-btn {
-    @apply w-full py-2.5 px-4 bg-[#2271b1] hover:bg-[#135e96] border border-[#2271b1] hover:border-[#135e96] text-white font-bold text-xs rounded shadow-sm cursor-pointer transition-colors duration-150 uppercase tracking-wider;
+    @apply w-full py-2.5 px-4 bg-[#2271b1] hover:bg-[#135e96] border border-[#2271b1] hover:border-[#135e96] text-white font-bold text-xs rounded shadow-sm transition-colors duration-150 uppercase tracking-wider;
   }
 
   .login-footer {

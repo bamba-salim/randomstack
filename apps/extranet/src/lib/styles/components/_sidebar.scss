@@ -3,7 +3,7 @@ $neon-pink: #ec4899;
 
 // --- BOUTON BURGER (Mobile uniquement) 📱 ---
 .mobile-burger-btn {
-  @apply fixed top-4 left-4 z-50 flex items-center justify-center py-2 px-3 bg-[#2271b1] text-white font-black text-[11px] uppercase tracking-wider rounded border border-[#135e96] shadow-md sm:hidden cursor-pointer;
+  @apply fixed top-4 left-4 z-50 flex items-center justify-center py-2 px-3 bg-[#2271b1] text-white font-black text-[11px] uppercase tracking-wider rounded border border-[#135e96] shadow-md sm:hidden;
 }
 
 .mobile-sidebar-overlay {
@@ -47,7 +47,7 @@ $neon-pink: #ec4899;
     }
 
     .logout-btn {
-      @apply px-4 py-3 text-red-200 hover:bg-red-950/20 border border-transparent hover:border-red-950/40 rounded text-left font-bold mt-auto cursor-pointer;
+      @apply px-4 py-3 text-red-200 hover:bg-red-950/20 border border-transparent hover:border-red-950/40 rounded text-left font-bold mt-auto;
     }
   }
 }

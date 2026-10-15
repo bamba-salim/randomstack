@@ -21,3 +21,54 @@
     }
   }
 }
+
+// Shell formulaire admin (styles effectivement appliqués après cascade pages)
+.form-page-container {
+  @apply flex flex-col gap-6 text-left w-full max-w-full;
+
+  .form-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+  }
+
+  .form-group {
+    @apply flex flex-col gap-1.5;
+
+    &.col-span-2 {
+      @apply sm:col-span-2;
+    }
+
+    .form-label {
+      @apply text-xs font-bold text-[#1d2327];
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      @apply w-full p-2.5 bg-white border border-[#8c8f94] text-[#2c3338] text-sm rounded shadow-inner focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] outline-none transition-all duration-100;
+
+      &.form-input--invalid {
+        @apply border-[#d63638] focus:border-[#d63638] focus:ring-[#d63638];
+      }
+    }
+
+    .form-textarea {
+      @apply h-32 resize-none;
+    }
+  }
+
+  .form-field-error {
+    @apply text-[11px] text-[#d63638] font-medium mt-1;
+  }
+
+  .form-actions {
+    @apply flex items-center gap-3 border-t border-[#c3c4c7] pt-6 mt-4;
+
+    .cancel-btn {
+      @apply py-2.5 px-4 bg-white border border-[#c3c4c7] hover:bg-[#f6f8fa] text-xs font-bold text-slate-600 rounded cursor-pointer transition-colors duration-150 text-center;
+    }
+
+    .save-btn {
+      @apply py-2.5 px-5 bg-[#2271b1] hover:bg-[#135e96] border border-[#2271b1] text-xs font-bold text-white rounded transition-colors duration-150 shadow-sm text-center disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+  }
+}

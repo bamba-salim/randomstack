@@ -30,7 +30,7 @@
     }
 
     .delete-para-btn {
-      @apply w-7 h-7 flex items-center justify-center border border-[#c3c4c7] hover:border-red-600 rounded bg-[#f6f8fa] hover:bg-red-50 text-slate-500 hover:text-red-600 text-xs font-bold transition-all duration-150 cursor-pointer shrink-0;
+      @apply w-7 h-7 flex items-center justify-center border border-[#c3c4c7] hover:border-red-600 rounded bg-[#f6f8fa] hover:bg-red-50 text-slate-500 hover:text-red-600 text-xs font-bold transition-all duration-150 shrink-0;
     }
   }
 
@@ -41,6 +41,6 @@
 
   // Bouton d'ajout sémantique
   .add-para-btn {
-    @apply self-start py-2 px-4 bg-white hover:bg-[#f6f8fa] border border-[#c3c4c7] hover:border-blue-600 text-[10px] font-black uppercase text-slate-600 hover:text-blue-600 rounded transition-all duration-150 cursor-pointer;
+    @apply self-start py-2 px-4 bg-white hover:bg-[#f6f8fa] border border-[#c3c4c7] hover:border-blue-600 text-[10px] font-black uppercase text-slate-600 hover:text-blue-600 rounded transition-all duration-150;
   }
 }

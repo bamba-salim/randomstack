@@ -11,6 +11,8 @@ export interface LoginFormBean {
 export interface RegisterFormBean {
     email: string
     password: string
+    /** Confirmation UI — validée puis retirée avant persistance. */
+    passwordConfirm?: string
     displayName?: string
 }
 
