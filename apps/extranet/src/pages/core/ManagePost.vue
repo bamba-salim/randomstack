@@ -101,12 +101,12 @@ onMounted(async () => {
     <!-- BARRE DE FILTRES DÉCOUPLÉE MULTI-CRITÈRES 🚀 -->
     <div class="filter-bar-wrap">
 
-      <!-- Recherche textuelle croisée (Auteurs, Titre, Contenu) -->
+      <!-- Recherche client : titre, résumé, auteur, tags -->
       <input
           v-model="searchQuery"
           @input="handleFilterChange"
           type="text"
-          placeholder="🔍 Rechercher (titre, contenu, auteur...)"
+          placeholder="🔍 Rechercher (titre, résumé, auteur, tags…)"
           class="filter-input"
       />
 

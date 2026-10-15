@@ -84,10 +84,11 @@ export default class WebService {
             FavoriteController.toggleFavorite
         )
 
-        // Fichiers (upload public durci : allowlist + rate-limit ; lecture par UUID)
+        // Fichiers (upload authentifié + rate-limit ; lecture publique par UUID)
         router.get('/files/:id', FileController.getFile)
         router.post(
             '/upload-file',
+            AuthMiddleware.isAuthenticated,
             RateLimitMiddleware.upload,
             upload.single('file'),
             FileController.upload

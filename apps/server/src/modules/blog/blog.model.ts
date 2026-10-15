@@ -193,6 +193,14 @@ export default class BlogModel extends BaseModel {
                 ...(includeDeleted ? {} : {status: {not: 'DELETED'}}),
                 ...(authorId ? {authorId} : {})
             },
+            include: {
+                author: {
+                    select: {
+                        id: true,
+                        profile: {select: {displayName: true}}
+                    }
+                }
+            },
             orderBy: {createdAt: 'desc'}
         })
     }

@@ -15,7 +15,7 @@ import {
 } from '#services'
 import {PostContentManager, BaseInput, BaseToggle} from '#components'
 import {toast} from '../../lib/toast'
-import {validateSavePost} from '@randomstack/commons'
+import {validateSavePost, FILE_TYPE, TABLE} from '@randomstack/commons'
 import type {EditPostFormBean, EditorialAuthorLite, PostStatus, Role} from '@randomstack/commons'
 
 const CLIENT_URL = String(import.meta.env['VITE_CLIENT_URL'] || 'http://localhost:5173').replace(/\/$/, '')
@@ -79,7 +79,7 @@ const handleCoverUpload = async (e: Event) => {
   if (!file || !formBean.value) return
   try {
     loading.value = true
-    const {idFile} = await uploadFile(file, 'IMAGE', 'POST')
+    const {idFile} = await uploadFile(file, FILE_TYPE.IMAGE, TABLE.POST)
     formBean.value.imageId = idFile
   } catch {
     toast.error("Erreur lors de l'upload de l'image de couverture.")

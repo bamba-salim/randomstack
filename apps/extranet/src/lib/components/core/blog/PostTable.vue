@@ -17,6 +17,7 @@ withDefaults(defineProps<{
       <tr>
         <th>Illustration</th>
         <th>Titre de l'article</th>
+        <th>Auteur</th>
         <th>Statut</th>
         <th>Mots-clés (Tags)</th>
         <th>Date de Publication</th>
@@ -34,6 +35,7 @@ withDefaults(defineProps<{
           </div>
         </td>
         <td class="tech-name">{{ post.title }}</td>
+        <td class="tech-lang">{{ post.authorName || '—' }}</td>
         <td class="p-4">
             <span class="category-badge" :class="post.status.toLowerCase()">
               {{ post.status }}

@@ -61,11 +61,14 @@ export interface PostShareResolved {
 export interface AdminPostListed {
     id: string
     title: string
+    summary: string
     status: PostStatus
     tags: string[]
     imageId: string | null
     publishAt?: string | null
     shareCode?: string
+    authorId: string | null
+    authorName: string | null
 }
 
 /** Auteur exposé sur la fiche article */

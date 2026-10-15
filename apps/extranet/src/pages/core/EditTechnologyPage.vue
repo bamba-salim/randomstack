@@ -4,8 +4,8 @@ import {useRoute, useRouter} from 'vue-router'
 
 import {Sidebar, ParagraphManager, BaseInput, BaseToggle} from '#components'
 
-import {saveTechnology, fetchTechnologies, fetchTechnologyFormData, uploadFile, fileUrl} from '#services'
-import {TechnologyFilter} from '@randomstack/commons'
+import {saveTechnology, fetchTechnologies, fetchTechnologyFormData, uploadFile, fileUrl, ApiError} from '#services'
+import {TechnologyFilter, validateSaveTechnology, FILE_TYPE, TABLE} from '@randomstack/commons'
 import {toast} from '../../lib/toast'
 
 import type {AdminTechnologyListed, EditTechnologyFormBean} from '@randomstack/commons'
@@ -20,10 +20,18 @@ const loading = ref(false)
 const loadError = ref<string | null>(null)
 
 const formBean = ref<EditTechnologyFormBean | null>(null)
+const fieldErrors = ref<Record<string, string>>({})
 
 const allTechnologies = ref<AdminTechnologyListed[]>([])
 const selectedLanguageDropdown = ref('')
 const isCustomLanguage = ref(false)
+
+const clearFieldError = (key: string) => {
+  if (!fieldErrors.value[key]) return
+  const next = {...fieldErrors.value}
+  delete next[key]
+  fieldErrors.value = next
+}
 
 const uniqueLanguages = computed(() => {
   return TechnologyFilter.getUniqueLanguages(allTechnologies.value)
@@ -53,7 +61,7 @@ const handleLogoUpload = async (e: Event) => {
 
   try {
     loading.value = true
-    const {idFile} = await uploadFile(file, 'IMAGE', 'technology')
+    const {idFile} = await uploadFile(file, FILE_TYPE.IMAGE, TABLE.TECHNOLOGY)
     formBean.value.logo = idFile
   } catch {
     toast.error("Erreur lors de l'upload du logo.")
@@ -64,14 +72,29 @@ const handleLogoUpload = async (e: Event) => {
 
 const handleSave = async () => {
   if (!formBean.value || loading.value) return
-  loading.value = true
 
+  fieldErrors.value = {}
+  const local = validateSaveTechnology(formBean.value)
+  if (!local.ok) {
+    fieldErrors.value = local.errors || (local.field ? {[local.field]: local.error} : {})
+    return
+  }
+
+  loading.value = true
   try {
-    await saveTechnology(formBean.value, techId.value)
+    await saveTechnology(local.data, techId.value)
     toast.success('Technologie enregistrée.')
     router.push('/dashboard')
-  } catch (err: any) {
-    toast.error(err.message || "Erreur lors de l'enregistrement.")
+  } catch (err: unknown) {
+    if (err instanceof ApiError && err.errors) {
+      fieldErrors.value = err.errors
+      return
+    }
+    if (err instanceof ApiError && err.field) {
+      fieldErrors.value = {[err.field]: err.message}
+      return
+    }
+    toast.error(err instanceof Error ? err.message : "Erreur lors de l'enregistrement.")
   } finally {
     loading.value = false
   }
@@ -132,13 +155,25 @@ onMounted(async () => {
 
     <div class="form-grid">
       <!-- NAME -->
-      <BaseInput v-model="formBean.name" label="Nom du Framework / Outil" required placeholder="Ex: Svelte"/>
+      <BaseInput
+          v-model="formBean.name"
+          label="Nom du Framework / Outil"
+          required
+          placeholder="Ex: Svelte"
+          :error="fieldErrors.name"
+          @clear-error="clearFieldError('name')"
+      />
 
       <!-- LANGAGE -->
       <div class="form-group">
         <label class="form-label">Langage principal</label>
         <div v-if="!isCustomLanguage" class="flex gap-2">
-          <select v-model="selectedLanguageDropdown" @change="handleLanguageSelect" required class="form-select flex-1">
+          <select
+              v-model="selectedLanguageDropdown"
+              required
+              :class="['form-select', 'flex-1', {'form-input--invalid': fieldErrors.language}]"
+              @change="handleLanguageSelect(); clearFieldError('language')"
+          >
             <option value="" disabled>-- Sélectionner un langage --</option>
             <option value="__NEW__" class="text-blue-600 font-extrabold">+ Ajouter un autre langage...</option>
             <option v-for="lang in uniqueLanguages" :key="lang" :value="lang">
@@ -148,13 +183,20 @@ onMounted(async () => {
         </div>
 
         <div class="flex gap-2" v-else>
-          <input v-model="formBean.language" type="text" required class="form-input flex-1"
-                 placeholder="Écrivez le nom..."/>
+          <input
+              v-model="formBean.language"
+              type="text"
+              required
+              :class="['form-input', 'flex-1', {'form-input--invalid': fieldErrors.language}]"
+              placeholder="Écrivez le nom..."
+              @input="clearFieldError('language')"
+          />
           <button type="button" @click="cancelCustomLanguage" class="cancel-btn"
                   style="margin: 0; padding: 0.625rem 1rem;">
             Annuler
           </button>
         </div>
+        <p v-if="fieldErrors.language" class="form-field-error">{{ fieldErrors.language }}</p>
       </div>
     </div>
 
@@ -168,23 +210,42 @@ onMounted(async () => {
               :key="cat"
               class="flex items-center gap-2 px-3 py-2 bg-[#f0f0f1] border border-[#c3c4c7] hover:bg-[#e0e0e0] rounded text-xs font-semibold text-[#1d2327] cursor-pointer select-none transition-colors duration-150"
           >
-            <input type="checkbox" :value="cat" v-model="formBean.categories"
-                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"/>
+            <input
+                type="checkbox"
+                :value="cat"
+                v-model="formBean.categories"
+                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
+                @change="clearFieldError('categories')"
+            />
             <span>{{ cat }}</span>
           </label>
         </div>
+        <p v-if="fieldErrors.categories" class="form-field-error">{{ fieldErrors.categories }}</p>
       </div>
 
       <!-- USAGE -->
-      <BaseInput v-model="formBean.usage" label="Utilisation" required placeholder="Ex: Frontend Web"
-                 className="col-span-2"/>
+      <BaseInput
+          v-model="formBean.usage"
+          label="Utilisation"
+          required
+          placeholder="Ex: Frontend Web"
+          className="col-span-2"
+          :error="fieldErrors.usage"
+          @clear-error="clearFieldError('usage')"
+      />
     </div>
 
     <!-- DESCRIPTION -->
     <div class="form-group col-span-2">
       <label class="form-label">Description d'introduction</label>
-      <textarea v-model="formBean.description" required class="form-textarea"
-                placeholder="Entrez une courte explication..."></textarea>
+      <textarea
+          v-model="formBean.description"
+          required
+          :class="['form-textarea', {'form-input--invalid': fieldErrors.description}]"
+          placeholder="Entrez une courte explication..."
+          @input="clearFieldError('description')"
+      ></textarea>
+      <p v-if="fieldErrors.description" class="form-field-error">{{ fieldErrors.description }}</p>
     </div>
 
     <!-- HISTORY -->
@@ -195,33 +256,69 @@ onMounted(async () => {
     <!-- 3. LES NOUVEAUX CHAMPS DU CAHIER DES CHARGES (OPTIONNELS) 🚀 -->
     <div class="form-grid">
       <!-- WEBSITE -->
-      <BaseInput v-model="formBean.websiteUrl" label="Site Web officiel" type="url"
-                 placeholder="Ex: https://svelte.dev"/>
+      <BaseInput
+          v-model="formBean.websiteUrl"
+          label="Site Web officiel"
+          type="url"
+          placeholder="Ex: https://svelte.dev"
+          :error="fieldErrors.websiteUrl"
+          @clear-error="clearFieldError('websiteUrl')"
+      />
 
       <!-- DOCUMENTATION -->
-      <BaseInput v-model="formBean.docsUrl" label="Lien vers la Documentation" type="url"
-                 placeholder="Ex: https://svelte.dev/docs"/>
+      <BaseInput
+          v-model="formBean.docsUrl"
+          label="Lien vers la Documentation"
+          type="url"
+          placeholder="Ex: https://svelte.dev/docs"
+          :error="fieldErrors.docsUrl"
+          @clear-error="clearFieldError('docsUrl')"
+      />
 
     </div>
 
     <div class="form-grid">
 
       <!-- CREATOR -->
-      <BaseInput v-model="formBean.creator" label="Créateur / Auteur" placeholder="Ex: Rich Harris"/>
+      <BaseInput
+          v-model="formBean.creator"
+          label="Créateur / Auteur"
+          placeholder="Ex: Rich Harris"
+          :error="fieldErrors.creator"
+          @clear-error="clearFieldError('creator')"
+      />
 
       <!-- YEAR -->
-      <BaseInput v-model="formBean.foundedAt" label="Année de création" placeholder="Ex: 2016"/>
+      <BaseInput
+          v-model="formBean.foundedAt"
+          label="Année de création"
+          placeholder="Ex: 2016"
+          :error="fieldErrors.foundedAt"
+          @clear-error="clearFieldError('foundedAt')"
+      />
 
     </div>
 
     <div class="form-grid">
       <!-- USERS COUNT -->
-      <BaseInput v-model.number="formBean.userCount" type="number" label="Nombre d'utilisateurs (Étoiles GitHub/GitLab)"
-                 placeholder="Ex: 75000"/>
+      <BaseInput
+          v-model.number="formBean.userCount"
+          type="number"
+          label="Nombre d'utilisateurs (Étoiles GitHub/GitLab)"
+          placeholder="Ex: 75000"
+          :error="fieldErrors.userCount"
+          @clear-error="clearFieldError('userCount')"
+      />
 
       <!-- PROJECT COUNT -->
-      <BaseInput v-model.number="formBean.projectCount" type="number" label="Nombre de projets recensés"
-                 placeholder="Ex: 120000"/>
+      <BaseInput
+          v-model.number="formBean.projectCount"
+          type="number"
+          label="Nombre de projets recensés"
+          placeholder="Ex: 120000"
+          :error="fieldErrors.projectCount"
+          @clear-error="clearFieldError('projectCount')"
+      />
 
     </div>
 

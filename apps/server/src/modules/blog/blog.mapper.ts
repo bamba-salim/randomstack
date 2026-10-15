@@ -100,11 +100,14 @@ export default class BlogMapper {
         return {
             id: post.id,
             title: post.title,
+            summary: post.summary || '',
             status: post.status,
             tags: post.tags || [],
             imageId: post.imageId,
             publishAt: post.publishAt,
-            shareCode: post.shareCode
+            shareCode: post.shareCode,
+            authorId: post.authorId ?? post.author?.id ?? null,
+            authorName: post.author?.profile?.displayName ?? null
         }
     }
 

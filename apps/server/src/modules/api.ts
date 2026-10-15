@@ -2,6 +2,7 @@ import {Router} from 'express'
 import {AuthMiddleware, ValidateMiddleware} from '#middlewares'
 import {
     validateSavePost,
+    validateSaveTechnology,
     validateCreateUser,
     validateUpdateUserRole
 } from '@randomstack/commons'
@@ -79,6 +80,7 @@ export default class Api {
         router.post(
             '/save-technology/:id?',
             AuthMiddleware.permit('ADMIN', 'EDITOR'),
+            ValidateMiddleware.body(validateSaveTechnology),
             AdminTechnologyController.saveTechnology
         )
 

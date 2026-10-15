@@ -18,8 +18,10 @@ export default class PostFilter {
             const q = searchQuery.toLowerCase().trim()
             result = result.filter(p => {
                 const titleMatch = p.title.toLowerCase().includes(q)
+                const summaryMatch = (p.summary || '').toLowerCase().includes(q)
+                const authorMatch = (p.authorName || '').toLowerCase().includes(q)
                 const tagsMatch = Array.isArray(p.tags) && p.tags.some(tag => tag.toLowerCase().includes(q))
-                return titleMatch || tagsMatch
+                return titleMatch || summaryMatch || authorMatch || tagsMatch
             })
         }
 
