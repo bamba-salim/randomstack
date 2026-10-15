@@ -200,6 +200,7 @@ watch(() => props.postId, load)
               v-if="comment.author.photoId"
               :src="fileUrl(comment.author.photoId)"
               :alt="comment.author.displayName"
+              loading="lazy"
           />
           <span v-else>{{ initials(comment.author.displayName) }}</span>
         </div>

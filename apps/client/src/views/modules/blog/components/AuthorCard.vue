@@ -14,6 +14,7 @@ defineProps<{
           v-if="author.photoId"
           :src="fileUrl(author.photoId)"
           :alt="author.displayName"
+          loading="lazy"
       />
       <span v-else class="author-card__initials">
         {{ author.displayName.substring(0, 2).toUpperCase() }}

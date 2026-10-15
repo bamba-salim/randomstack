@@ -24,7 +24,7 @@ defineProps<{
       <tr v-for="tech in technologies" :key="tech.id">
         <td class="p-4">
           <div class="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
-            <img v-if="tech.logo" :src="fileUrl(tech.logo)" class="w-full h-full object-cover" />
+            <img v-if="tech.logo" :src="fileUrl(tech.logo)" class="w-full h-full object-cover" loading="lazy" />
             <span v-else class="text-[9px] font-black text-slate-400 uppercase">{{ tech.name.substring(0, 2) }}</span>
           </div>
         </td>

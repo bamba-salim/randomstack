@@ -55,7 +55,7 @@ watch(() => route.params['slug'], (slug) => {
 
         <section class="detail-top-section">
           <div class="detail-image-box">
-            <img v-if="tech.logo" :src="fileUrl(tech.logo)" :alt="tech.name"/>
+            <img v-if="tech.logo" :src="fileUrl(tech.logo)" :alt="tech.name" fetchpriority="high"/>
             <span v-else class="initials-placeholder">{{ tech.name.substring(0, 2) }}</span>
           </div>
 

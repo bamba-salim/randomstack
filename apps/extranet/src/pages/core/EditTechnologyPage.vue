@@ -341,6 +341,7 @@ onMounted(async () => {
             v-if="formBean.logo"
             :src="fileUrl(formBean.logo)"
             class="w-full max-h-64 object-contain mb-3 bg-white border border-[#c3c4c7] rounded shadow-sm"
+            loading="lazy"
         />
         <span v-else class="text-xs text-slate-500 font-bold mb-2 block">Sélectionnez un logo :</span>
         <input type="file" accept="image/*" @change="handleLogoUpload" class="file-input w-full"/>

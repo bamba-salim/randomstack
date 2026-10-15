@@ -78,6 +78,8 @@
 - <span style="color:#e03e3e">[x]</span> CSRF — évalué, non requis (SameSite=lax + cookie host-only + CORS JSON)
 - <span style="color:#e03e3e">[x]</span> UUID params delete/purge (`validatePostId`)
 - <span style="color:#e03e3e">[x]</span> Rate-limit comments / votes / save-post / draw
+- <span style="color:#e03e3e">[x]</span> Cache GET publics (`CacheMiddleware` + docs Cloudflare Cache Rules)
+- <span style="color:#e03e3e">[x]</span> `loading="lazy"` images (LCP en `fetchpriority="high"`)
 - <span style="color:#e03e3e">[x]</span> `helmet` sur l’API (CSP / frameguard / referrer / HSTS)
 - <span style="color:#e03e3e">[x]</span> `validateSaveTechnology` + middleware `/ws/save-technology`
 - <span style="color:#e03e3e">[x]</span> Recherche admin posts enrichie (auteur + résumé + tags)
@@ -120,8 +122,8 @@
 
 ### P3 — perf / hygiene
 
-- [ ] Cache HTTP GET publics + CDN Cloudflare
-- [ ] `loading="lazy"` images (presque absent hors AdSlot)
+- <span style="color:#e03e3e">[x]</span> Cache HTTP GET publics + CDN Cloudflare — `CacheMiddleware` (`s-maxage`) sur GET publics ; `no-store` si session ; docs Cache Rules
+- <span style="color:#e03e3e">[x]</span> `loading="lazy"` images — listes / blocs / tables ; LCP (hero article, featured, tech detail, profil) en `fetchpriority="high"`
 - [ ] Routes Vue lazy (`import()`) — aujourd’hui eager client + extranet
 - [ ] `npm audit` / Dependabot CI
 - [ ] Revue messages d’erreur API (pas de stack/Prisma en prod)

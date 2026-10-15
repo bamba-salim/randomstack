@@ -109,6 +109,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick))
                   :src="fileUrl(user.photoId)"
                   :alt="user.displayName || 'Profil'"
                   class="user-menu__avatar-img"
+                  loading="lazy"
               />
               <span v-else class="user-menu__avatar-fallback">{{ initials }}</span>
             </button>

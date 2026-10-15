@@ -31,6 +31,7 @@ defineProps<{
                 :src="fileUrl(user.photoId)"
                 :alt="user.displayName"
                 class="w-full h-full object-cover"
+                loading="lazy"
             />
             <span v-else>{{ user.displayName.substring(0, 2).toUpperCase() }}</span>
           </div>

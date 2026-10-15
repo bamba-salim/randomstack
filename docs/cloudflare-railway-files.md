@@ -100,7 +100,26 @@ VITE_API_URL=https://api.ton-domaine.io
 - WAF managed rules activées
 - Optionnel plus tard : captcha Cloudflare Turnstile avant upload public
 
+### Cache CDN (Cache Rules)
+
+L’API envoie déjà `Cache-Control` / `s-maxage` sur les GET publics. Cloudflare Free respecte ces headers si le trafic est proxied ☁️.
+
+| Pattern | Comportement attendu |
+|---------|----------------------|
+| `GET /fetch-posts*`, `/fetch-tags`, `/fetch-technologies*`, `/fetch-similar-posts/*`, `/fetch-share/*`, `/fetch-comments/*`, `/fetch-profile/*`, `/fetch-draw-technologies` | Edge cache via `s-maxage=120` |
+| `GET /fetch-post/*`, `/fetch-favorites`, `/fetch-draw-history`, `/fetch-post-preview/*` | `private, no-store` (session) — **ne pas** forcer le cache |
+| `GET /files/:id` → **302** signé | `no-store` (TTL présigné) |
+| `GET /files/:id` → fichier local / `/public/*` | long TTL `immutable` |
+
+Règle Cloudflare optionnelle (Caching → Cache Rules) :
+
+1. If hostname = `api.…` AND URI Path starts with `/fetch-` AND method = GET → **Eligible for cache** (Respect origin Cache-Control)
+2. If URI Path starts with `/files/` → **Bypass cache** (évite de figer un 302 signé)
+
+Les fronts (www / admin) : activer le cache standard Cloudflare sur les assets Vite (`/_assets/*`, hashed).
+
 ---
+
 
 ## 3. Comportement code
 

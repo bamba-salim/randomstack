@@ -18,7 +18,7 @@ const formatDate = (date: string | Date) => {
 
     <!-- Couverture universelle avec fallback -->
     <div class="card-cover">
-      <img v-if="post.image" :src="fileUrl(post.image)" :alt="post.title" />
+      <img v-if="post.image" :src="fileUrl(post.image)" :alt="post.title" fetchpriority="high" />
       <div v-else class="card-cover-empty">À LA UNE</div>
     </div>
 

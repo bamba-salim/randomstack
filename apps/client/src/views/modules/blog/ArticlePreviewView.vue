@@ -66,7 +66,7 @@ watch(() => route.params['shareCode'], (code) => {
       <p v-if="post.summary" class="article-summary">{{ post.summary }}</p>
 
       <figure v-if="post.imageId" class="w-full bg-[#f6f8fa] border border-[#c3c4c7] overflow-hidden mb-8">
-        <img :src="fileUrl(post.imageId)" :alt="post.title" class="w-full h-auto max-h-[480px] object-cover"/>
+        <img :src="fileUrl(post.imageId)" :alt="post.title" class="w-full h-auto max-h-[480px] object-cover" fetchpriority="high"/>
       </figure>
 
       <div class="post-content-body flex flex-col gap-6 w-full text-left">

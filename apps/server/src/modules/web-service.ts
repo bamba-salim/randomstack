@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import {AuthMiddleware, RateLimitMiddleware, ValidateMiddleware} from '#middlewares'
+import {AuthMiddleware, CacheMiddleware, RateLimitMiddleware, ValidateMiddleware} from '#middlewares'
 import {validateCreateComment, validateVoteComment} from '@randomstack/commons'
 import {BlogController, CommentController, FavoriteController} from '#blog'
 import {FileController} from '#file'
@@ -23,37 +23,74 @@ export default class WebService {
 
         // Stack / tirage
         router.post('/draw-stack', RateLimitMiddleware.draw, StackController.draw)
-        router.get('/fetch-draw-history', StackController.getHistory)
-        router.get('/fetch-draw-technologies', StackController.fetchDrawActiveTechnologies)
+        router.get('/fetch-draw-history', CacheMiddleware.noStore, StackController.getHistory)
+        router.get(
+            '/fetch-draw-technologies',
+            CacheMiddleware.publicShort,
+            StackController.fetchDrawActiveTechnologies
+        )
         router.post('/save-share', StackController.saveShare)
-        router.get('/fetch-share/:code', StackController.fetchShare)
+        router.get('/fetch-share/:code', CacheMiddleware.publicShort, StackController.fetchShare)
 
         // Technologies (encyclopédie)
-        router.get('/fetch-technologies', TechnologyController.fetchTechnologies)
-        router.get('/fetch-technology-by-slug/:slug', TechnologyController.fetchTechnologyBySlug)
+        router.get(
+            '/fetch-technologies',
+            CacheMiddleware.publicShort,
+            TechnologyController.fetchTechnologies
+        )
+        router.get(
+            '/fetch-technology-by-slug/:slug',
+            CacheMiddleware.publicShort,
+            TechnologyController.fetchTechnologyBySlug
+        )
 
         // Profils publics
-        router.get('/fetch-profile/:id', AuthController.fetchPublicProfile)
+        router.get(
+            '/fetch-profile/:id',
+            CacheMiddleware.publicShort,
+            AuthController.fetchPublicProfile
+        )
 
-        // Blog
-        router.get('/fetch-posts', BlogController.fetchPublishedPosts)
-        router.get('/fetch-posts/tag/:tag', BlogController.fetchPostsByTag)
-        router.get('/fetch-posts/author/:authorId', BlogController.fetchPostsByAuthor)
-        router.get('/fetch-tags', BlogController.fetchUniqueTags)
-        router.get('/fetch-similar-posts/:slug', BlogController.fetchSimilarPosts)
-        /** Lecture canonique : /tag/slug */
-        router.get('/fetch-post/:slug', BlogController.fetchPostBySlug)
+        // Blog — listes / tags (cache CDN OK)
+        router.get('/fetch-posts', CacheMiddleware.publicShort, BlogController.fetchPublishedPosts)
+        router.get(
+            '/fetch-posts/tag/:tag',
+            CacheMiddleware.publicShort,
+            BlogController.fetchPostsByTag
+        )
+        router.get(
+            '/fetch-posts/author/:authorId',
+            CacheMiddleware.publicShort,
+            BlogController.fetchPostsByAuthor
+        )
+        router.get('/fetch-tags', CacheMiddleware.publicShort, BlogController.fetchUniqueTags)
+        router.get(
+            '/fetch-similar-posts/:slug',
+            CacheMiddleware.publicShort,
+            BlogController.fetchSimilarPosts
+        )
+        /** Lecture canonique : /tag/slug — isFavorite dépend de la session → no-store */
+        router.get('/fetch-post/:slug', CacheMiddleware.noStore, BlogController.fetchPostBySlug)
         /** Preview staff (session) */
         router.get(
             '/fetch-post-preview/:shareCode',
             AuthMiddleware.isAuthenticated,
+            CacheMiddleware.noStore,
             BlogController.fetchPostPreview
         )
         /** Page de partage : /post/shareCode */
-        router.get('/fetch-post-by-code/:shareCode', BlogController.fetchPostByShareCode)
+        router.get(
+            '/fetch-post-by-code/:shareCode',
+            CacheMiddleware.publicShort,
+            BlogController.fetchPostByShareCode
+        )
 
         // Commentaires
-        router.get('/fetch-comments/:postId', CommentController.fetchComments)
+        router.get(
+            '/fetch-comments/:postId',
+            CacheMiddleware.publicShort,
+            CommentController.fetchComments
+        )
         router.post(
             '/create-comment',
             AuthMiddleware.isAuthenticated,
@@ -78,6 +115,7 @@ export default class WebService {
         router.get(
             '/fetch-favorites',
             AuthMiddleware.isAuthenticated,
+            CacheMiddleware.noStore,
             FavoriteController.fetchFavorites
         )
         router.post(
@@ -87,6 +125,7 @@ export default class WebService {
         )
 
         // Fichiers (upload authentifié + rate-limit ; lecture publique par UUID)
+        // Cache headers posés dans FileController (302 signé ≠ fichier local)
         router.get('/files/:id', FileController.getFile)
         router.post(
             '/upload-file',

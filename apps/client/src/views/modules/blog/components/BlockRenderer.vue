@@ -52,7 +52,7 @@ const listLines = computed(() =>
 
   <!-- IMAGE -->
   <figure v-else-if="block.type === 'IMAGE'" class="blog-image-block">
-    <img :src="fileUrl(block.value)" :alt="block.caption || 'Illustration'" draggable="false"/>
+    <img :src="fileUrl(block.value)" :alt="block.caption || 'Illustration'" loading="lazy" draggable="false"/>
     <figcaption v-if="block.caption">{{ block.caption }}</figcaption>
   </figure>
 

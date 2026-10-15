@@ -57,6 +57,7 @@ watch(
                   v-if="profile.photoId"
                   :src="fileUrl(profile.photoId)"
                   :alt="profile.displayName"
+                  fetchpriority="high"
               />
               <span v-else>{{ initials }}</span>
             </div>

@@ -425,6 +425,7 @@ onMounted(async () => {
               v-if="formBean.imageId"
               :src="fileUrl(formBean.imageId)"
               class="w-full max-h-64 object-contain mb-3 bg-white border border-[#c3c4c7] rounded shadow-sm"
+              loading="lazy"
           />
           <input
               v-if="canWrite"

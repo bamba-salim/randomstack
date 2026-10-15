@@ -96,7 +96,13 @@ app.use(express.json({
 app.use(SessionMiddleware.config)
 app.use('/ws', Api.routes)
 app.use('/auth/admin', AdminAuth.routes)
-app.use('/public', express.static(path.resolve(process.cwd(), 'public')))
+app.use('/public', express.static(path.resolve(process.cwd(), 'public'), {
+    maxAge: '7d',
+    immutable: true,
+    setHeaders(res) {
+        res.setHeader('Cache-Control', 'public, max-age=604800, immutable')
+    }
+}))
 app.use('/', WebService.routes)
 app.use('/auth', Auth.routes)
 

@@ -128,6 +128,8 @@ export default class FileController {
             }
 
             if (resolved.kind === 'redirect') {
+                // URL présignée à TTL court — ne pas cacher le 302 en CDN
+                res.setHeader('Cache-Control', 'private, no-store')
                 res.redirect(302, resolved.url)
                 return
             }
@@ -137,6 +139,8 @@ export default class FileController {
                 return
             }
 
+            // Fichier local UUID ≈ immuable — navigateur + Cloudflare
+            res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, immutable')
             res.setHeader('X-Content-Type-Options', 'nosniff')
             res.type(resolved.mimeType)
             res.sendFile(resolved.absolutePath)

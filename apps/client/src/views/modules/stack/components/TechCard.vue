@@ -15,7 +15,7 @@ const router = useRouter()
 
     <!-- 1. IMAGE OU INITIALES DE FOND (4/3) -->
     <div class="card-bg-image">
-      <img v-if="tech.logo" :src="fileUrl(tech.logo)" :alt="tech.name" />
+      <img v-if="tech.logo" :src="fileUrl(tech.logo)" :alt="tech.name" loading="lazy" />
       <div v-else class="initials-bg">{{ tech.name.substring(0, 2) }}</div>
     </div>
 

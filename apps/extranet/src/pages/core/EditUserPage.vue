@@ -234,6 +234,7 @@ onMounted(async () => {
               v-if="user.photoId"
               :src="fileUrl(user.photoId)"
               :alt="user.displayName"
+              loading="lazy"
           />
           <span v-else>{{ initials }}</span>
         </div>

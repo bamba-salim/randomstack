@@ -223,6 +223,7 @@ const handleLogout = async () => {
               v-if="photoId"
               :src="fileUrl(photoId)"
               :alt="displayName || 'Photo de profil'"
+              loading="lazy"
           />
           <span v-else>{{ initials }}</span>
         </div>

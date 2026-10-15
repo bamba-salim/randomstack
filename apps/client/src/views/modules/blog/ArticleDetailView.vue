@@ -200,6 +200,7 @@ watch(() => route.params['slug'], (slug) => {
               :src="fileUrl(post.imageId)"
               :alt="post.title"
               class="w-full h-auto max-h-[480px] object-cover"
+              fetchpriority="high"
           />
         </figure>
 
