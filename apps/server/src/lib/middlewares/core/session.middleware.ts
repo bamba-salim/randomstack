@@ -1,4 +1,6 @@
 import session from 'express-session'
+import connectPgSimple from 'connect-pg-simple'
+import pg from 'pg'
 import type {RequestHandler} from 'express'
 import crypto from 'crypto'
 
@@ -45,19 +47,35 @@ function resolveSessionSecret(): string {
 
 const SESSION_SECRET = resolveSessionSecret()
 
-function buildSession(saveUninitialized: boolean): RequestHandler {
+const PgStore = connectPgSimple(session)
+
+/** Pool dédié au store de session (séparé de l’adapter Prisma). */
+const sessionPool = new pg.Pool({
+    connectionString: process.env['DATABASE_URL']
+})
+
+sessionPool.on('error', (err) => {
+    console.error('[Session] Erreur pool PostgreSQL :', err.message)
+})
+
+function buildSession(): RequestHandler {
     return session({
         name: SESSION_COOKIE,
         secret: SESSION_SECRET,
+        store: new PgStore({
+            pool: sessionPool,
+            tableName: 'session',
+            createTableIfMissing: false
+        }),
         resave: false,
-        saveUninitialized,
+        saveUninitialized: false,
         cookie: cookieOptions
     })
 }
 
 export default class SessionMiddleware {
-    /** Session partagée site public + extranet */
-    static readonly config = buildSession(true)
+    /** Session partagée site public + extranet (store PG) */
+    static readonly config = buildSession()
 
     /** @deprecated — utiliser `.config` */
     static readonly client = SessionMiddleware.config

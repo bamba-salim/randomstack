@@ -1,6 +1,7 @@
 import './load-env.js'
 import express from 'express'
 import cors from 'cors'
+import helmet from 'helmet'
 import path from 'path'
 
 import {Database} from '#db'
@@ -13,6 +14,32 @@ import Api from './modules/api'
 import Auth, {AdminAuth} from './modules/auth'
 
 const app = express()
+const isProd = process.env['NODE_ENV'] === 'production'
+
+/**
+ * Headers de sécurité HTTP.
+ * - CORP cross-origin : les SPA (www / admin) chargent `/files/:id` depuis l’API.
+ * - CSP stricte côté API (réponses JSON / pas de HTML applicatif).
+ * - HSTS uniquement en prod (HTTPS derrière Cloudflare / Railway).
+ */
+app.use(helmet({
+    crossOriginResourcePolicy: {policy: 'cross-origin'},
+    crossOriginEmbedderPolicy: false,
+    frameguard: {action: 'deny'},
+    referrerPolicy: {policy: 'no-referrer'},
+    contentSecurityPolicy: {
+        useDefaults: false,
+        directives: {
+            defaultSrc: ["'none'"],
+            frameAncestors: ["'none'"],
+            baseUri: ["'none'"],
+            formAction: ["'none'"]
+        }
+    },
+    hsts: isProd
+        ? {maxAge: 31536000, includeSubDomains: true, preload: true}
+        : false
+}))
 
 /**
  * Origines CORS (env) + localhost dev.
@@ -60,7 +87,10 @@ app.use(cors({
     credentials: true
 }))
 
-app.use(express.json())
+// Cap body JSON (DoS) — uploads fichiers via multer (5 Mo), pas ici
+app.use(express.json({
+    limit: process.env['JSON_BODY_LIMIT']?.trim() || '1mb'
+}))
 
 // Session unique client + extranet (`rs.sid`) — 2 navigateurs si comptes distincts
 app.use(SessionMiddleware.config)

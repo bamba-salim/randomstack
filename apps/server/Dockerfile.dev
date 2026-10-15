@@ -1,7 +1,10 @@
-FROM node:20-alpine
+FROM node:22-alpine
 WORKDIR /app
 
-# Copie de l'ensemble des manifestes de paquets pour résoudre l'espace de travail npm 🚀
+# Lockfile généré avec npm 12 (host Node 26) — npm 10 crash edgesOut
+RUN npm install -g npm@12
+
+# Tous les manifests workspaces avant install
 COPY package*.json ./
 COPY packages/commons/package*.json ./packages/commons/
 COPY apps/server/package*.json ./apps/server/

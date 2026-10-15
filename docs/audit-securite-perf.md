@@ -16,8 +16,8 @@
 
 1. ~~**Sécurité immédiate** — auth sur `POST /upload-file` + fixer cover `'POST'` → `TABLE.POST`~~
 2. **Sécu API** — helmet + `trust proxy` + `express.json({ limit })` + garde `CORS_ALLOW_ALL` en prod
-3. **Validators / contenu** — ~~`validateSaveTechnology`~~ + sanitize HTML serveur
-4. **Ops** — session store PG + Bucket Railway / DNS (infra)
+3. ~~**Validators / contenu** — `validateSaveTechnology` + sanitize HTML serveur~~
+4. ~~**Ops** — session store PG~~ + Bucket Railway / DNS (infra)
 5. ~~**Produit** — enrichir filtre client admin posts (auteur + résumé)~~
 
 ---
@@ -71,6 +71,11 @@
 
 ## Résolu récemment (ne plus rouvrir)
 
+- <span style="color:#e03e3e">[x]</span> Magic bytes upload (`ImageSniff`)
+- <span style="color:#e03e3e">[x]</span> Sanitize HTML posts (commons + validateSavePost)
+- <span style="color:#e03e3e">[x]</span> `express.json` limité à 1 Mo
+- <span style="color:#e03e3e">[x]</span> Session store PG (`connect-pg-simple`) + `saveUninitialized: false`
+- <span style="color:#e03e3e">[x]</span> `helmet` sur l’API (CSP / frameguard / referrer / HSTS)
 - <span style="color:#e03e3e">[x]</span> `validateSaveTechnology` + middleware `/ws/save-technology`
 - <span style="color:#e03e3e">[x]</span> Recherche admin posts enrichie (auteur + résumé + tags)
 - <span style="color:#e03e3e">[x]</span> `POST /upload-file` authentifié + cover `TABLE.POST`
@@ -94,17 +99,17 @@
 
 ### P1 — sécu API
 
-- [ ] `helmet` (CSP, X-Frame-Options, Referrer-Policy, etc.)
+- <span style="color:#e03e3e">[x]</span> `helmet` (CSP, X-Frame-Options, Referrer-Policy, HSTS prod, CORP cross-origin pour `/files`)
 - [ ] `trust proxy` (rate-limit IP derrière Cloudflare/Railway)
-- [ ] `express.json({ limit })`
+- <span style="color:#e03e3e">[x]</span> `express.json({ limit })` — défaut `1mb` (override `JSON_BODY_LIMIT`)
 - [ ] Refuse démarrage si `CORS_ALLOW_ALL=true` en production
 - <span style="color:#e03e3e">[x]</span> `validateSaveTechnology`
-- [ ] Sanitize HTML **serveur** à la save post
+- <span style="color:#e03e3e">[x]</span> Sanitize HTML **serveur** à la save post (`sanitizePostContent` dans `validateSavePost`)
 
 ### P2 — ops / durcissement
 
-- [ ] Magic bytes upload (valider le buffer avant write)
-- [ ] Session store PG (`connect-pg-simple`) + `saveUninitialized: false`
+- <span style="color:#e03e3e">[x]</span> Magic bytes upload (`file-type` + sharp metadata avant write)
+- <span style="color:#e03e3e">[x]</span> Session store PG (`connect-pg-simple` + table `session`) + `saveUninitialized: false`
 - [ ] CSRF cross-subdomain (si besoin au-delà de `SameSite=lax`)
 - [ ] Rate-limit comments / votes / save-post / draw
 - [ ] Validation UUID params delete/purge

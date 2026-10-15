@@ -6,6 +6,7 @@ import {FILE_TYPE, TABLE, type FileType, type Table} from '@randomstack/commons'
 
 import FileAction from './file.action.js'
 import FileMapper from './file.mapper.js'
+import ImageSniff from './image-sniff.js'
 
 /** Catégories / types autorisés sur l’upload public (évite path traversal). */
 const ALLOWED_CATEGORIES = new Set<string>(Object.values(TABLE))
@@ -55,25 +56,39 @@ export default class FileController {
             const ext = path.extname(req.file.originalname).toLowerCase()
             const mime = (req.file.mimetype || '').toLowerCase()
 
+            // Filtre déclaré (rapide) — la vérité reste les magic bytes
             if (BLOCKED_EXTS.has(ext) || BLOCKED_MIMES.has(mime)) {
                 res.status(400).json({error: 'Ce type de fichier n’est pas autorisé.'})
                 return
             }
-
-            if (!IMAGE_EXTS.has(ext) || !IMAGE_MIMES.has(mime)) {
+            if ((ext && !IMAGE_EXTS.has(ext)) || (mime && mime !== 'application/octet-stream' && !IMAGE_MIMES.has(mime))) {
                 res.status(400).json({
                     error: 'Image invalide. Formats acceptés : JPG, PNG, WebP, GIF.'
                 })
                 return
             }
 
+            let sniffed
+            try {
+                sniffed = await ImageSniff.assertSafeImage(req.file.buffer)
+            } catch (err: any) {
+                res.status(400).json({
+                    error: err?.message || 'Image invalide (contenu non conforme).'
+                })
+                return
+            }
+
+            // Nom réaligné sur le vrai type (pas l’extension client spoofable)
+            const base = path.basename(req.file.originalname, path.extname(req.file.originalname)) || 'upload'
+            const safeName = `${base}${sniffed.extension}`
+
             const savedFile = await FileAction.save(
                 req.file.buffer,
-                req.file.originalname,
+                safeName,
                 type,
                 category,
                 undefined,
-                mime
+                sniffed.mimeType
             )
 
             if (!savedFile) {

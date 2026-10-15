@@ -1,6 +1,7 @@
 import {POST_STATUS, type PostStatus} from '../constants'
 import type {EditPostFormBean} from '../dtos/core/blog.dto'
 import type {PostContentBlock} from '../interfaces/core/post.interface'
+import {sanitizePlainText, sanitizePostContent} from '../utils/core/sanitize-html'
 import {asString} from './helpers'
 import {fail, failFields, ok, type ValidationResult} from './types'
 
@@ -41,11 +42,14 @@ export function validateSavePost(raw: unknown): ValidationResult<EditPostFormBea
     const status = asString(body['status']) as PostStatus
     const errors: Record<string, string> = {}
 
-    if (!title) errors['title'] = 'Le titre est requis.'
-    else if (title.length > 200) errors['title'] = 'Le titre est trop long (200 max).'
+    const cleanTitle = sanitizePlainText(title)
+    const cleanSummary = sanitizePlainText(summary)
 
-    if (!summary) errors['summary'] = 'Le résumé est requis.'
-    else if (summary.length > 2000) errors['summary'] = 'Le résumé est trop long (2000 max).'
+    if (!cleanTitle) errors['title'] = 'Le titre est requis.'
+    else if (cleanTitle.length > 200) errors['title'] = 'Le titre est trop long (200 max).'
+
+    if (!cleanSummary) errors['summary'] = 'Le résumé est requis.'
+    else if (cleanSummary.length > 2000) errors['summary'] = 'Le résumé est trop long (2000 max).'
 
     if (!WRITE_STATUSES.includes(status)) {
         errors['status'] = 'Statut invalide.'
@@ -79,9 +83,9 @@ export function validateSavePost(raw: unknown): ValidationResult<EditPostFormBea
 
     return ok({
         ...(typeof body['id'] === 'string' ? {id: body['id']} : {}),
-        title,
-        summary,
-        content: normalizeContent(body['content']),
+        title: cleanTitle,
+        summary: cleanSummary,
+        content: sanitizePostContent(normalizeContent(body['content'])),
         imageId,
         status,
         tags: normalizeStringList(body['tags']),

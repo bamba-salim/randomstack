@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import {computed} from 'vue'
-import {type PostContentBlock} from '@randomstack/commons'
+import {type PostContentBlock, sanitizeHtml} from '@randomstack/commons'
 import {fileUrl} from '#services'
-import {sanitizeHtml} from '../../../../lib/sanitize-html'
 import BlockRenderer from './BlockRenderer.vue'
 
 const props = defineProps<{block: PostContentBlock}>()
