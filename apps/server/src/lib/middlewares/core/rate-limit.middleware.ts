@@ -2,8 +2,14 @@ import type {Request, Response, NextFunction, RequestHandler} from 'express'
 
 type Bucket = {count: number; resetAt: number}
 
+/** Clé user session si dispo, sinon IP (évite de coller tout un NAT sur un compte). */
+function sessionOrIp(req: Request): string {
+    const userId = (req.session as {userId?: string} | undefined)?.userId
+    return userId || req.ip || 'unknown'
+}
+
 /**
- * Rate-limit mémoire (par process) — freine brute-force / spam upload.
+ * Rate-limit mémoire (par process) — freine brute-force / spam.
  * En multi-instance, préférer Redis ; suffisant pour un seul serveur.
  */
 export default class RateLimitMiddleware {
@@ -53,10 +59,41 @@ export default class RateLimitMiddleware {
         message: 'Trop de créations de compte. Réessaie plus tard.'
     })
 
-    /** Upload public */
+    /** Upload */
     static readonly upload = RateLimitMiddleware.limit({
         windowMs: 15 * 60 * 1000,
         max: 40,
         message: 'Trop d’uploads. Réessaie plus tard.'
+    })
+
+    /** Commentaires (auth) */
+    static readonly comment = RateLimitMiddleware.limit({
+        windowMs: 15 * 60 * 1000,
+        max: 50,
+        message: 'Trop de commentaires. Réessaie plus tard.',
+        key: sessionOrIp
+    })
+
+    /** Votes commentaires (auth) */
+    static readonly vote = RateLimitMiddleware.limit({
+        windowMs: 15 * 60 * 1000,
+        max: 60,
+        message: 'Trop de votes. Réessaie plus tard.',
+        key: sessionOrIp
+    })
+
+    /** Sauvegarde article extranet (auth) */
+    static readonly savePost = RateLimitMiddleware.limit({
+        windowMs: 15 * 60 * 1000,
+        max: 40,
+        message: 'Trop de sauvegardes. Réessaie plus tard.',
+        key: sessionOrIp
+    })
+
+    /** Tirage stack (public) */
+    static readonly draw = RateLimitMiddleware.limit({
+        windowMs: 15 * 60 * 1000,
+        max: 60,
+        message: 'Trop de tirages. Réessaie plus tard.'
     })
 }

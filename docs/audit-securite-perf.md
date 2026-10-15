@@ -75,6 +75,9 @@
 - <span style="color:#e03e3e">[x]</span> Sanitize HTML posts (commons + validateSavePost)
 - <span style="color:#e03e3e">[x]</span> `express.json` limité à 1 Mo
 - <span style="color:#e03e3e">[x]</span> Session store PG (`connect-pg-simple`) + `saveUninitialized: false`
+- <span style="color:#e03e3e">[x]</span> CSRF — évalué, non requis (SameSite=lax + cookie host-only + CORS JSON)
+- <span style="color:#e03e3e">[x]</span> UUID params delete/purge (`validatePostId`)
+- <span style="color:#e03e3e">[x]</span> Rate-limit comments / votes / save-post / draw
 - <span style="color:#e03e3e">[x]</span> `helmet` sur l’API (CSP / frameguard / referrer / HSTS)
 - <span style="color:#e03e3e">[x]</span> `validateSaveTechnology` + middleware `/ws/save-technology`
 - <span style="color:#e03e3e">[x]</span> Recherche admin posts enrichie (auteur + résumé + tags)
@@ -110,9 +113,9 @@
 
 - <span style="color:#e03e3e">[x]</span> Magic bytes upload (`file-type` + sharp metadata avant write)
 - <span style="color:#e03e3e">[x]</span> Session store PG (`connect-pg-simple` + table `session`) + `saveUninitialized: false`
-- [ ] CSRF cross-subdomain (si besoin au-delà de `SameSite=lax`)
-- [ ] Rate-limit comments / votes / save-post / draw
-- [ ] Validation UUID params delete/purge
+- <span style="color:#e03e3e">[x]</span> CSRF cross-subdomain — **pas nécessaire** (décision 15/10) : cookie `rs.sid` host-only (pas de `Domain=`), `SameSite=lax`, mutations JSON/`FormData` via `fetch` + CORS allowlist + `credentials`. Un token CSRF n’ajoute rien face à un XSS sur www/admin ; le CSRF classique cross-site est déjà bloqué. Revoir seulement si cookie scopé `.randomstack.io` ou endpoints `application/x-www-form-urlencoded`.
+- <span style="color:#e03e3e">[x]</span> Rate-limit comments / votes / save-post / draw — `RateLimitMiddleware` (comment 50, vote 60, savePost 40, draw 60 / 15 min)
+- <span style="color:#e03e3e">[x]</span> Validation UUID params delete/purge — `validatePostId` + `ValidateMiddleware.params` sur `/ws/delete-post/:id` et `/ws/purge-post/:id`
 - [ ] Infra : Bucket Railway + vars `S3_*` + DNS Cloudflare `api` — voir `docs/cloudflare-railway-files.md`
 
 ### P3 — perf / hygiene

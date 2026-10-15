@@ -22,7 +22,7 @@ export default class WebService {
         const router = Router()
 
         // Stack / tirage
-        router.post('/draw-stack', StackController.draw)
+        router.post('/draw-stack', RateLimitMiddleware.draw, StackController.draw)
         router.get('/fetch-draw-history', StackController.getHistory)
         router.get('/fetch-draw-technologies', StackController.fetchDrawActiveTechnologies)
         router.post('/save-share', StackController.saveShare)
@@ -57,12 +57,14 @@ export default class WebService {
         router.post(
             '/create-comment',
             AuthMiddleware.isAuthenticated,
+            RateLimitMiddleware.comment,
             ValidateMiddleware.body(validateCreateComment),
             CommentController.createComment
         )
         router.post(
             '/vote-comment/:id',
             AuthMiddleware.isAuthenticated,
+            RateLimitMiddleware.vote,
             ValidateMiddleware.body(validateVoteComment),
             CommentController.voteComment
         )

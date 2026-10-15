@@ -12,6 +12,11 @@ export const CLIENT_SESSION_COOKIE = SESSION_COOKIE
 /** @deprecated — alias de SESSION_COOKIE */
 export const ADMIN_SESSION_COOKIE = SESSION_COOKIE
 
+/**
+ * Cookie host-only (pas de `domain`) + SameSite=lax.
+ * Suffisant vs CSRF cross-site avec API JSON/CORS ; pas de token CSRF tant que
+ * le cookie n’est pas scopé `.randomstack.io` et qu’on n’expose pas d’endpoints form-urlencoded.
+ */
 const cookieOptions = {
     secure: process.env['NODE_ENV'] === 'production' && process.env['COOKIE_SECURE'] !== 'false'
         ? true

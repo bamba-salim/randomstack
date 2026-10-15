@@ -2,7 +2,7 @@ import type {Request, Response} from 'express'
 import fs from 'fs'
 import path from 'path'
 
-import {FILE_TYPE, TABLE, type FileType, type Table} from '@randomstack/commons'
+import {FILE_TYPE, TABLE, isUuid, type FileType, type Table} from '@randomstack/commons'
 
 import FileAction from './file.action.js'
 import FileMapper from './file.mapper.js'
@@ -116,8 +116,7 @@ export default class FileController {
                 return
             }
 
-            // UUID v4 basique — refuse les chemins / ids inventés
-            if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+            if (!isUuid(id)) {
                 res.status(400).json({error: 'Identifiant fichier invalide.'})
                 return
             }

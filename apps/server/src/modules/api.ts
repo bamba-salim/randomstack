@@ -1,7 +1,8 @@
 import {Router} from 'express'
-import {AuthMiddleware, ValidateMiddleware} from '#middlewares'
+import {AuthMiddleware, RateLimitMiddleware, ValidateMiddleware} from '#middlewares'
 import {
     validateSavePost,
+    validatePostId,
     validateSaveTechnology,
     validateCreateUser,
     validateUpdateUserRole
@@ -47,17 +48,20 @@ export default class Api {
         router.post(
             '/save-post/:id?',
             AuthMiddleware.permit('ADMIN', 'EDITOR', 'AUTHOR'),
+            RateLimitMiddleware.savePost,
             ValidateMiddleware.body(validateSavePost),
             AdminBlogController.savePost
         )
         router.delete(
             '/delete-post/:id',
             AuthMiddleware.permit('ADMIN', 'EDITOR', 'AUTHOR'),
+            ValidateMiddleware.params(validatePostId),
             AdminBlogController.deletePost
         )
         router.delete(
             '/purge-post/:id',
             AuthMiddleware.permit('ADMIN'),
+            ValidateMiddleware.params(validatePostId),
             AdminBlogController.purgePost
         )
         router.get(

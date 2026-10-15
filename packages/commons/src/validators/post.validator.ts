@@ -2,7 +2,7 @@ import {POST_STATUS, type PostStatus} from '../constants'
 import type {EditPostFormBean} from '../dtos/core/blog.dto'
 import type {PostContentBlock} from '../interfaces/core/post.interface'
 import {sanitizePlainText, sanitizePostContent} from '../utils/core/sanitize-html'
-import {asString} from './helpers'
+import {asString, isUuid} from './helpers'
 import {fail, failFields, ok, type ValidationResult} from './types'
 
 const WRITE_STATUSES: PostStatus[] = [
@@ -99,8 +99,11 @@ export function validateSavePost(raw: unknown): ValidationResult<EditPostFormBea
     })
 }
 
+/** Params `:id` — delete / purge / fetch article. */
 export function validatePostId(raw: unknown): ValidationResult<{id: string}> {
-    const id = asString(raw)
+    const params = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>
+    const id = asString(params['id'])
     if (!id) return fail('Identifiant article manquant.', {field: 'id'})
+    if (!isUuid(id)) return fail('Identifiant article invalide.', {field: 'id'})
     return ok({id})
 }
