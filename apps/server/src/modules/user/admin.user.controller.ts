@@ -4,8 +4,6 @@ import {PasswordUtils} from '#utils'
 import UserModel from './user.model'
 import UserMapper from './user.mapper'
 
-const ROLES: Role[] = ['USER', 'AUTHOR', 'MODERATOR', 'EDITOR', 'ADMIN']
-
 export default class AdminUserController {
 
     static async fetchEditorialAuthors(_req: Request, res: Response): Promise<void> {
@@ -62,40 +60,12 @@ export default class AdminUserController {
                 return
             }
 
-            const body = req.body as CreateUserFormBean
-            const email = String(body?.email || '').trim().toLowerCase()
-            const password = String(body?.password || '')
-            const displayName = String(body?.displayName || '').trim()
-            const role = String(body?.role || '').trim() as Role
-
-            if (!email || !password) {
-                res.status(400).json({error: 'Email et mot de passe requis.'})
-                return
-            }
-
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                res.status(400).json({error: 'Email invalide.'})
-                return
-            }
-
-            if (password.length < 8) {
-                res.status(400).json({error: 'Le mot de passe doit contenir au moins 8 caractères.'})
-                return
-            }
-
-            if (!role || !ROLES.includes(role)) {
-                res.status(400).json({error: 'Rôle invalide.'})
-                return
-            }
-
-            if (!displayName) {
-                res.status(400).json({error: 'Le nom d’affichage est requis.'})
-                return
-            }
+            // Body déjà validé par validateCreateUser
+            const {email, password, displayName, role} = req.body as CreateUserFormBean
 
             const existing = await UserModel.findByEmail(email)
             if (existing) {
-                res.status(409).json({error: 'Un compte existe déjà avec cet email.'})
+                res.status(409).json({error: 'Impossible de créer ce compte.'})
                 return
             }
 
@@ -114,7 +84,7 @@ export default class AdminUserController {
             res.status(201).json(UserMapper.buildCreateUserResponse(listed))
         } catch (error: any) {
             console.error('[AdminUserController] Erreur createUser :', error.message || error)
-            res.status(500).json({error: 'Impossible de créer l’utilisateur.'})
+            res.status(500).json({error: 'Impossible de créer ce compte.'})
         }
     }
 
@@ -126,18 +96,13 @@ export default class AdminUserController {
     static async updateUserRole(req: Request, res: Response): Promise<void> {
         try {
             const {id} = req.params
-            const role = String((req.body as UpdateUserRoleFormBean)?.role || '').trim() as Role
+            const {role} = req.body as UpdateUserRoleFormBean
             const session = (req as any).session
             const actorRole = session?.userRole as Role | undefined
             const moderatorManagedRoles: Role[] = ['USER', 'AUTHOR']
 
             if (!id) {
                 res.status(400).json({error: 'Identifiant utilisateur manquant.'})
-                return
-            }
-
-            if (!role || !ROLES.includes(role)) {
-                res.status(400).json({error: 'Rôle invalide.'})
                 return
             }
 

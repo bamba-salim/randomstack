@@ -3,8 +3,6 @@ import type {CreateCommentFormBean, VoteCommentFormBean} from '@randomstack/comm
 import CommentModel from './comment.model'
 import CommentMapper from './comment.mapper'
 
-const MAX_CONTENT_LENGTH = 2000
-
 export default class CommentController {
 
     private static sessionUser(req: Request) {
@@ -48,24 +46,7 @@ export default class CommentController {
                 return
             }
 
-            const body = req.body as CreateCommentFormBean
-            const postId = String(body?.postId || '').trim()
-            const content = String(body?.content || '').trim()
-
-            if (!postId) {
-                res.status(400).json({error: 'Article manquant.'})
-                return
-            }
-
-            if (!content) {
-                res.status(400).json({error: 'Le commentaire ne peut pas être vide.'})
-                return
-            }
-
-            if (content.length > MAX_CONTENT_LENGTH) {
-                res.status(400).json({error: `Commentaire trop long (max ${MAX_CONTENT_LENGTH} caractères).`})
-                return
-            }
+            const {postId, content} = req.body as CreateCommentFormBean
 
             const exists = await CommentModel.postExistsPublished(postId)
             if (!exists) {
@@ -95,13 +76,7 @@ export default class CommentController {
             }
 
             const {id} = req.params
-            const body = req.body as VoteCommentFormBean
-            const requested = body?.vote === undefined ? null : body.vote
-
-            if (requested !== null && requested !== 'LIKE' && requested !== 'DISLIKE') {
-                res.status(400).json({error: 'Vote invalide.'})
-                return
-            }
+            const requested = (req.body as VoteCommentFormBean).vote ?? null
 
             const existing = await CommentModel.fetchById(id)
             if (!existing) {

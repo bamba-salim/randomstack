@@ -1,3 +1,13 @@
+.form-page-container {
+  .form-input--invalid {
+    @apply border-[#d63638];
+  }
+
+  .form-field-error {
+    @apply text-[11px] text-[#d63638] font-medium mt-1;
+  }
+}
+
 .user-detail {
   @apply flex flex-col gap-4 max-w-4xl;
 

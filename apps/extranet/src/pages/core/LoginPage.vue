@@ -2,23 +2,36 @@
 import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {login} from '#services'
+import {validateLogin, AuthValidatorMessages} from '@randomstack/commons'
 import {toast} from '../../lib/toast'
 
 const router = useRouter()
 const email = ref('')
 const password = ref('')
+const formError = ref<string | null>(null)
 const loading = ref(false)
+
+const clearFormError = () => {
+  formError.value = null
+}
 
 const handleLogin = async () => {
   if (loading.value) return
-  loading.value = true
+  formError.value = null
 
+  const local = validateLogin({email: email.value, password: password.value})
+  if (!local.ok) {
+    formError.value = local.error
+    return
+  }
+
+  loading.value = true
   try {
-    const user = await login({email: email.value, password: password.value})
+    const user = await login(local.data)
     toast.success('Connexion réussie.')
     router.push(user.role === 'ADMIN' || user.role === 'EDITOR' ? '/dashboard' : '/manage-post')
   } catch (err: any) {
-    toast.error(err.message || 'Une erreur est survenue lors de la connexion.')
+    formError.value = err?.message || AuthValidatorMessages.AUTH_FAIL
   } finally {
     loading.value = false
   }
@@ -32,18 +45,15 @@ const handleLogin = async () => {
       <h2 class="logo-title">RANDOMSTACK</h2>
     </div>
 
-    <!-- CARTE DE CONNEXION WORDPRESS STYLE -->
     <div class="login-card">
-
       <form @submit.prevent="handleLogin">
-
         <div class="form-group">
           <label class="form-label">Identifiant ou adresse e-mail</label>
           <input
               v-model="email"
               type="email"
-              required
               class="form-input"
+              @input="clearFormError"
           />
         </div>
 
@@ -52,8 +62,8 @@ const handleLogin = async () => {
           <input
               v-model="password"
               type="password"
-              required
               class="form-input"
+              @input="clearFormError"
           />
         </div>
 
@@ -65,6 +75,7 @@ const handleLogin = async () => {
           {{ loading ? 'Connexion...' : 'Se connecter' }}
         </button>
 
+        <p v-if="formError" class="error-box mt-4 mb-0" role="alert">{{ formError }}</p>
       </form>
     </div>
 

@@ -1,4 +1,5 @@
-import ApiClient from './api.client'
+import ApiClient, {ApiError} from './api.client'
+export {ApiError}
 import type {
     DrawnStack,
     DrawResponse,

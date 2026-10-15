@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import {ref, onMounted, computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import {fetchUserById, updateUserRole, createUser, fileUrl, getMe} from '#services'
+import {fetchUserById, updateUserRole, createUser, fileUrl, getMe, ApiError} from '#services'
 import {BaseInput} from '#components'
 import {toast} from '../../lib/toast'
+import {validateCreateUser} from '@randomstack/commons'
 import type {AdminUserDetail, Role} from '@randomstack/commons'
 
 const route = useRoute()
@@ -25,9 +26,18 @@ const loadError = ref<string | null>(null)
 const createForm = ref({
   email: '',
   password: '',
+  passwordConfirm: '',
   displayName: '',
   role: 'USER' as Role
 })
+const fieldErrors = ref<Record<string, string>>({})
+
+const clearFieldError = (key: string) => {
+  if (!fieldErrors.value[key]) return
+  const next = {...fieldErrors.value}
+  delete next[key]
+  fieldErrors.value = next
+}
 
 const isAdmin = computed(() => actorRole.value === 'ADMIN')
 const isModerator = computed(() => actorRole.value === 'MODERATOR')
@@ -67,34 +77,31 @@ const formatDate = (value: string | Date) =>
 
 const handleCreate = async () => {
   if (!isAdmin.value || saving.value) return
+  fieldErrors.value = {}
 
-  const displayName = createForm.value.displayName.trim()
-  const email = createForm.value.email.trim()
-  const password = createForm.value.password
-
-  if (!displayName || !email || !password) {
-    toast.error('Nom, email et mot de passe sont requis.')
-    return
-  }
-  if (password.length < 8) {
-    toast.error('Le mot de passe doit contenir au moins 8 caractères.')
+  const local = validateCreateUser(createForm.value)
+  if (!local.ok) {
+    fieldErrors.value = local.errors || (local.field ? {[local.field]: local.error} : {})
     return
   }
 
   saving.value = true
   try {
-    const result = await createUser({
-      email,
-      password,
-      displayName,
-      role: createForm.value.role
-    })
+    const result = await createUser(local.data)
     toast.success('Utilisateur créé.')
     await router.replace(`/edit-user/${result.user.id}`)
     user.value = await fetchUserById(result.user.id)
     selectedRole.value = user.value.role
   } catch (err: any) {
-    toast.error(err?.message || 'Impossible de créer l’utilisateur.')
+    if (err instanceof ApiError && err.errors) {
+      fieldErrors.value = err.errors
+      return
+    }
+    if (err instanceof ApiError && err.field) {
+      fieldErrors.value = {[err.field]: err.message}
+      return
+    }
+    toast.error(err?.message || 'Impossible de créer ce compte.')
   } finally {
     saving.value = false
   }
@@ -171,20 +178,44 @@ onMounted(async () => {
       class="form-page-container max-w-lg"
       @submit.prevent="handleCreate"
   >
-    <BaseInput v-model="createForm.displayName" label="Nom d’affichage" required/>
-    <BaseInput v-model="createForm.email" label="Email" type="email" required/>
+    <BaseInput
+        v-model="createForm.displayName"
+        label="Nom d’affichage"
+        :error="fieldErrors.displayName"
+        @clear-error="clearFieldError('displayName')"
+    />
+    <BaseInput
+        v-model="createForm.email"
+        label="Email"
+        type="email"
+        :error="fieldErrors.email"
+        @clear-error="clearFieldError('email')"
+    />
     <BaseInput
         v-model="createForm.password"
         label="Mot de passe (min. 8 caractères)"
         type="password"
-        required
+        :error="fieldErrors.password"
+        @clear-error="clearFieldError('password'); clearFieldError('passwordConfirm')"
+    />
+    <BaseInput
+        v-model="createForm.passwordConfirm"
+        label="Confirmer le mot de passe"
+        type="password"
+        :error="fieldErrors.passwordConfirm"
+        @clear-error="clearFieldError('passwordConfirm')"
     />
 
     <div class="form-group mb-2">
       <label class="form-label">Rôle</label>
-      <select v-model="createForm.role" class="form-input" required>
+      <select
+          v-model="createForm.role"
+          :class="['form-input', {'form-input--invalid': fieldErrors.role}]"
+          @change="clearFieldError('role')"
+      >
         <option v-for="role in roles" :key="role" :value="role">{{ role }}</option>
       </select>
+      <p v-if="fieldErrors.role" class="form-field-error">{{ fieldErrors.role }}</p>
     </div>
 
     <div class="form-actions border-t border-[#c3c4c7] pt-6 mt-4 flex gap-3">

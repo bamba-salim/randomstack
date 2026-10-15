@@ -1,6 +1,6 @@
 import type {Request, Response} from 'express'
-import type {PublicPostListed} from '@randomstack/commons'
-import {FILE_TYPE} from '@randomstack/commons'
+import type {LoginFormBean, RegisterFormBean, EditProfileFormBean, PublicPostListed} from '@randomstack/commons'
+import {FILE_TYPE, AuthValidatorMessages} from '@randomstack/commons'
 
 import UserModel from './user.model'
 import AuthMapper from './auth.mapper'
@@ -10,7 +10,8 @@ import BlogModel from '../blog/blog.model'
 import BlogMapper from '../blog/blog.mapper'
 import FileModel from '../file/file.model.js'
 
-const AUTH_FAIL_MESSAGE = 'Identifiants incorrects.'
+const AUTH_FAIL_MESSAGE = AuthValidatorMessages.AUTH_FAIL
+const REGISTER_FAIL_MESSAGE = AuthValidatorMessages.REGISTER_FAIL
 
 function regenerateSession(req: Request): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -36,10 +37,6 @@ async function openSession(req: Request, user: {id: string; role: string; passwo
 export default class AuthController {
 
     private static async verifyCredentials(email: string, password: string) {
-        if (!email || !password) {
-            return {user: null, error: 'Email et mot de passe requis.'}
-        }
-
         const user = await UserModel.findByEmail(email)
 
         // Message unique : ne révèle pas si l’email existe (énumération de comptes)
@@ -52,7 +49,7 @@ export default class AuthController {
 
     static async login(req: Request, res: Response): Promise<void> {
         try {
-            const {email, password} = req.body
+            const {email, password} = req.body as LoginFormBean
             const {user, error} = await AuthController.verifyCredentials(email, password)
 
             if (error || !user) {
@@ -70,32 +67,15 @@ export default class AuthController {
     /**
      * Inscription publique — rôle USER + profil, session ouverte
      * Cible : POST /auth/register
+     * Body déjà validé par ValidateMiddleware + validateRegister.
      */
     static async register(req: Request, res: Response): Promise<void> {
         try {
-            const email = String(req.body?.email || '').trim().toLowerCase()
-            const password = String(req.body?.password || '')
-            const displayName = String(req.body?.displayName || '').trim()
-
-            if (!email || !password) {
-                res.status(400).json({error: 'Email et mot de passe requis.'})
-                return
-            }
-
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                res.status(400).json({error: 'Email invalide.'})
-                return
-            }
-
-            if (password.length < 8) {
-                res.status(400).json({error: 'Le mot de passe doit contenir au moins 8 caractères.'})
-                return
-            }
+            const {email, password, displayName} = req.body as RegisterFormBean
 
             const existing = await UserModel.findByEmail(email)
             if (existing) {
-                // Même surface d’erreur pour limiter l’énumération
-                res.status(409).json({error: 'Impossible de créer ce compte.'})
+                res.status(409).json({error: REGISTER_FAIL_MESSAGE})
                 return
             }
 
@@ -109,13 +89,13 @@ export default class AuthController {
             res.status(201).json(AuthMapper.buildSessionUserResponse(user))
         } catch (error: any) {
             console.error('[AuthController] Erreur register :', error.message || error)
-            res.status(500).json({error: "Impossible de créer le compte."})
+            res.status(500).json({error: REGISTER_FAIL_MESSAGE})
         }
     }
 
     static async adminLogin(req: Request, res: Response): Promise<void> {
         try {
-            const {email, password} = req.body
+            const {email, password} = req.body as LoginFormBean
             const {user, error} = await AuthController.verifyCredentials(email, password)
 
             const allowedAdminRoles = ['ADMIN', 'EDITOR', 'AUTHOR', 'MODERATOR']
@@ -184,6 +164,7 @@ export default class AuthController {
     /**
      * Mise à jour du profil de l'utilisateur connecté
      * Cible : POST /auth/update-profile
+     * Body déjà validé par validateEditProfile.
      */
     static async updateProfile(req: Request, res: Response): Promise<void> {
         try {
@@ -194,40 +175,15 @@ export default class AuthController {
                 return
             }
 
-            const formBean = AuthMapper.normalizeEditProfileFormBean(req.body || {})
+            const formBean = req.body as EditProfileFormBean
 
-            if (!formBean.displayName) {
-                res.status(400).json({error: 'Le nom d’affichage est requis.'})
-                return
-            }
-
-            if (formBean.displayName.length > 80) {
-                res.status(400).json({error: 'Le nom d’affichage est trop long (80 max).'})
-                return
-            }
-
-            if (!formBean.photoId) {
-                res.status(400).json({error: 'Une photo de profil est obligatoire.'})
-                return
-            }
-
-            const photo = await FileModel.getFileById(formBean.photoId)
+            const photo = await FileModel.getFileById(formBean.photoId!)
             if (!photo || photo.type !== FILE_TYPE.IMAGE) {
-                res.status(400).json({error: 'La photo de profil doit être une image valide.'})
+                res.status(400).json({
+                    error: 'La photo de profil doit être une image valide.',
+                    field: 'photoId'
+                })
                 return
-            }
-
-            for (const link of formBean.links) {
-                try {
-                    const parsed = new URL(link.url)
-                    if (!['http:', 'https:'].includes(parsed.protocol)) {
-                        res.status(400).json({error: `URL invalide : ${link.label}`})
-                        return
-                    }
-                } catch {
-                    res.status(400).json({error: `URL invalide : ${link.label}`})
-                    return
-                }
             }
 
             const user = await UserModel.updateOwnProfile(userId, {

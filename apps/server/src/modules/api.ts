@@ -1,5 +1,10 @@
 import {Router} from 'express'
-import {AuthMiddleware} from '#middlewares'
+import {AuthMiddleware, ValidateMiddleware} from '#middlewares'
+import {
+    validateSavePost,
+    validateCreateUser,
+    validateUpdateUserRole
+} from '@randomstack/commons'
 import {AdminBlogController, BlogController} from './blog'
 import {AdminTechnologyController} from './stack'
 import {AdminUserController} from '#user'
@@ -41,6 +46,7 @@ export default class Api {
         router.post(
             '/save-post/:id?',
             AuthMiddleware.permit('ADMIN', 'EDITOR', 'AUTHOR'),
+            ValidateMiddleware.body(validateSavePost),
             AdminBlogController.savePost
         )
         router.delete(
@@ -97,11 +103,13 @@ export default class Api {
         router.post(
             '/update-user-role/:id',
             AuthMiddleware.permit('ADMIN', 'MODERATOR'),
+            ValidateMiddleware.body(validateUpdateUserRole),
             AdminUserController.updateUserRole
         )
         router.post(
             '/create-user',
             AuthMiddleware.permit('ADMIN'),
+            ValidateMiddleware.body(validateCreateUser),
             AdminUserController.createUser
         )
 

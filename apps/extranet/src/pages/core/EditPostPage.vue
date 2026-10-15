@@ -10,10 +10,12 @@ import {
   fetchEditorialAuthors,
   uploadFile,
   fileUrl,
-  getMe
+  getMe,
+  ApiError
 } from '#services'
 import {PostContentManager, BaseInput, BaseToggle} from '#components'
 import {toast} from '../../lib/toast'
+import {validateSavePost} from '@randomstack/commons'
 import type {EditPostFormBean, EditorialAuthorLite, PostStatus, Role} from '@randomstack/commons'
 
 const CLIENT_URL = String(import.meta.env['VITE_CLIENT_URL'] || 'http://localhost:5173').replace(/\/$/, '')
@@ -34,10 +36,18 @@ const formBean = ref<EditPostFormBean | null>(null)
 const scheduleAtLocal = ref('')
 const showScheduleModal = ref(false)
 const scheduleModalError = ref<string | null>(null)
+const fieldErrors = ref<Record<string, string>>({})
 
 const currentTag = ref('')
 const availableTags = ref<string[]>([])
 const currentSource = ref('')
+
+const clearFieldError = (key: string) => {
+  if (!fieldErrors.value[key]) return
+  const next = {...fieldErrors.value}
+  delete next[key]
+  fieldErrors.value = next
+}
 
 const previewHref = computed(() => {
   if (!formBean.value?.shareCode) return null
@@ -130,12 +140,7 @@ const handlePrimarySave = async () => {
 
 const handleSave = async (status: PostStatus, opts?: {keepPublishAt?: boolean}) => {
   if (!formBean.value || loading.value || !canWrite.value) return
-
-  const title = String(formBean.value.title || '').trim()
-  if (!title) {
-    toast.error('Le titre est requis pour enregistrer.')
-    return
-  }
+  fieldErrors.value = {}
 
   if (status === 'DRAFT' && !canDraft.value) {
     toast.error('Un article déjà publié ne peut plus repasser en brouillon.')
@@ -145,10 +150,6 @@ const handleSave = async (status: PostStatus, opts?: {keepPublishAt?: boolean}) 
   if (status === 'SCHEDULED') {
     if (!canSchedule.value) {
       toast.error('Un article déjà publié ne peut plus être planifié.')
-      return
-    }
-    if (!formBean.value.publishAt) {
-      toast.error('Choisis une date/heure de publication pour planifier.')
       return
     }
   }
@@ -162,16 +163,27 @@ const handleSave = async (status: PostStatus, opts?: {keepPublishAt?: boolean}) 
   }
 
   const previousStatus = formBean.value.status
+  const payload: EditPostFormBean = {...formBean.value, status}
+
+  const local = validateSavePost(payload)
+  if (!local.ok) {
+    fieldErrors.value = local.errors || (local.field ? {[local.field]: local.error} : {})
+    if (local.field === 'publishAt' || local.errors?.['publishAt']) {
+      scheduleModalError.value = local.errors?.['publishAt'] || local.error
+      if (status === 'SCHEDULED') showScheduleModal.value = true
+    }
+    return
+  }
+
   formBean.value.status = status
   loading.value = true
 
   const wasCreate = !postId.value
-  // Enregistrement contenu d’un article déjà en ligne (pas une republication)
   const isContentUpdate =
     Boolean(opts?.keepPublishAt) && previousStatus === 'PUBLISHED' && status === 'PUBLISHED'
 
   try {
-    const result = await savePost(formBean.value, postId.value)
+    const result = await savePost(local.data, postId.value)
     postId.value = result.post.id
     isEditMode.value = true
 
@@ -204,6 +216,14 @@ const handleSave = async (status: PostStatus, opts?: {keepPublishAt?: boolean}) 
 
     toast.success('Brouillon enregistré.')
   } catch (err: any) {
+    if (err instanceof ApiError && err.errors) {
+      fieldErrors.value = err.errors
+      return
+    }
+    if (err instanceof ApiError && err.field) {
+      fieldErrors.value = {[err.field]: err.message}
+      return
+    }
     toast.error(err.message || "Erreur d'enregistrement de l'article.")
   } finally {
     loading.value = false
@@ -378,16 +398,24 @@ onMounted(async () => {
         </select>
       </div>
 
-      <BaseInput v-model="formBean.title" label="Titre" :disabled="isReadOnly"/>
+      <BaseInput
+          v-model="formBean.title"
+          label="Titre"
+          :disabled="isReadOnly"
+          :error="fieldErrors.title"
+          @clear-error="clearFieldError('title')"
+      />
 
       <div class="form-group col-span-2">
         <label class="form-label">Résumé court</label>
         <textarea
             v-model="formBean.summary"
-            class="form-textarea"
+            :class="['form-textarea', {'form-input--invalid': fieldErrors.summary}]"
             :disabled="isReadOnly"
             placeholder="Écrivez un court résumé..."
+            @input="clearFieldError('summary')"
         ></textarea>
+        <p v-if="fieldErrors.summary" class="form-field-error">{{ fieldErrors.summary }}</p>
       </div>
 
       <div class="form-group col-span-2">

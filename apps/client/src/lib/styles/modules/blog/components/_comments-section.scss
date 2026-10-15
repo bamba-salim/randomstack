@@ -35,6 +35,14 @@
     &:disabled {
       @apply bg-[#f6f8fa] text-slate-400;
     }
+
+    &--invalid {
+      @apply border-[#d63638];
+    }
+  }
+
+  &__field-error {
+    @apply text-[11px] text-[#d63638] font-medium;
   }
 
   &__form-actions {

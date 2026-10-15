@@ -2,22 +2,34 @@
 import {ref} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
 import {login} from '#services'
+import {validateLogin, AuthValidatorMessages} from '@randomstack/commons'
 import {toast} from '../../../lib/toast'
 
 const router = useRouter()
 const route = useRoute()
 const email = ref('')
 const password = ref('')
+const formError = ref<string | null>(null)
 const loading = ref(false)
+
+const clearFormError = () => {
+  formError.value = null
+}
 
 const handleLogin = async () => {
   if (loading.value) return
-  loading.value = true
+  formError.value = null
 
+  const local = validateLogin({email: email.value, password: password.value})
+  if (!local.ok) {
+    formError.value = local.error
+    return
+  }
+
+  loading.value = true
   try {
-    await login({email: email.value, password: password.value})
+    await login(local.data)
     toast.success('Connexion réussie.')
-    // Open redirect : uniquement chemins internes (`/foo`), jamais `//evil.com`
     const raw = typeof route.query['redirect'] === 'string' ? route.query['redirect'] : '/profile'
     const redirect =
       raw.startsWith('/') && !raw.startsWith('//') && !raw.includes('\\')
@@ -25,7 +37,7 @@ const handleLogin = async () => {
         : '/profile'
     await router.push(redirect)
   } catch (err: any) {
-    toast.error(err.message || 'Connexion impossible.')
+    formError.value = err?.message || AuthValidatorMessages.AUTH_FAIL
   } finally {
     loading.value = false
   }
@@ -47,9 +59,9 @@ const handleLogin = async () => {
           <input
               v-model="email"
               type="email"
-              required
               autocomplete="email"
               class="auth-form__input"
+              @input="clearFormError"
           />
         </label>
 
@@ -58,15 +70,17 @@ const handleLogin = async () => {
           <input
               v-model="password"
               type="password"
-              required
               autocomplete="current-password"
               class="auth-form__input"
+              @input="clearFormError"
           />
         </label>
 
         <button type="submit" class="btn btn--primary auth-form__submit" :disabled="loading">
           {{ loading ? 'Connexion…' : 'Se connecter' }}
         </button>
+
+        <p v-if="formError" class="auth-form__error" role="alert">{{ formError }}</p>
       </form>
 
       <p class="auth-card__switch">

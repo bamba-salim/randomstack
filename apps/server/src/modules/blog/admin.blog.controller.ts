@@ -8,8 +8,6 @@ import BlogMapper from './blog.mapper'
 
 type SessionInfo = {userId?: string; userRole?: string}
 
-const WRITE_STATUSES: PostStatus[] = ['DRAFT', 'PUBLISHED', 'SCHEDULED', 'ARCHIVED']
-
 export default class AdminBlogController {
 
     private static session(req: Request): SessionInfo {
@@ -87,10 +85,6 @@ export default class AdminBlogController {
             }
 
             const reqStatus = formBean.status as PostStatus
-            if (!WRITE_STATUSES.includes(reqStatus)) {
-                res.status(400).json({error: 'Statut invalide.'})
-                return
-            }
 
             let hasBeenPublishedFlag = formBean.hasBeenPublished || false
             let authorId: string | null = sessionUserId
@@ -131,23 +125,19 @@ export default class AdminBlogController {
             }
 
             if (reqStatus === 'DRAFT' && hasBeenPublishedFlag) {
-                res.status(400).json({error: 'Un article déjà publié ne peut plus repasser en brouillon.'})
+                res.status(400).json({
+                    error: 'Un article déjà publié ne peut plus repasser en brouillon.',
+                    field: 'status'
+                })
                 return
             }
 
-            if (reqStatus === 'SCHEDULED') {
-                if (!formBean.publishAt) {
-                    res.status(400).json({error: 'Une date de publication est requise pour planifier.'})
-                    return
-                }
-                if (new Date(formBean.publishAt) <= new Date()) {
-                    res.status(400).json({error: 'La date de planification doit être dans le futur.'})
-                    return
-                }
-                if (hasBeenPublishedFlag) {
-                    res.status(400).json({error: 'Un article déjà publié ne peut plus être planifié.'})
-                    return
-                }
+            if (reqStatus === 'SCHEDULED' && hasBeenPublishedFlag) {
+                res.status(400).json({
+                    error: 'Un article déjà publié ne peut plus être planifié.',
+                    field: 'status'
+                })
+                return
             }
 
             if (!AdminBlogController.canFeature(session)) {

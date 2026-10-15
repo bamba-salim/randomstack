@@ -1,5 +1,11 @@
 import {Router} from 'express'
-import {AuthMiddleware, RateLimitMiddleware, SESSION_COOKIE} from '#middlewares'
+import {
+    AuthMiddleware,
+    RateLimitMiddleware,
+    SESSION_COOKIE,
+    ValidateMiddleware
+} from '#middlewares'
+import {validateLogin, validateRegister, validateEditProfile} from '@randomstack/commons'
 import {AuthController} from './user'
 
 /**
@@ -10,11 +16,26 @@ export default class Auth {
     static get routes(): Router {
         const router = Router()
 
-        router.post('/login', RateLimitMiddleware.auth, AuthController.login)
-        router.post('/register', RateLimitMiddleware.register, AuthController.register)
+        router.post(
+            '/login',
+            RateLimitMiddleware.auth,
+            ValidateMiddleware.body(validateLogin),
+            AuthController.login
+        )
+        router.post(
+            '/register',
+            RateLimitMiddleware.register,
+            ValidateMiddleware.body(validateRegister),
+            AuthController.register
+        )
 
         router.get('/me', AuthMiddleware.isAuthenticated, AuthController.me)
-        router.post('/update-profile', AuthMiddleware.isAuthenticated, AuthController.updateProfile)
+        router.post(
+            '/update-profile',
+            AuthMiddleware.isAuthenticated,
+            ValidateMiddleware.body(validateEditProfile),
+            AuthController.updateProfile
+        )
         router.post('/logout', AuthMiddleware.isAuthenticated, AuthController.logout(SESSION_COOKIE))
 
         return router
@@ -29,7 +50,12 @@ export class AdminAuth {
     static get routes(): Router {
         const router = Router()
 
-        router.post('/login', RateLimitMiddleware.auth, AuthController.adminLogin)
+        router.post(
+            '/login',
+            RateLimitMiddleware.auth,
+            ValidateMiddleware.body(validateLogin),
+            AuthController.adminLogin
+        )
         router.get('/me', AuthMiddleware.isAuthenticated, AuthController.me)
         router.post('/logout', AuthMiddleware.isAuthenticated, AuthController.logout(SESSION_COOKIE))
 

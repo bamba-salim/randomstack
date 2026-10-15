@@ -7,8 +7,13 @@ defineProps<{
   placeholder?: string
   required?: boolean
   className?: string
+  error?: string | null
+  disabled?: boolean
 }>()
 
+const emit = defineEmits<{
+  (e: 'clear-error'): void
+}>()
 </script>
 
 <template>
@@ -19,7 +24,10 @@ defineProps<{
         :type="type || 'text'"
         :required="required"
         :placeholder="placeholder"
-        class="form-input"
+        :disabled="disabled"
+        :class="['form-input', {'form-input--invalid': Boolean(error)}]"
+        @input="emit('clear-error')"
     />
+    <p v-if="error" class="form-field-error">{{ error }}</p>
   </div>
 </template>

@@ -1,5 +1,6 @@
 import {Router} from 'express'
-import {AuthMiddleware, RateLimitMiddleware} from '#middlewares'
+import {AuthMiddleware, RateLimitMiddleware, ValidateMiddleware} from '#middlewares'
+import {validateCreateComment, validateVoteComment} from '@randomstack/commons'
 import {BlogController, CommentController, FavoriteController} from './blog'
 import {FileController} from './file'
 import {StackController, TechnologyController} from './stack'
@@ -56,11 +57,13 @@ export default class WebService {
         router.post(
             '/create-comment',
             AuthMiddleware.isAuthenticated,
+            ValidateMiddleware.body(validateCreateComment),
             CommentController.createComment
         )
         router.post(
             '/vote-comment/:id',
             AuthMiddleware.isAuthenticated,
+            ValidateMiddleware.body(validateVoteComment),
             CommentController.voteComment
         )
         router.delete(

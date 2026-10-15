@@ -7,7 +7,8 @@ import {
   voteComment,
   deleteComment,
   getMe,
-  fileUrl
+  fileUrl,
+  ApiError
 } from '#services'
 import type {
   CommentsListResponse,
@@ -15,6 +16,7 @@ import type {
   CommentVoteType,
   SessionUserLite
 } from '@randomstack/commons'
+import {validateCreateComment} from '@randomstack/commons'
 import {toast} from '../../../../lib/toast'
 
 const props = defineProps<{
@@ -31,6 +33,7 @@ const data = ref<CommentsListResponse | null>(null)
 const loading = ref(true)
 const submitting = ref(false)
 const draft = ref('')
+const contentError = ref<string | null>(null)
 const votingId = ref<string | null>(null)
 
 const isLoggedIn = computed(() => Boolean(me.value))
@@ -80,12 +83,18 @@ const handleSubmit = async () => {
     router.push('/login')
     return
   }
-  const content = draft.value.trim()
-  if (!content || submitting.value) return
+  if (submitting.value) return
+  contentError.value = null
+
+  const local = validateCreateComment({postId: props.postId, content: draft.value})
+  if (!local.ok) {
+    contentError.value = local.errors?.['content'] || local.error
+    return
+  }
 
   submitting.value = true
   try {
-    const result = await createComment(props.postId, content)
+    const result = await createComment(local.data.postId, local.data.content)
     if (!data.value) {
       data.value = {
         commentsCount: 1,
@@ -99,6 +108,10 @@ const handleSubmit = async () => {
     emit('count-change', data.value.commentsCount)
     toast.success('Commentaire publié.')
   } catch (err: any) {
+    if (err instanceof ApiError && (err.field === 'content' || err.errors?.['content'])) {
+      contentError.value = err.errors?.['content'] || err.message
+      return
+    }
     toast.error(err?.message || 'Publication impossible.')
   } finally {
     submitting.value = false
@@ -155,12 +168,14 @@ watch(() => props.postId, load)
       <textarea
           id="comment-draft"
           v-model="draft"
-          class="comments-section__textarea"
+          :class="['comments-section__textarea', {'comments-section__textarea--invalid': contentError}]"
           rows="3"
           maxlength="2000"
           :placeholder="isLoggedIn ? 'Écrire un commentaire…' : 'Connecte-toi pour commenter…'"
           :disabled="!isLoggedIn || submitting"
+          @input="contentError = null"
       />
+      <p v-if="contentError" class="comments-section__field-error">{{ contentError }}</p>
       <div class="comments-section__form-actions">
         <router-link v-if="!isLoggedIn" to="/login" class="comments-section__login-link">
           Se connecter pour commenter ou voter
@@ -169,7 +184,7 @@ watch(() => props.postId, load)
             v-else
             type="submit"
             class="comments-section__submit"
-            :disabled="submitting || !draft.trim()"
+            :disabled="submitting"
         >
           {{ submitting ? 'Publication…' : 'Publier' }}
         </button>

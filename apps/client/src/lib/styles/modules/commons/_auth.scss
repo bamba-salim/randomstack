@@ -143,6 +143,14 @@
     &:focus {
       @apply border-[#2271b1] ring-1 ring-[#2271b1];
     }
+
+    &--invalid {
+      @apply border-[#d63638];
+
+      &:focus {
+        @apply border-[#d63638] ring-1 ring-[#d63638];
+      }
+    }
   }
 
   &__submit {
@@ -151,6 +159,14 @@
 
   &__hint {
     @apply text-[11px] text-slate-500;
+  }
+
+  &__field-error {
+    @apply text-[11px] text-[#d63638] font-medium;
+  }
+
+  &__error {
+    @apply text-sm text-[#d63638] bg-[#fcf0f1] border border-[#d63638]/40 px-3 py-2 mt-1;
   }
 
   &__textarea {
