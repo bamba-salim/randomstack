@@ -6,7 +6,7 @@ import {
     ValidateMiddleware
 } from '#middlewares'
 import {validateLogin, validateRegister, validateEditProfile} from '@randomstack/commons'
-import {AuthController} from './user'
+import {AuthController} from '#user'
 
 /**
  * Auth unique (cookie `rs.sid`) — client + extranet

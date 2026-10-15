@@ -1,5 +1,5 @@
 import type {ScheduledJob} from '@randomstack/commons'
-import PurgeDeletedPostsAction from '../../../../modules/blog/purge-deleted-posts.action'
+import {PurgeDeletedPostsAction} from '#blog'
 
 export const purgeDeletedPostsJob: ScheduledJob = {
     name: 'Purge corbeille articles (90 jours)',

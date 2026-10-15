@@ -5,10 +5,8 @@ import {FILE_TYPE, AuthValidatorMessages} from '@randomstack/commons'
 import UserModel from './user.model'
 import AuthMapper from './auth.mapper'
 import {PasswordUtils} from '#utils'
-import FavoriteModel from '../blog/favorite.model'
-import BlogModel from '../blog/blog.model'
-import BlogMapper from '../blog/blog.mapper'
-import FileModel from '../file/file.model.js'
+import {FavoriteModel, BlogModel, BlogMapper} from '#blog'
+import {FileModel} from '#file'
 
 const AUTH_FAIL_MESSAGE = AuthValidatorMessages.AUTH_FAIL
 const REGISTER_FAIL_MESSAGE = AuthValidatorMessages.REGISTER_FAIL

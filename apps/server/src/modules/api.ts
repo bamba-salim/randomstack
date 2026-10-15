@@ -6,8 +6,8 @@ import {
     validateCreateUser,
     validateUpdateUserRole
 } from '@randomstack/commons'
-import {AdminBlogController, BlogController} from './blog'
-import {AdminTechnologyController} from './stack'
+import {AdminBlogController, BlogController} from '#blog'
+import {AdminTechnologyController} from '#stack'
 import {AdminUserController} from '#user'
 
 /**

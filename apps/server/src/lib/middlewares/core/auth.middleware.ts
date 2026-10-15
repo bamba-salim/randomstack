@@ -1,5 +1,5 @@
 import type {Request, Response, NextFunction} from 'express'
-import UserModel from '../../../modules/user/user.model.js'
+import {UserModel} from '#user'
 
 export default class AuthMiddleware {
     /**

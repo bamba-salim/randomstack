@@ -51,12 +51,19 @@
 
 ## MINOR
 
-- [ ] **Routes orphelines front** : `DELETE /ws/delete-post`, `GET /ws/fetch-posts-contents`, `GET /fetch-similar-posts`, `GET /fetch-tags` public, etc. (à confirmer usage réel)
+- <span style="color:#e03e3e">[x]</span> **Routes « orphelines » (check 15/10)** :
+  - `DELETE /ws/delete-post` → **utilisé** (EditPostPage corbeille)
+  - `GET /fetch-similar-posts/:slug` → **utilisé** (ArticleDetailView)
+  - `GET /ws/fetch-tags` → **utilisé** (EditPostPage) ; `GET /fetch-tags` **public** → **orphelins** (aucun front)
+  - `GET /ws/fetch-posts-contents` → **orphelin** (ADMIN only, aucun front)
 - <span style="color:#e03e3e">[x]</span> **`PublicPostDetail` / date** — `ArticleDetailView` utilise `publishAt` (plus de `createdAt` requis)
 - <span style="color:#e03e3e">[x]</span> **Login** — message unique (plus d’énumération email) — `AUTH_FAIL` / `REGISTER_FAIL`
 - <span style="color:#e03e3e">[x]</span> **`MODERATOR`** — login admin OK **et** `/ws` autorisé en lecture (posts/users) ; écriture articles refusée (voulu)
 - [ ] **CORS `allow-all`** — toujours possible via env ; **pas de garde prod** — `index.ts`
-- [ ] **tsconfig dead paths** : `#modules`, `#interfaces`
+- <span style="color:#e03e3e">[x]</span> **Alias paths (check 15/10)** :
+  - `#modules` / `#interfaces` → **morts** (fichiers absents) → retirés du tsconfig ; types = commons, pas de mega-barrel
+  - `#blog` était déclaré mais inutilisé → branché (api, web-service, jobs, auth.controller)
+  - extranet `#scripts` → **mort** (pas de dossier) → retiré package/tsconfig/vite
 - <span style="color:#e03e3e">[x]</span> **`DrawAction` dupliqué / `#action-support`** — disparu
 - [ ] **Spec Notion V0** vs stack réelle (Vue + Prisma) — doc
 

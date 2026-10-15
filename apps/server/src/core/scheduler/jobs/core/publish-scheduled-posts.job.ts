@@ -1,6 +1,5 @@
 import type {ScheduledJob} from '@randomstack/commons'
-import PublishScheduledAction from '../../../../modules/blog/publish-scheduled.action'
-// Note: action locale au module blog (pas encore d’alias #blog pour les actions)
+import {PublishScheduledAction} from '#blog'
 
 export const publishScheduledPostsJob: ScheduledJob = {
     name: 'Publication des articles planifiés',

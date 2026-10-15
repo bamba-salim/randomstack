@@ -26,9 +26,6 @@
       "#pages": [
         "./src/pages/index.ts"
       ],
-      "#scripts": [
-        "./src/scripts/index.ts"
-      ],
       "#components": [
         "./src/lib/components/index.ts"
       ],

@@ -20,17 +20,11 @@
       "#file": ["./src/modules/file/index.ts"],
       "#stack": ["./src/modules/stack/index.ts"],
 
-
-      "#modules": ["./src/modules/index.ts"],
-
       "#db": ["./src/lib/db/index.ts"],
-      "#interfaces": ["./src/lib/interfaces/index.ts"],
       "#middlewares": ["./src/lib/middlewares/index.ts"],
       "#utils": ["./src/lib/utils/index.ts"],
       "#scheduler": ["./src/core/scheduler/index.ts"],
       "@randomstack/commons": ["../../packages/commons/src/index.ts"]
-
-
     }
   },
   "include": [

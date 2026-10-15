@@ -9,7 +9,6 @@ export default defineConfig({
             '#pages': fileURLToPath(new URL('./src/pages/index.ts', import.meta.url)),
 
             '#services': fileURLToPath(new URL('./src/services/index.ts', import.meta.url)),
-            '#scripts': fileURLToPath(new URL('./src/scripts/index.ts', import.meta.url)),
             '#components': fileURLToPath(new URL('./src/lib/components/index.ts', import.meta.url)),
             '#utils': fileURLToPath(new URL('./src/lib/utils/index.ts', import.meta.url))
         }

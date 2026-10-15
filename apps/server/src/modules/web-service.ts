@@ -1,9 +1,9 @@
 import {Router} from 'express'
 import {AuthMiddleware, RateLimitMiddleware, ValidateMiddleware} from '#middlewares'
 import {validateCreateComment, validateVoteComment} from '@randomstack/commons'
-import {BlogController, CommentController, FavoriteController} from './blog'
-import {FileController} from './file'
-import {StackController, TechnologyController} from './stack'
+import {BlogController, CommentController, FavoriteController} from '#blog'
+import {FileController} from '#file'
+import {StackController, TechnologyController} from '#stack'
 import {AuthController} from '#user'
 import multer from 'multer'
 

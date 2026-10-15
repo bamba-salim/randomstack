@@ -15,10 +15,6 @@
       "development": "./src/services/index.ts",
       "default": "./dist/services/index.js"
     },
-    "#scripts": {
-      "development": "./src/scripts/index.ts",
-      "default": "./dist/scripts/index.js"
-    },
     "#components": {
       "development": "./src/lib/components/index.ts",
       "default": "./dist/lib/components/index.js"
