@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, onMounted, computed} from 'vue'
+import {ref, onMounted, computed, nextTick} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {
   triggerDraw,
@@ -12,6 +12,7 @@ import {
   type ExcludeTechnologyLite
 } from '#services'
 import {DraftScript} from '#scripts'
+import {DRAW_SERVER_CATEGORIES} from '@randomstack/commons'
 
 import SlotReel from './components/SlotReel.vue'
 import BlacklistDrawer from './components/BlacklistDrawer.vue'
@@ -199,13 +200,94 @@ const handleShare = async () => {
   }
 }
 
+/** Prépare un tirage avec une techno imposée (`?with=slug`) : verrouille la bonne couche. */
+const applyLockedTechFromQuery = async (): Promise<boolean> => {
+  const slug = typeof route.query['with'] === 'string' ? route.query['with'] : ''
+  if (!slug) return false
+
+  const match = allTechnologies.value.find(t => t.slug === slug)
+  if (!match) {
+    toast.info('Cette techno n’est pas disponible au tirage (inactive ou hors catégories tirables).')
+    router.replace({path: '/draft', query: {}})
+    return false
+  }
+
+  const cats = match.categories || []
+  const layer: DrawTechnologyLite = {
+    id: match.id,
+    name: match.name,
+    slug: match.slug,
+    logo: match.logo,
+    language: match.language,
+    categories: cats
+  }
+
+  const isClient = cats.some(c => ['FRONTEND', 'MOBILE', 'DESKTOP'].includes(c))
+  const isServer = cats.some(c => (DRAW_SERVER_CATEGORIES as readonly string[]).includes(c))
+  const isDatabase = cats.includes('DATABASE')
+
+  // Priorité : client > serveur > données si multi-catégories
+  clientLocked.value = false
+  serverLocked.value = false
+  databaseLocked.value = false
+
+  if (isClient) {
+    clientLocked.value = true
+    if (cats.includes('MOBILE')) selectedProjectType.value = 'MOBILE'
+    else if (cats.includes('DESKTOP')) selectedProjectType.value = 'DESKTOP'
+    else selectedProjectType.value = 'FRONTEND'
+    currentStack.value = {
+      clientLayer: layer,
+      serverLayer: null,
+      databaseLayer: null,
+      timestamp: new Date().toISOString()
+    }
+    clientReel.value = [layer]
+    serverReel.value = []
+    databaseReel.value = []
+  } else if (isServer) {
+    serverLocked.value = true
+    currentStack.value = {
+      clientLayer: null,
+      serverLayer: layer,
+      databaseLayer: null,
+      timestamp: new Date().toISOString()
+    }
+    clientReel.value = []
+    serverReel.value = [layer]
+    databaseReel.value = []
+  } else if (isDatabase) {
+    databaseLocked.value = true
+    currentStack.value = {
+      clientLayer: null,
+      serverLayer: null,
+      databaseLayer: layer,
+      timestamp: new Date().toISOString()
+    }
+    clientReel.value = []
+    serverReel.value = []
+    databaseReel.value = [layer]
+  } else {
+    toast.info('Cette techno n’est pas tirable.')
+    router.replace({path: '/draft', query: {}})
+    return false
+  }
+
+  toast.success(`${match.name} verrouillé — tirage des autres couches…`)
+  await nextTick()
+  await handleDraw()
+  router.replace({path: '/draft', query: {}})
+  return true
+}
+
 /**
  * Initialisation au montage du composant.
  *
  * Étapes :
  *  1. Charge toutes les technologies disponibles (pour la blacklist)
  *  2. Si un shareCode est présent dans l'URL → charge le stack partagé et s'arrête
- *  3. Sinon → charge l'historique de session et restaure le dernier stack affiché
+ *  3. Si `?with=slug` → verrouille la techno et lance un tirage
+ *  4. Sinon → charge l'historique de session et restaure le dernier stack affiché
  */
 onMounted(async () => {
   try {
@@ -240,7 +322,10 @@ onMounted(async () => {
       }
     }
 
-    // Étape 3 — Chargement de l'historique de session et restauration du dernier stack
+    // Étape 3 — Tirage imposé depuis une fiche techno
+    if (await applyLockedTechFromQuery()) return
+
+    // Étape 4 — Chargement de l'historique de session et restauration du dernier stack
     const fetchedHistory = await fetchHistory()
     history.value = fetchedHistory
     if (fetchedHistory.length > 0) {

@@ -18,7 +18,7 @@ const isReadOnly = computed(() => role.value === 'MODERATOR')
 const subtitle = computed(() => {
   if (role.value === 'AUTHOR') return 'Tes articles uniquement (brouillons, publiés, programmés).'
   if (role.value === 'EDITOR') return 'Tous les articles — contenu, statut et à la une.'
-  if (role.value === 'MODERATOR') return 'Tous les articles — consultation seule (signalements bientôt).'
+  if (role.value === 'MODERATOR') return 'Tous les articles — consultation seule (signalements via Inbox).'
   return 'Rédigez, programmez et gérez les articles du blog de RANDOMSTACK'
 })
 

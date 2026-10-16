@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, watch} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
-import {logout, getMe} from '#services'
+import {logout, getMe, fetchInboxOpenCount} from '#services'
 import {toast} from '../../../toast'
 import type {Role} from '@randomstack/commons'
 
@@ -10,6 +10,7 @@ const route = useRoute()
 
 const isMobileMenuOpen = ref(false)
 const role = ref<Role | null>(null)
+const inboxOpenCount = ref(0)
 
 const canManageTech = () => role.value === 'ADMIN' || role.value === 'EDITOR'
 const canManageUsers = () =>
@@ -21,10 +22,31 @@ const canManagePosts = () =>
   role.value === 'AUTHOR' ||
   role.value === 'MODERATOR'
 
+const refreshInboxBadge = async () => {
+  if (!canManagePosts()) {
+    inboxOpenCount.value = 0
+    return
+  }
+  try {
+    inboxOpenCount.value = await fetchInboxOpenCount()
+  } catch {
+    inboxOpenCount.value = 0
+  }
+}
+
 onMounted(async () => {
   const me = await getMe()
   role.value = me?.role ?? null
+  await refreshInboxBadge()
 })
+
+// Rafraîchir le badge en quittant / changeant de page inbox
+watch(
+  () => route.path,
+  () => {
+    refreshInboxBadge()
+  }
+)
 
 const handleLogout = async () => {
   try {
@@ -51,6 +73,21 @@ const handleLogout = async () => {
     </div>
 
     <nav class="sidebar-nav">
+      <router-link
+          v-if="canManagePosts()"
+          to="/inbox"
+          :class="['nav-link', 'nav-link--inbox', { 'active': route.path.startsWith('/inbox') }]"
+      >
+        <span>📥 Inbox</span>
+        <span
+            v-if="inboxOpenCount > 0"
+            class="inbox-badge"
+            :title="`${inboxOpenCount} nouveau(x) message(s)`"
+        >
+          {{ inboxOpenCount > 99 ? '99+' : inboxOpenCount }}
+        </span>
+      </router-link>
+
       <router-link
           v-if="canManageTech()"
           to="/dashboard"

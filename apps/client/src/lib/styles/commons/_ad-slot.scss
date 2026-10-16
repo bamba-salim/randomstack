@@ -87,7 +87,8 @@
     }
   }
 
-  &--home-sidebar .ad-slot__image {
+  &--home-sidebar .ad-slot__image,
+  &--technology-sidebar .ad-slot__image {
     max-height: 200px;
   }
 
@@ -109,8 +110,7 @@
   }
 
   &--article-rail-left,
-  &--article-rail-right,
-  &--technology-sidebar {
+  &--article-rail-right {
     &.ad-slot--rail .ad-slot__image {
       min-height: 320px;
     }

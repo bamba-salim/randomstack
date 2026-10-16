@@ -14,7 +14,10 @@ export type AdPlacement =
     | 'article-footer'
     | 'article-rail-left'
     | 'article-rail-right'
+    | 'technology-header'
     | 'technology-sidebar'
+    | 'technology-mid'
+    | 'technology-footer'
     | 'tag-inline'
     | 'profile-header'
     | 'profile-rail-left'
@@ -43,7 +46,10 @@ export const HOUSE_ADS: Record<AdPlacement, HouseAd | null> = {
     'article-footer': null,
     'article-rail-left': null,
     'article-rail-right': null,
+    'technology-header': null,
     'technology-sidebar': null,
+    'technology-mid': null,
+    'technology-footer': null,
     'tag-inline': null,
     'profile-header': null,
     'profile-rail-left': null,

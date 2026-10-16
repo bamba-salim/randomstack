@@ -95,4 +95,12 @@ export default class RateLimitMiddleware {
         max: 60,
         message: 'Trop de tirages. Réessaie plus tard.'
     })
+
+    /** Inbox (signalements / suggestions, auth) */
+    static readonly inbox = RateLimitMiddleware.limit({
+        windowMs: 15 * 60 * 1000,
+        max: 15,
+        message: 'Trop de messages envoyés. Réessaie plus tard.',
+        key: sessionOrIp
+    })
 }

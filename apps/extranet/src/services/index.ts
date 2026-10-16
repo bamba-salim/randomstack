@@ -11,6 +11,8 @@ import type {
     EditPostFormBean,
     EditorialAuthorLite,
     FileType,
+    InboxMessageListed,
+    InboxStatus,
     Role,
     Table,
     UpdateUserRoleResponse
@@ -115,4 +117,38 @@ export const uploadFile = async (
 export const fileUrl = (id: string | null | undefined): string => {
     if (!id) return ''
     return `${ApiClient.baseUrl}/files/${id}`
+}
+
+// ─── Inbox ───────────────────────────────────────────────────────────────────
+
+export const fetchInboxMessages = async (): Promise<InboxMessageListed[]> => {
+    return await ApiClient.get<InboxMessageListed[]>('/ws/fetch-inbox-messages')
+}
+
+export const fetchInboxMessage = async (id: string): Promise<InboxMessageListed> => {
+    return await ApiClient.get<InboxMessageListed>(`/ws/fetch-inbox-message/${id}`)
+}
+
+export const fetchInboxOpenCount = async (): Promise<number> => {
+    const data = await ApiClient.get<{count: number}>('/ws/fetch-inbox-open-count')
+    return data.count ?? 0
+}
+
+export const fetchInboxTargetReports = async (opts: {
+    technologyId?: string
+    postId?: string
+}): Promise<InboxMessageListed[]> => {
+    const params = new URLSearchParams()
+    if (opts.technologyId) params.set('technologyId', opts.technologyId)
+    if (opts.postId) params.set('postId', opts.postId)
+    return await ApiClient.get<InboxMessageListed[]>(
+        `/ws/fetch-inbox-target-reports?${params.toString()}`
+    )
+}
+
+export const updateInboxStatus = async (
+    id: string,
+    status: InboxStatus
+): Promise<{success: boolean; message: InboxMessageListed}> => {
+    return await ApiClient.post(`/ws/update-inbox-status/${id}`, {status})
 }

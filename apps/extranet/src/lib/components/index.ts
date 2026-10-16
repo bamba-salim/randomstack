@@ -2,6 +2,7 @@
 export {default as Sidebar} from './core/commons/Sidebar.vue'
 export {default as BaseInput} from './core/commons/BaseInput.vue'
 export {default as BaseToggle} from './core/commons/BaseToggle.vue'
+export {default as InboxReportsPanel} from './core/commons/InboxReportsPanel.vue'
 
 // STACK
 export {default as TechnologyTable} from './core/stack/TechnologyTable.vue'

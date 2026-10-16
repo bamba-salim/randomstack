@@ -57,6 +57,22 @@ enum CompatibilityKind {
   INCOMPATIBLE
 }
 
+/// Messages inbox (signalements / suggestions / demandes)
+enum InboxKind {
+  TECH_REPORT
+  POST_REPORT
+  TECH_SUGGESTION
+  ARTICLE_SUGGESTION
+  AUTHOR_REQUEST
+}
+
+enum InboxStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  DISMISSED
+}
+
 model Technology {
   id         String     @id @default(uuid())
   name       String     @unique
@@ -137,6 +153,8 @@ model User {
   favorites     PostFavorite[]
   profile       UserProfile?
   authoredPosts Post[]
+  inboxMessages InboxMessage[] @relation("InboxAuthor")
+  inboxResolved InboxMessage[] @relation("InboxResolver")
 }
 
 // Profil public (bio, photo, portfolio) — id = User.id
@@ -266,4 +284,35 @@ model File {
   // Relations inverses
   posts         Post[]
   profilePhotos UserProfile[]
+}
+
+/// Inbox unique : signalements, suggestions, demandes de statut
+model InboxMessage {
+  id     String      @id @default(uuid())
+  kind   InboxKind
+  status InboxStatus @default(OPEN)
+  subject String
+  body   String      @db.Text
+
+  authorId String
+  author   User   @relation("InboxAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  /// Cibles optionnelles selon le kind
+  technologyId String?
+  postId       String?
+
+  meta Json?
+
+  resolvedById String?
+  resolvedBy   User?     @relation("InboxResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+  resolvedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([kind, status])
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([technologyId])
+  @@index([postId])
 }

@@ -19,6 +19,7 @@
       "#blog": ["./src/modules/blog/index.ts"],
       "#file": ["./src/modules/file/index.ts"],
       "#stack": ["./src/modules/stack/index.ts"],
+      "#inbox": ["./src/modules/inbox/index.ts"],
 
       "#db": ["./src/lib/db/index.ts"],
       "#middlewares": ["./src/lib/middlewares/index.ts"],

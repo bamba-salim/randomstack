@@ -89,7 +89,9 @@ export interface PublicTechnologyDetail {
 export interface ExcludeTechnologyLite {
     id: string
     name: string
+    slug: string
     logo: string | null
+    language: string
     usage: string
     categories: Category[]
 }

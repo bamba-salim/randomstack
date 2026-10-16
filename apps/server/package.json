@@ -28,6 +28,11 @@
       "development": "./src/modules/user/index.ts",
       "default": "./dist/modules/user/index.js"
     },
+    "#inbox": {
+      "development": "./src/modules/inbox/index.ts",
+      "default": "./dist/modules/inbox/index.js"
+    },
+
     "#db": {
       "development": "./src/lib/db/index.ts",
       "default": "./dist/lib/db/index.js"

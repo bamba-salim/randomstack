@@ -13,7 +13,7 @@ import {
   getMe,
   ApiError
 } from '#services'
-import {PostContentManager, BaseInput, BaseToggle} from '#components'
+import {PostContentManager, BaseInput, BaseToggle, InboxReportsPanel} from '#components'
 import {toast} from '../../lib/toast'
 import {validateSavePost, FILE_TYPE, TABLE} from '@randomstack/commons'
 import type {EditPostFormBean, EditorialAuthorLite, PostStatus, Role} from '@randomstack/commons'
@@ -371,8 +371,10 @@ onMounted(async () => {
 
     <form v-else-if="formBean" @submit.prevent class="form-page-container">
       <p v-if="isReadOnly" class="error-box mb-4">
-        Lecture seule — tu pourras signaler un problème sur cet article prochainement.
+        Lecture seule — tu peux traiter les signalements ci-dessous.
       </p>
+
+      <InboxReportsPanel v-if="isEditMode && postId" :post-id="postId"/>
 
       <div v-if="canFeature" class="form-group mb-2">
         <BaseToggle

@@ -1,38 +1,32 @@
-// --- FICHE DÉTAILLÉE D'UNE TECHNOLOGIE ---
+// --- FICHE DÉTAILLÉE D'UNE TECHNOLOGIE (disposition type home) ---
 .tech-detail-page {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
   width: 100%;
-  align-items: start;
 
-  // Tablette+ : un seul rail à droite (rien sur mobile)
-  @media (min-width: 768px) {
-    grid-template-columns: minmax(0, 1fr) 140px;
+  &__banner {
+    width: 100%;
+
+    &--footer {
+      margin-top: 0.5rem;
+    }
+
+    .ad-slot__placeholder {
+      min-height: 100px;
+    }
   }
 
-  @media (min-width: 1200px) {
-    grid-template-columns: minmax(0, 1fr) 160px;
-  }
-}
-
-.tech-detail-ad {
-  display: none;
-
-  @media (min-width: 768px) {
-    display: block;
-    width: 140px;
-    position: sticky;
-    top: 5.5rem;
-  }
-
-  @media (min-width: 1200px) {
-    width: 160px;
+  .lobby-control-sidebar {
+    @media (min-width: 768px) {
+      position: sticky;
+      top: 5.5rem;
+    }
   }
 }
 
 .tech-detail-layout {
-  @apply flex flex-col gap-8 w-full text-left min-w-0;
+  @apply flex flex-col gap-8 text-left;
 
   // 1. En-tête : Image gauche + Table métadonnées droite
   .detail-top-section {

@@ -215,7 +215,9 @@ export default class TechnologyMapper {
         return {
             id: tech.id,
             name: tech.name,
+            slug: tech.slug,
             logo: tech.logo,
+            language: tech.language,
             usage: tech.usage,
             categories: tech.categories || []
         }

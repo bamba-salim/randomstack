@@ -5,9 +5,11 @@ import {
     validatePostId,
     validateSaveTechnology,
     validateCreateUser,
-    validateUpdateUserRole
+    validateUpdateUserRole,
+    validateUpdateInboxStatus
 } from '@randomstack/commons'
 import {AdminBlogController, BlogController} from '#blog'
+import {InboxController} from '#inbox'
 import {AdminTechnologyController} from '#stack'
 import {AdminUserController} from '#user'
 
@@ -117,6 +119,34 @@ export default class Api {
             AuthMiddleware.permit('ADMIN'),
             ValidateMiddleware.body(validateCreateUser),
             AdminUserController.createUser
+        )
+
+        // Inbox — lecture / statut (filtrée par rôle dans le controller)
+        router.get(
+            '/fetch-inbox-messages',
+            AuthMiddleware.permit('ADMIN', 'EDITOR', 'AUTHOR', 'MODERATOR'),
+            InboxController.fetchMessages
+        )
+        router.get(
+            '/fetch-inbox-message/:id',
+            AuthMiddleware.permit('ADMIN', 'EDITOR', 'AUTHOR', 'MODERATOR'),
+            InboxController.fetchMessage
+        )
+        router.get(
+            '/fetch-inbox-open-count',
+            AuthMiddleware.permit('ADMIN', 'EDITOR', 'AUTHOR', 'MODERATOR'),
+            InboxController.fetchOpenCount
+        )
+        router.get(
+            '/fetch-inbox-target-reports',
+            AuthMiddleware.permit('ADMIN', 'EDITOR', 'AUTHOR', 'MODERATOR'),
+            InboxController.fetchTargetReports
+        )
+        router.post(
+            '/update-inbox-status/:id',
+            AuthMiddleware.permit('ADMIN', 'EDITOR', 'AUTHOR', 'MODERATOR'),
+            ValidateMiddleware.body(validateUpdateInboxStatus),
+            InboxController.updateStatus
         )
 
         return router

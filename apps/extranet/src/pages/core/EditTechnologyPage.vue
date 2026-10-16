@@ -2,7 +2,7 @@
 import {ref, onMounted, computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 
-import {Sidebar, ParagraphManager, BaseInput, BaseToggle} from '#components'
+import {Sidebar, ParagraphManager, BaseInput, BaseToggle, InboxReportsPanel} from '#components'
 
 import {saveTechnology, fetchTechnologies, fetchTechnologyFormData, uploadFile, fileUrl, ApiError} from '#services'
 import {
@@ -243,6 +243,8 @@ onMounted(async () => {
 
   <!-- Le formulaire ne s'affiche qu'une fois le FormBean initialisé par l'API 🚀 -->
   <form v-else-if="formBean" @submit.prevent="handleSave" class="form-page-container">
+
+    <InboxReportsPanel v-if="isEditMode && techId" :technology-id="techId"/>
 
     <div class="form-group">
       <BaseToggle v-model="formBean.isActive" label="Disponible au tirage au sort"/>

@@ -1,8 +1,13 @@
 import {Router} from 'express'
 import {AuthMiddleware, CacheMiddleware, RateLimitMiddleware, ValidateMiddleware} from '#middlewares'
-import {validateCreateComment, validateVoteComment} from '@randomstack/commons'
+import {
+    validateCreateComment,
+    validateCreateInboxMessage,
+    validateVoteComment
+} from '@randomstack/commons'
 import {BlogController, CommentController, FavoriteController} from '#blog'
 import {FileController} from '#file'
+import {InboxController} from '#inbox'
 import {StackController, TechnologyController} from '#stack'
 import {AuthController} from '#user'
 import multer from 'multer'
@@ -133,6 +138,15 @@ export default class WebService {
             RateLimitMiddleware.upload,
             upload.single('file'),
             FileController.upload
+        )
+
+        // Inbox — signalements / suggestions (auth)
+        router.post(
+            '/create-inbox-message',
+            AuthMiddleware.isAuthenticated,
+            RateLimitMiddleware.inbox,
+            ValidateMiddleware.body(validateCreateInboxMessage),
+            InboxController.create
         )
 
         return router

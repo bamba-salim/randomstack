@@ -77,12 +77,64 @@ export const COMPATIBILITY_KIND_LABELS: Record<
     INCOMPATIBLE: 'Incompatible',
 }
 
+/** Inbox extranet — kinds de messages */
+export const INBOX_KIND = {
+    TECH_REPORT: 'TECH_REPORT',
+    POST_REPORT: 'POST_REPORT',
+    TECH_SUGGESTION: 'TECH_SUGGESTION',
+    ARTICLE_SUGGESTION: 'ARTICLE_SUGGESTION',
+    AUTHOR_REQUEST: 'AUTHOR_REQUEST',
+} as const
+
+export const INBOX_KIND_LABELS: Record<
+    (typeof INBOX_KIND)[keyof typeof INBOX_KIND],
+    string
+> = {
+    TECH_REPORT: 'Signalement techno',
+    POST_REPORT: 'Signalement article',
+    TECH_SUGGESTION: 'Suggestion techno',
+    ARTICLE_SUGGESTION: 'Suggestion article',
+    AUTHOR_REQUEST: 'Demande statut auteur',
+}
+
+export const INBOX_STATUS = {
+    OPEN: 'OPEN',
+    IN_PROGRESS: 'IN_PROGRESS',
+    RESOLVED: 'RESOLVED',
+    DISMISSED: 'DISMISSED',
+} as const
+
+export const INBOX_STATUS_LABELS: Record<
+    (typeof INBOX_STATUS)[keyof typeof INBOX_STATUS],
+    string
+> = {
+    OPEN: 'Ouvert',
+    IN_PROGRESS: 'En cours',
+    RESOLVED: 'Traité',
+    DISMISSED: 'Rejeté',
+}
+
 export const USER_ROLE = {
     USER: 'USER',
     AUTHOR: 'AUTHOR',
     MODERATOR: 'MODERATOR',
     EDITOR: 'EDITOR',
     ADMIN: 'ADMIN'
+}
+
+/**
+ * Visibilité inbox par rôle staff.
+ * ADMIN voit tout ; les autres ne voient que les kinds listés.
+ */
+export const INBOX_KIND_ROLES: Record<
+    (typeof INBOX_KIND)[keyof typeof INBOX_KIND],
+    ReadonlyArray<(typeof USER_ROLE)[keyof typeof USER_ROLE]>
+> = {
+    TECH_REPORT: [USER_ROLE.ADMIN, USER_ROLE.EDITOR],
+    POST_REPORT: [USER_ROLE.ADMIN, USER_ROLE.EDITOR, USER_ROLE.MODERATOR],
+    TECH_SUGGESTION: [USER_ROLE.ADMIN, USER_ROLE.EDITOR],
+    ARTICLE_SUGGESTION: [USER_ROLE.ADMIN, USER_ROLE.EDITOR, USER_ROLE.AUTHOR],
+    AUTHOR_REQUEST: [USER_ROLE.ADMIN, USER_ROLE.MODERATOR],
 }
 
 export const POST_STATUS = {
@@ -110,7 +162,19 @@ export const BLOCK_TYPE = {
 export type FileType = typeof FILE_TYPE[keyof typeof FILE_TYPE]
 export type Category = typeof TECHNOLOGY_CATEGORY[keyof typeof TECHNOLOGY_CATEGORY]
 export type CompatibilityKind = typeof COMPATIBILITY_KIND[keyof typeof COMPATIBILITY_KIND]
+export type InboxKind = typeof INBOX_KIND[keyof typeof INBOX_KIND]
+export type InboxStatus = typeof INBOX_STATUS[keyof typeof INBOX_STATUS]
 export type Role = typeof USER_ROLE[keyof typeof USER_ROLE]
 export type PostStatus = typeof POST_STATUS[keyof typeof POST_STATUS]
 export type BlockType = typeof BLOCK_TYPE[keyof typeof BLOCK_TYPE]
 export type Table = typeof TABLE[keyof typeof TABLE]
+
+/** Kinds visibles pour un rôle staff (ADMIN = tous). */
+export function inboxKindsForRole(role: Role): InboxKind[] {
+    if (role === USER_ROLE.ADMIN) {
+        return Object.values(INBOX_KIND)
+    }
+    return (Object.keys(INBOX_KIND_ROLES) as InboxKind[]).filter(kind =>
+        INBOX_KIND_ROLES[kind].includes(role)
+    )
+}

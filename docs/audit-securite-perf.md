@@ -27,7 +27,7 @@ Le code sécu / perf / dette / bugs polish est **fermé**. Docs infra : `docs/cl
 
 - [ ] Profil enrichi : technos connues, préférences, projets, suggestions, mes articles, mes tirages
 - [ ] Articles : vidéo / liens vidéo
-- [ ] Suggestions de technologies (contribués par la communauté)
+- [ ] Entrées inbox restantes côté client : signalement article, suggestion techno/article, demande auteur
 - [ ] Projets communauté / marque liés aux techs
 ### Qualité
 
@@ -40,6 +40,8 @@ Le code sécu / perf / dette / bugs polish est **fermé**. Docs infra : `docs/cl
 1. <span style="color:#e03e3e">[x]</span> Page **About** (`/about` — nav + footer)
 2. <span style="color:#e03e3e">[x]</span> Catégories encyclopédie : **API**, **CMS**, **Agent IA**, **Librairies**, **ORM** (hors tirage) · **BaaS** tirable comme backend
 3. <span style="color:#e03e3e">[x]</span> **Compatibilités** techs (inter-catégories) — ego-graphe fiche + admin + seed Firebase
+4. <span style="color:#e03e3e">[x]</span> **Tirage avec cette techno** (fiche → `/draft?with=slug`, couche verrouillée)
+5. <span style="color:#e03e3e">[x]</span> **Inbox** générique (rôles) + signalement techno (auth) sur fiche
 
 ---
 

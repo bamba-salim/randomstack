@@ -55,6 +55,18 @@ const router = createRouter({
                     meta: {requiresRoles: ['ADMIN', 'EDITOR']}
                 },
                 {
+                    path: 'inbox',
+                    name: 'inbox',
+                    component: () => import('./core/InboxPage.vue'),
+                    meta: {requiresRoles: ['ADMIN', 'EDITOR', 'AUTHOR', 'MODERATOR']}
+                },
+                {
+                    path: 'inbox/:id',
+                    name: 'inbox-detail',
+                    component: () => import('./core/InboxDetailPage.vue'),
+                    meta: {requiresRoles: ['ADMIN', 'EDITOR', 'AUTHOR', 'MODERATOR']}
+                },
+                {
                     path: 'manage-post',
                     name: 'manage-post',
                     component: () => import('./core/ManagePost.vue'),

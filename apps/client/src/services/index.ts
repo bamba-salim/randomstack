@@ -20,7 +20,8 @@ import type {
     FavoritesListResponse,
     ToggleFavoriteResponse,
     FileType,
-    Table
+    Table,
+    CreateInboxMessageFormBean
 } from '@randomstack/commons'
 import {FILE_TYPE, TABLE} from '@randomstack/commons'
 
@@ -174,4 +175,11 @@ export const uploadFile = async (
 export const fileUrl = (id: string | null | undefined): string => {
     if (!id) return ''
     return `${ApiClient.baseUrl}/files/${id}`
+}
+
+/** Inbox — signalement / suggestion (auth) */
+export const createInboxMessage = async (
+    payload: CreateInboxMessageFormBean
+): Promise<{success: boolean}> => {
+    return await ApiClient.post('/create-inbox-message', payload)
 }

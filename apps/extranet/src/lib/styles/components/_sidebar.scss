@@ -44,6 +44,15 @@ $neon-pink: #ec4899;
       &.disabled {
         @apply text-blue-300/60 hover:text-blue-300 rounded cursor-not-allowed hover:bg-transparent;
       }
+
+      &--inbox {
+        @apply flex items-center justify-between gap-2;
+      }
+    }
+
+    .inbox-badge {
+      @apply inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full
+        bg-cyan-400 text-[#0a2540] text-[10px] font-black leading-none;
     }
 
     .logout-btn {
