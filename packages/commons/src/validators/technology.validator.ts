@@ -21,6 +21,11 @@ function normalizeHistory(raw: unknown): string[] {
     return raw.map(p => String(p ?? '').trim()).filter(Boolean)
 }
 
+function normalizeIdList(raw: unknown): string[] {
+    if (!Array.isArray(raw)) return []
+    return [...new Set(raw.map(id => String(id ?? '').trim()).filter(Boolean))]
+}
+
 function normalizeOptionalUrl(
     raw: unknown,
     field: string,
@@ -133,6 +138,9 @@ export function validateSaveTechnology(raw: unknown): ValidationResult<EditTechn
         userCount,
         projectCount,
         history: normalizeHistory(body['history']),
-        versions: normalizeVersions(body['versions'])
+        versions: normalizeVersions(body['versions']),
+        recommendedIds: normalizeIdList(body['recommendedIds']),
+        worksWithIds: normalizeIdList(body['worksWithIds']),
+        incompatibleIds: normalizeIdList(body['incompatibleIds'])
     })
 }

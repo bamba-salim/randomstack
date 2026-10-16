@@ -51,6 +51,12 @@ enum VoteType {
   DISLIKE
 }
 
+enum CompatibilityKind {
+  WORKS_WITH
+  RECOMMENDED
+  INCOMPATIBLE
+}
+
 model Technology {
   id         String     @id @default(uuid())
   name       String     @unique
@@ -64,6 +70,26 @@ model Technology {
 
   // Relation 1-à-1 : detail.id = Technology.id
   detail TechnologyInfo?
+
+  compatFrom TechnologyCompatibility[] @relation("CompatFrom")
+  compatTo   TechnologyCompatibility[] @relation("CompatTo")
+}
+
+/// Lien de compatibilité entre deux technos (souvent symétrique en écriture)
+model TechnologyCompatibility {
+  id     String            @id @default(uuid())
+  fromId String
+  toId   String
+  kind   CompatibilityKind
+  note   String?
+
+  from Technology @relation("CompatFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to   Technology @relation("CompatTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@unique([fromId, toId])
+  @@index([fromId])
+  @@index([toId])
+  @@index([kind])
 }
 
 // Infos enrichies d'une technologie (table lourde)

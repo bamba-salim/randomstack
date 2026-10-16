@@ -62,6 +62,21 @@ export const TECHNOLOGY_CATEGORY_LABELS: Record<
     BAAS: 'BaaS',
 }
 
+export const COMPATIBILITY_KIND = {
+    WORKS_WITH: 'WORKS_WITH',
+    RECOMMENDED: 'RECOMMENDED',
+    INCOMPATIBLE: 'INCOMPATIBLE',
+} as const
+
+export const COMPATIBILITY_KIND_LABELS: Record<
+    (typeof COMPATIBILITY_KIND)[keyof typeof COMPATIBILITY_KIND],
+    string
+> = {
+    WORKS_WITH: 'Compatible',
+    RECOMMENDED: 'Recommandé',
+    INCOMPATIBLE: 'Incompatible',
+}
+
 export const USER_ROLE = {
     USER: 'USER',
     AUTHOR: 'AUTHOR',
@@ -94,6 +109,7 @@ export const BLOCK_TYPE = {
 
 export type FileType = typeof FILE_TYPE[keyof typeof FILE_TYPE]
 export type Category = typeof TECHNOLOGY_CATEGORY[keyof typeof TECHNOLOGY_CATEGORY]
+export type CompatibilityKind = typeof COMPATIBILITY_KIND[keyof typeof COMPATIBILITY_KIND]
 export type Role = typeof USER_ROLE[keyof typeof USER_ROLE]
 export type PostStatus = typeof POST_STATUS[keyof typeof POST_STATUS]
 export type BlockType = typeof BLOCK_TYPE[keyof typeof BLOCK_TYPE]

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import {ref, onMounted, watch} from 'vue'
+import {ref, computed, onMounted, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {fetchTechnologyBySlug, fileUrl} from '#services'
 import {Breadcrumbs, AdSlot} from '#components'
+import TechCompatGraph from './components/TechCompatGraph.vue'
 import type {PublicTechnologyDetail} from '@randomstack/commons'
 
 const route = useRoute()
@@ -10,6 +11,10 @@ const router = useRouter()
 
 const tech = ref<PublicTechnologyDetail | null>(null)
 const loading = ref(true)
+
+const graphNodes = computed(() =>
+  (tech.value?.compatibilities || []).filter(c => c.kind !== 'INCOMPATIBLE')
+)
 
 const loadTech = async (slug: string) => {
   loading.value = true
@@ -160,6 +165,33 @@ watch(() => route.params['slug'], (slug) => {
             >
               📚 Consulter la Documentation
             </a>
+          </div>
+        </section>
+
+        <section
+            v-if="graphNodes.length || tech.incompatibilities?.length"
+            class="tech-compat-section"
+        >
+          <h2 class="section-heading">Compatibilités</h2>
+
+          <TechCompatGraph
+              v-if="graphNodes.length"
+              :center="{id: tech.id, name: tech.name, slug: tech.slug, logo: tech.logo}"
+              :nodes="graphNodes"
+          />
+
+          <div v-if="tech.incompatibilities?.length">
+            <h3 class="section-heading mt-4">Non recommandé</h3>
+            <ul class="tech-compat-section__list">
+              <li v-for="c in tech.incompatibilities" :key="`inc-${c.id}`">
+                <router-link
+                    :to="`/technology/${c.slug}`"
+                    class="tech-compat-section__chip tech-compat-section__chip--incompatible"
+                >
+                  {{ c.name }}
+                </router-link>
+              </li>
+            </ul>
           </div>
         </section>
       </div>

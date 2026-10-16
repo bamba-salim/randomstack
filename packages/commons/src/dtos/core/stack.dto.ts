@@ -1,4 +1,4 @@
-import type {Category} from '../../constants'
+import type {Category, CompatibilityKind} from '../../constants'
 import type {TechnologyVersion} from '../../interfaces/core/technology.interface'
 
 /** Formulaire création / édition techno (extranet) */
@@ -20,6 +20,21 @@ export interface EditTechnologyFormBean {
     projectCount?: number | null
     history?: string[]
     versions?: TechnologyVersion | null
+
+    /** IDs technos liées (catégories disjointes) */
+    recommendedIds?: string[]
+    worksWithIds?: string[]
+    incompatibleIds?: string[]
+}
+
+/** Nœud léger pour listes / graphe de compatibilité */
+export interface TechnologyCompatLite {
+    id: string
+    slug: string
+    name: string
+    logo: string | null
+    categories: Category[]
+    kind: CompatibilityKind
 }
 
 /** Liste encyclopédie (cartes) */
@@ -64,6 +79,10 @@ export interface PublicTechnologyDetail {
     versions: TechnologyVersion | null
     userCount: number | null
     projectCount: number | null
+    /** Ego-graphe / listes (recommandé + compatible) */
+    compatibilities: TechnologyCompatLite[]
+    /** Liste exhaustive des vrais conflits */
+    incompatibilities: TechnologyCompatLite[]
 }
 
 /** Pool tirage / blacklist (exclu du tirage) */

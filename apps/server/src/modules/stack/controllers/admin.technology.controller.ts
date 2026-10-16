@@ -1,6 +1,8 @@
 import type {Request, Response} from 'express'
 import crypto from 'crypto'
+import type {EditTechnologyFormBean} from '@randomstack/commons'
 import TechnologyModel from '../models/technology.model'
+import TechnologyCompatibilityModel from '../models/technology-compatibility.model'
 import TechnologyMapper from '../mappers/technology.mapper'
 
 export default class AdminTechnologyController {
@@ -20,7 +22,8 @@ export default class AdminTechnologyController {
                     res.status(404).json({error: 'Technologie introuvable.'})
                     return
                 }
-                formBean = TechnologyMapper.fromDBToClientFormBean(tech)
+                const compatRows = await TechnologyCompatibilityModel.fetchForTechnology(id)
+                formBean = TechnologyMapper.fromDBToClientFormBean(tech, compatRows)
             }
 
             res.json(formBean)
@@ -32,12 +35,12 @@ export default class AdminTechnologyController {
 
     /**
      * Sauvegarde d'une technologie en JSON pur (l'upload de fichier passe par le module file)
-     * Cible : POST /api/admin/technologies / PUT /api/admin/technologies/:id
      */
     static async saveTechnology(req: Request, res: Response): Promise<void> {
         try {
             const {id} = req.params
             const targetId = id || crypto.randomUUID()
+            const body = req.body as EditTechnologyFormBean
 
             if (id) {
                 const existingTech = await TechnologyModel.fetchTechnologyById(id)
@@ -47,11 +50,23 @@ export default class AdminTechnologyController {
                 }
             }
 
-            const editDTO = TechnologyMapper.toSaveTechnologyDTO(req.body, targetId)
+            const editDTO = TechnologyMapper.toSaveTechnologyDTO(body, targetId)
 
             const result = id
                 ? await TechnologyModel.updateTechnology(id, editDTO)
                 : await TechnologyModel.createTechnology(editDTO)
+
+            const links = TechnologyMapper.extractCompatLinksFromBody(body)
+            const sync = await TechnologyCompatibilityModel.replaceForTechnology(
+                result.id,
+                links,
+                result.categories as EditTechnologyFormBean['categories']
+            )
+
+            if (!sync.ok) {
+                res.status(400).json({error: sync.error, field: 'compatibilities'})
+                return
+            }
 
             res.json(TechnologyMapper.buildSaveTechnologyResponse(result))
         } catch (error: any) {

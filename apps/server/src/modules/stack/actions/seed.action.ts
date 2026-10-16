@@ -1,11 +1,13 @@
+import crypto from 'crypto'
 import {UserModel} from '#user'
 import {PasswordUtils} from '#utils'
 import {FileUtils} from '#file'
 
 import TechnologyModel from '../models/technology.model'
+import TechnologyCompatibilityModel from '../models/technology-compatibility.model'
 import TechnologyMapper from '../mappers/technology.mapper'
 
-import type {Category, RawExcelTech, Role} from '@randomstack/commons'
+import type {Category, CompatibilityKind, RawExcelTech, Role} from '@randomstack/commons'
 
 type SeedAccount = {
     envEmail: string
@@ -64,14 +66,16 @@ export default class SeedAction {
     static async execute(): Promise<void> {
         try {
             await this.injectTechnologies()
+            await this.syncBaasCategories()
+            await this.injectFirebaseCompatibilities()
             await this.injectSeedUsers()
         } catch (error: any) {
             console.error('[Seed] ❌ ERREUR CRITIQUE rencontrée pendant le seeding :', error.message || error)
         }
     }
 
-    private static determineCategories(utilisation: string): Category[] {
-        const lower = utilisation.toLowerCase()
+    private static determineCategories(utilisation: string, framework = ''): Category[] {
+        const lower = `${utilisation} ${framework}`.toLowerCase()
         const categories: Category[] = []
 
         if (lower.includes('frontend')) categories.push('FRONTEND')
@@ -87,7 +91,17 @@ export default class SeedAction {
             categories.push('DATABASE')
         }
 
-        if (
+        const isBaas =
+            lower.includes('baas')
+            || lower.includes('backend-as-a-service')
+            || lower.includes('backend as a service')
+            || lower.includes('firebase')
+            || lower.includes('supabase')
+
+        // BaaS avant le match générique « backend » (ex. « Backend-as-a-Service »)
+        if (isBaas) {
+            categories.push('BAAS')
+        } else if (
             lower.includes('backend')
             || lower.includes('back-end')
             || lower.includes('serveur')
@@ -130,9 +144,6 @@ export default class SeedAction {
         if (lower.includes('orm') || lower.includes('odm') || lower.includes('query builder')) {
             categories.push('ORM')
         }
-        if (lower.includes('baas') || lower.includes('firebase') || lower.includes('supabase')) {
-            categories.push('BAAS')
-        }
 
         if (categories.length === 0) {
             console.warn(
@@ -142,6 +153,25 @@ export default class SeedAction {
         }
 
         return categories
+    }
+
+    /** Reclasse Firebase / Supabase en BAAS (idempotent, DBs déjà seedées). */
+    private static async syncBaasCategories() {
+        const baasNames = new Set(['firebase', 'supabase'])
+        const all = await TechnologyModel.fetchTechnologies()
+        let updated = 0
+
+        for (const tech of all) {
+            if (!baasNames.has(tech.name.toLowerCase())) continue
+            const cats = tech.categories as Category[]
+            if (cats.length === 1 && cats[0] === 'BAAS') continue
+            await TechnologyModel.setCategories(tech.id, ['BAAS'])
+            updated++
+        }
+
+        if (updated) {
+            console.log(`[Seed] ✅ Catégorie BAAS synchronisée : ${updated} techno(s).`)
+        }
     }
 
     private static async injectTechnologies() {
@@ -159,7 +189,7 @@ export default class SeedAction {
             }
 
             for (const tech of technologies) {
-                const categories = this.determineCategories(tech.Utilisation)
+                const categories = this.determineCategories(tech.Utilisation, tech.Framework)
                 const targetId = crypto.randomUUID()
                 const techno = TechnologyMapper.toSaveFromExcel(tech, categories, targetId)
 
@@ -167,6 +197,92 @@ export default class SeedAction {
             }
             console.log(`[Seed] ✅ Ingestion réussie : ${technologies.length} technologies importées de l'Excel.`)
         }
+    }
+
+    /**
+     * Compatibilités Firebase (BaaS) → technos d’autres catégories uniquement.
+     * Idempotent : réécrit les liens Firebase à chaque boot.
+     */
+    private static async injectFirebaseCompatibilities() {
+        const all = await TechnologyModel.fetchTechnologies()
+        const byName = new Map(all.map(t => [t.name.toLowerCase(), t]))
+
+        const firebase = byName.get('firebase')
+        if (!firebase) {
+            console.warn('[Seed] Firebase introuvable — compatibilités ignorées.')
+            return
+        }
+
+        // Uniquement d’autres catégories que BAAS (FRONTEND / MOBILE / BACKEND / …)
+        const recommended = [
+            'React',
+            'Flutter',
+            'Angular',
+            'Vue.js',
+            'Next.js',
+            'React Native',
+            'Nuxt.js',
+            'SvelteKit'
+        ]
+        const worksWith = [
+            'Svelte',
+            'SolidJS',
+            'Astro',
+            'Preact',
+            'Gatsby',
+            'Remix',
+            'Alpine.js',
+            'Vanilla JS',
+            'Vanilla TS',
+            'SwiftUI',
+            'Jetpack Compose',
+            'UIKit',
+            'Kotlin Multiplatform (KMP)',
+            '.NET MAUI / Xamarin',
+            'Node.js',
+            'Express.js',
+            'NestJS',
+            'Fastify',
+            'Koa.js',
+            'Hapi.js',
+            'Django',
+            'Flask',
+            'FastAPI',
+            'Laravel',
+            'Spring Boot',
+            'ASP.NET Core'
+        ]
+
+        const links: {toId: string; kind: CompatibilityKind}[] = []
+        const pushNamed = (names: string[], kind: CompatibilityKind) => {
+            for (const name of names) {
+                const target = byName.get(name.toLowerCase())
+                if (!target) continue
+                if (TechnologyCompatibilityModel.categoriesOverlap(
+                    firebase.categories as Category[],
+                    target.categories as Category[]
+                )) {
+                    continue
+                }
+                links.push({toId: target.id, kind})
+            }
+        }
+
+        pushNamed(recommended, 'RECOMMENDED')
+        pushNamed(worksWith, 'WORKS_WITH')
+
+        const result = await TechnologyCompatibilityModel.replaceForTechnology(
+            firebase.id,
+            links,
+            firebase.categories as Category[]
+        )
+
+        if (!result.ok) {
+            console.warn('[Seed] Compatibilités Firebase :', result.error)
+            return
+        }
+
+        console.log(`[Seed] ✅ Compatibilités Firebase : ${links.length} liens inter-catégories.`)
     }
 
     private static async injectSeedUsers() {

@@ -1,5 +1,5 @@
 import {BaseModel} from '#abstracts'
-import type {EditTechnology} from '@randomstack/commons'
+import type {Category, EditTechnology} from '@randomstack/commons'
 
 export default class TechnologyModel extends BaseModel {
 
@@ -66,6 +66,13 @@ export default class TechnologyModel extends BaseModel {
 
     static async countTechnologies(): Promise<number> {
         return await this.db.technology.count()
+    }
+
+    static async setCategories(id: string, categories: Category[]) {
+        return await this.db.technology.update({
+            where: {id},
+            data: {categories: {set: categories}}
+        })
     }
 
     static async getTechnologies() {

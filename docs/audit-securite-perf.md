@@ -14,7 +14,6 @@ Le code sécu / perf / dette / bugs polish est **fermé**. Docs infra : `docs/cl
 
 ### Produit / pages
 
-- [ ] **Compatibilités** entre techs (matrice / relations)
 - [ ] **CLI** `npx create-random-stack` (bootstrap projet dans le terminal)
 - [ ] **Multi-langue** : FR / EN / ES / PT / DE
 
@@ -40,6 +39,7 @@ Le code sécu / perf / dette / bugs polish est **fermé**. Docs infra : `docs/cl
 
 1. <span style="color:#e03e3e">[x]</span> Page **About** (`/about` — nav + footer)
 2. <span style="color:#e03e3e">[x]</span> Catégories encyclopédie : **API**, **CMS**, **Agent IA**, **Librairies**, **ORM** (hors tirage) · **BaaS** tirable comme backend
+3. <span style="color:#e03e3e">[x]</span> **Compatibilités** techs (inter-catégories) — ego-graphe fiche + admin + seed Firebase
 
 ---
 

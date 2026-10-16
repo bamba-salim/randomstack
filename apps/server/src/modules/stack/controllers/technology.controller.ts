@@ -1,5 +1,6 @@
 import type {Request, Response} from 'express'
 import TechnologyModel from '../models/technology.model'
+import TechnologyCompatibilityModel from '../models/technology-compatibility.model'
 import TechnologyMapper from '../mappers/technology.mapper'
 
 export default class TechnologyController {
@@ -15,7 +16,7 @@ export default class TechnologyController {
         }
     }
 
-    /** GET fiche publique → PublicTechnologyDetail */
+    /** GET fiche publique → PublicTechnologyDetail (+ compatibilités) */
     static async fetchTechnologyBySlug(req: Request, res: Response): Promise<void> {
         try {
             const {slug} = req.params
@@ -26,7 +27,8 @@ export default class TechnologyController {
                 return
             }
 
-            res.json(TechnologyMapper.buildPublicTechnologyDetail(tech))
+            const compatRows = await TechnologyCompatibilityModel.fetchForTechnology(tech.id)
+            res.json(TechnologyMapper.buildPublicTechnologyDetail(tech, compatRows))
         } catch (error) {
             console.error('[TechnologyController] Erreur fetchTechnologyBySlug :', error)
             res.status(500).json({error: 'Erreur lors de la récupération de la technologie.'})

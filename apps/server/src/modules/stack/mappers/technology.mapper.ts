@@ -1,11 +1,13 @@
 import type {
     Category,
+    CompatibilityKind,
     EditTechnology,
     EditTechnologyFormBean,
     TechnologyVersion,
     PublicTechnologyListed,
     AdminTechnologyListed,
     PublicTechnologyDetail,
+    TechnologyCompatLite,
     ExcludeTechnologyLite,
     DrawTechnologyLite,
     SaveTechnologyResponse
@@ -38,11 +40,34 @@ export default class TechnologyMapper {
             userCount: null,
             projectCount: null,
             history: [],
-            description: ''
+            description: '',
+            recommendedIds: [],
+            worksWithIds: [],
+            incompatibleIds: []
         }
     }
 
-    static fromDBToClientFormBean(tech: any): EditTechnologyFormBean {
+    static fromDBToClientFormBean(
+        tech: any,
+        compatRows: {
+            fromId: string
+            toId: string
+            kind: CompatibilityKind
+            from?: {id: string}
+            to?: {id: string}
+        }[] = []
+    ): EditTechnologyFormBean {
+        const recommendedIds: string[] = []
+        const worksWithIds: string[] = []
+        const incompatibleIds: string[] = []
+
+        for (const row of compatRows) {
+            const otherId = row.fromId === tech.id ? row.toId : row.fromId
+            if (row.kind === 'RECOMMENDED') recommendedIds.push(otherId)
+            else if (row.kind === 'WORKS_WITH') worksWithIds.push(otherId)
+            else if (row.kind === 'INCOMPATIBLE') incompatibleIds.push(otherId)
+        }
+
         return {
             id: tech.id,
             name: tech.name,
@@ -59,8 +84,51 @@ export default class TechnologyMapper {
             userCount: tech.detail?.userCount || null,
             projectCount: tech.detail?.projectCount || null,
             history: tech.detail?.history || [],
-            description: tech.detail?.description || ''
+            description: tech.detail?.description || '',
+            recommendedIds: [...new Set(recommendedIds)],
+            worksWithIds: [...new Set(worksWithIds)],
+            incompatibleIds: [...new Set(incompatibleIds)]
         }
+    }
+
+    static buildCompatLiteFromRows(
+        techId: string,
+        rows: {
+            kind: CompatibilityKind
+            fromId: string
+            toId: string
+            from: {id: string; slug: string; name: string; logo: string | null; categories: Category[]}
+            to: {id: string; slug: string; name: string; logo: string | null; categories: Category[]}
+        }[]
+    ): {compatibilities: TechnologyCompatLite[]; incompatibilities: TechnologyCompatLite[]} {
+        const seen = new Set<string>()
+        const compatibilities: TechnologyCompatLite[] = []
+        const incompatibilities: TechnologyCompatLite[] = []
+
+        for (const row of rows) {
+            const other = row.fromId === techId ? row.to : row.from
+            const key = `${other.id}:${row.kind}`
+            if (seen.has(key)) continue
+            seen.add(key)
+
+            const lite: TechnologyCompatLite = {
+                id: other.id,
+                slug: other.slug,
+                name: other.name,
+                logo: other.logo,
+                categories: other.categories || [],
+                kind: row.kind
+            }
+
+            if (row.kind === 'INCOMPATIBLE') incompatibilities.push(lite)
+            else compatibilities.push(lite)
+        }
+
+        const kindOrder = {RECOMMENDED: 0, WORKS_WITH: 1, INCOMPATIBLE: 2} as const
+        compatibilities.sort((a, b) => kindOrder[a.kind] - kindOrder[b.kind] || a.name.localeCompare(b.name, 'fr'))
+        incompatibilities.sort((a, b) => a.name.localeCompare(b.name, 'fr'))
+
+        return {compatibilities, incompatibilities}
     }
 
     static buildPublicTechnologyListed(tech: any): PublicTechnologyListed {
@@ -104,7 +172,11 @@ export default class TechnologyMapper {
         }
     }
 
-    static buildPublicTechnologyDetail(tech: any): PublicTechnologyDetail {
+    static buildPublicTechnologyDetail(
+        tech: any,
+        compatRows: Parameters<typeof TechnologyMapper.buildCompatLiteFromRows>[1] = []
+    ): PublicTechnologyDetail {
+        const {compatibilities, incompatibilities} = this.buildCompatLiteFromRows(tech.id, compatRows)
         return {
             id: tech.id,
             slug: tech.slug,
@@ -121,8 +193,22 @@ export default class TechnologyMapper {
             foundedAt: tech.detail?.foundedAt ?? null,
             versions: tech.detail?.versions ?? null,
             userCount: tech.detail?.userCount ?? null,
-            projectCount: tech.detail?.projectCount ?? null
+            projectCount: tech.detail?.projectCount ?? null,
+            compatibilities,
+            incompatibilities
         }
+    }
+
+    static extractCompatLinksFromBody(body: {
+        recommendedIds?: string[]
+        worksWithIds?: string[]
+        incompatibleIds?: string[]
+    }): {toId: string; kind: CompatibilityKind}[] {
+        const links: {toId: string; kind: CompatibilityKind}[] = []
+        for (const id of body.recommendedIds || []) links.push({toId: id, kind: 'RECOMMENDED'})
+        for (const id of body.worksWithIds || []) links.push({toId: id, kind: 'WORKS_WITH'})
+        for (const id of body.incompatibleIds || []) links.push({toId: id, kind: 'INCOMPATIBLE'})
+        return links
     }
 
     static buildExcludeTechnologyLite(tech: any): ExcludeTechnologyLite {

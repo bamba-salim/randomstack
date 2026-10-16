@@ -11,13 +11,17 @@ import {
   FILE_TYPE,
   TABLE,
   TECHNOLOGY_CATEGORY,
-  TECHNOLOGY_CATEGORY_LABELS
+  TECHNOLOGY_CATEGORY_LABELS,
+  type Category,
+  type AdminTechnologyListed,
+  type EditTechnologyFormBean
 } from '@randomstack/commons'
-
-const categoryOptions = Object.values(TECHNOLOGY_CATEGORY)
 import {toast} from '../../lib/toast'
 
-import type {AdminTechnologyListed, EditTechnologyFormBean} from '@randomstack/commons'
+const categoryOptions = Object.values(TECHNOLOGY_CATEGORY)
+
+const categoriesOverlap = (a: Category[], b: Category[]) =>
+  a.some(cat => b.includes(cat))
 
 const route = useRoute()
 const router = useRouter()
@@ -35,6 +39,13 @@ const allTechnologies = ref<AdminTechnologyListed[]>([])
 const selectedLanguageDropdown = ref('')
 const isCustomLanguage = ref(false)
 
+type CompatListKey = 'recommendedIds' | 'worksWithIds' | 'incompatibleIds'
+const compatQueries = ref<Record<CompatListKey, string>>({
+  recommendedIds: '',
+  worksWithIds: '',
+  incompatibleIds: ''
+})
+
 const clearFieldError = (key: string) => {
   if (!fieldErrors.value[key]) return
   const next = {...fieldErrors.value}
@@ -45,6 +56,76 @@ const clearFieldError = (key: string) => {
 const uniqueLanguages = computed(() => {
   return TechnologyFilter.getUniqueLanguages(allTechnologies.value)
 })
+
+const techById = computed(() => new Map(allTechnologies.value.map(t => [t.id, t])))
+
+/** Cibles de compatibilité : hors soi, catégories disjointes */
+const compatCandidates = computed(() => {
+  if (!formBean.value) return []
+  const selfId = formBean.value.id
+  const selfCats = formBean.value.categories || []
+  return allTechnologies.value
+    .filter(t => t.id !== selfId && !categoriesOverlap(selfCats, t.categories || []))
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name, 'fr'))
+})
+
+/** Suggestions datalist : pas déjà liées dans une des 3 listes */
+const compatSuggestions = computed(() => {
+  if (!formBean.value) return []
+  const taken = new Set([
+    ...formBean.value.recommendedIds,
+    ...formBean.value.worksWithIds,
+    ...formBean.value.incompatibleIds
+  ])
+  return compatCandidates.value.filter(t => !taken.has(t.id))
+})
+
+const resolveCompatTech = (raw: string) => {
+  const q = raw.trim().toLowerCase()
+  if (!q) return null
+  return (
+    compatSuggestions.value.find(t => t.name.toLowerCase() === q)
+    || compatSuggestions.value.find(t => t.name.toLowerCase().startsWith(q))
+    || null
+  )
+}
+
+const addCompat = (key: CompatListKey) => {
+  if (!formBean.value) return
+  const tech = resolveCompatTech(compatQueries.value[key])
+  if (!tech) return
+
+  for (const list of ['recommendedIds', 'worksWithIds', 'incompatibleIds'] as CompatListKey[]) {
+    formBean.value[list] = formBean.value[list].filter(id => id !== tech.id)
+  }
+  formBean.value[key].push(tech.id)
+  compatQueries.value[key] = ''
+  clearFieldError('compatibilities')
+}
+
+const handleCompatInput = (key: CompatListKey, e: Event) => {
+  const val = (e.target as HTMLInputElement).value
+  if (val.includes(',')) {
+    val.split(',').forEach(chunk => {
+      compatQueries.value[key] = chunk
+      addCompat(key)
+    })
+  }
+}
+
+const handleCompatEnter = (key: CompatListKey, e: KeyboardEvent) => {
+  e.preventDefault()
+  addCompat(key)
+}
+
+const removeCompat = (key: CompatListKey, id: string) => {
+  if (!formBean.value) return
+  formBean.value[key] = formBean.value[key].filter(x => x !== id)
+  clearFieldError('compatibilities')
+}
+
+const compatChipName = (id: string) => techById.value.get(id)?.name || id
 
 const handleLanguageSelect = () => {
   if (!formBean.value) return
@@ -123,7 +204,12 @@ onMounted(async () => {
     isEditMode.value = Boolean(techId.value)
 
     const flatFormBean = await fetchTechnologyFormData(techId.value)
-    formBean.value = flatFormBean
+    formBean.value = {
+      ...flatFormBean,
+      recommendedIds: flatFormBean.recommendedIds || [],
+      worksWithIds: flatFormBean.worksWithIds || [],
+      incompatibleIds: flatFormBean.incompatibleIds || []
+    }
 
     selectedLanguageDropdown.value = flatFormBean.language || ''
     isCustomLanguage.value = false
@@ -340,6 +426,74 @@ onMounted(async () => {
       <BaseInput v-model="formBean.versions.latest.num" label="Dernière Version (Numéro)" placeholder="Ex: v4.1.2"/>
       <BaseInput v-model="formBean.versions.latest.date" label="Date de sortie (Dernière)"
                  placeholder="Ex: 01/02/2026"/>
+    </div>
+
+    <!-- COMPATIBILITÉS (inter-catégories uniquement) — même UX que les tags -->
+    <div class="form-group col-span-2 border border-[#c3c4c7] p-4 bg-[#f6f8fa]">
+      <label class="form-label">Compatibilités</label>
+      <p class="text-[10px] text-slate-500 mb-3">
+        Liens uniquement avec des technos d’<strong>autres catégories</strong>.
+        Recherche + Entrée / Ajouter (comme les tags). Incompatibles = conflits réels uniquement.
+      </p>
+      <p v-if="fieldErrors.compatibilities" class="form-field-error mb-2">{{ fieldErrors.compatibilities }}</p>
+
+      <datalist id="suggested-compat-techs">
+        <option
+            v-for="t in compatSuggestions"
+            :key="t.id"
+            :value="t.name"
+        >
+          {{ t.categories.map(c => TECHNOLOGY_CATEGORY_LABELS[c]).join(', ') }}
+        </option>
+      </datalist>
+
+      <div class="flex flex-col gap-5">
+        <div
+            v-for="block in [
+              {key: 'recommendedIds' as const, label: 'Recommandé'},
+              {key: 'worksWithIds' as const, label: 'Compatible'},
+              {key: 'incompatibleIds' as const, label: 'Incompatible (exhaustif)'}
+            ]"
+            :key="block.key"
+        >
+          <label class="form-label text-[10px]">{{ block.label }}</label>
+          <div class="flex gap-2 mb-2">
+            <input
+                v-model="compatQueries[block.key]"
+                list="suggested-compat-techs"
+                type="text"
+                class="form-input flex-1 text-xs"
+                placeholder="Rechercher une techno…"
+                @input="handleCompatInput(block.key, $event)"
+                @keydown.enter="handleCompatEnter(block.key, $event)"
+            />
+            <button
+                type="button"
+                class="px-3 py-2 bg-white border border-[#c3c4c7] text-[10px] font-bold shrink-0"
+                @click="addCompat(block.key)"
+            >
+              Ajouter
+            </button>
+          </div>
+          <div
+              v-if="formBean[block.key].length"
+              class="flex flex-wrap gap-2 pt-2 border-t border-[#c3c4c7]/40"
+          >
+            <span
+                v-for="id in formBean[block.key]"
+                :key="`${block.key}-${id}`"
+                class="flex items-center gap-1.5 px-2.5 py-1 bg-white border border-[#c3c4c7] rounded-full text-[10px] font-black"
+            >
+              {{ compatChipName(id) }}
+              <button
+                  type="button"
+                  class="text-slate-400 hover:text-red-500"
+                  @click="removeCompat(block.key, id)"
+              >✕</button>
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ZONE DE LOGO / ILLUSTRATION -->
