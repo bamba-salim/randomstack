@@ -18,6 +18,48 @@ export const TECHNOLOGY_CATEGORY = {
     DATABASE: 'DATABASE',
     MOBILE: 'MOBILE',
     DESKTOP: 'DESKTOP',
+    /** Encyclopédie — hors tirage `/draft` (sauf BAAS → couche serveur) */
+    API: 'API',
+    CMS: 'CMS',
+    AI_AGENT: 'AI_AGENT',
+    LIBRARY: 'LIBRARY',
+    ORM: 'ORM',
+    /** BaaS : tirable comme backend (Firebase, Supabase…) */
+    BAAS: 'BAAS',
+} as const
+
+/** Catégories éligibles au générateur `/draft` */
+export const DRAW_ELIGIBLE_CATEGORIES = [
+    TECHNOLOGY_CATEGORY.FRONTEND,
+    TECHNOLOGY_CATEGORY.BACKEND,
+    TECHNOLOGY_CATEGORY.DATABASE,
+    TECHNOLOGY_CATEGORY.MOBILE,
+    TECHNOLOGY_CATEGORY.DESKTOP,
+    TECHNOLOGY_CATEGORY.BAAS,
+] as const
+
+/** Couche serveur du tirage = BACKEND + BaaS */
+export const DRAW_SERVER_CATEGORIES = [
+    TECHNOLOGY_CATEGORY.BACKEND,
+    TECHNOLOGY_CATEGORY.BAAS,
+] as const
+
+/** Libellés UI (admin / encyclopédie) */
+export const TECHNOLOGY_CATEGORY_LABELS: Record<
+    (typeof TECHNOLOGY_CATEGORY)[keyof typeof TECHNOLOGY_CATEGORY],
+    string
+> = {
+    FRONTEND: 'Frontend',
+    BACKEND: 'Backend',
+    DATABASE: 'Base de données',
+    MOBILE: 'Mobile',
+    DESKTOP: 'Desktop',
+    API: 'API',
+    CMS: 'CMS',
+    AI_AGENT: 'Agent IA',
+    LIBRARY: 'Librairies',
+    ORM: 'ORM',
+    BAAS: 'BaaS',
 }
 
 export const USER_ROLE = {

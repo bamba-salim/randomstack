@@ -82,7 +82,6 @@ export default class SeedAction {
             lower.includes('base de données') ||
             lower.includes('stockage') ||
             lower.includes('cache') ||
-            lower.includes('baas') ||
             lower.includes('database')
         ) {
             categories.push('DATABASE')
@@ -96,6 +95,43 @@ export default class SeedAction {
             || lower.includes('runtime')
         ) {
             categories.push('BACKEND')
+        }
+
+        // Encyclopédie (hors tirage si aucune couche FRONT/BACK/DB/…)
+        if (
+            lower.includes('saas')
+            || lower.includes('api tierce')
+            || lower.includes('api externe')
+            || lower.includes('third-party')
+        ) {
+            categories.push('API')
+        }
+        if (lower.includes('cms') || lower.includes('wordpress') || lower.includes('headless')) {
+            categories.push('CMS')
+        }
+        if (
+            lower.includes('agent ia')
+            || lower.includes('ai agent')
+            || lower.includes('llm')
+            || lower.includes('copilot')
+        ) {
+            categories.push('AI_AGENT')
+        }
+        if (
+            lower.includes('librairie')
+            || lower.includes('library')
+            || lower.includes('css')
+            || lower.includes('jquery')
+            || lower.includes('tailwind')
+            || lower.includes('bootstrap')
+        ) {
+            categories.push('LIBRARY')
+        }
+        if (lower.includes('orm') || lower.includes('odm') || lower.includes('query builder')) {
+            categories.push('ORM')
+        }
+        if (lower.includes('baas') || lower.includes('firebase') || lower.includes('supabase')) {
+            categories.push('BAAS')
         }
 
         if (categories.length === 0) {

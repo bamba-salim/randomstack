@@ -2,7 +2,12 @@
 import {ref, onMounted, computed} from 'vue'
 import {fetchAllTechnologies} from '#services'
 import {Pagination, AdSlot} from '#components'
-import {TechnologyFilter, type PublicTechnologyListed} from '@randomstack/commons'
+import {
+  TechnologyFilter,
+  TECHNOLOGY_CATEGORY,
+  TECHNOLOGY_CATEGORY_LABELS,
+  type PublicTechnologyListed
+} from '@randomstack/commons'
 
 import TechCard from './components/TechCard.vue'
 
@@ -15,6 +20,22 @@ const searchQuery = ref('')
 const selectedFilter = ref<string>('ALL')
 const currentPage = ref(1)
 const itemsPerPage = ref(20)
+
+/** Filtres encyclopédie (libellés FR) — Web = FRONTEND */
+const categoryFilters = [
+  {value: 'ALL', label: 'Tout'},
+  {value: TECHNOLOGY_CATEGORY.FRONTEND, label: 'Web'},
+  {value: TECHNOLOGY_CATEGORY.BACKEND, label: TECHNOLOGY_CATEGORY_LABELS.BACKEND},
+  {value: TECHNOLOGY_CATEGORY.DATABASE, label: TECHNOLOGY_CATEGORY_LABELS.DATABASE},
+  {value: TECHNOLOGY_CATEGORY.MOBILE, label: TECHNOLOGY_CATEGORY_LABELS.MOBILE},
+  {value: TECHNOLOGY_CATEGORY.DESKTOP, label: TECHNOLOGY_CATEGORY_LABELS.DESKTOP},
+  {value: TECHNOLOGY_CATEGORY.API, label: TECHNOLOGY_CATEGORY_LABELS.API},
+  {value: TECHNOLOGY_CATEGORY.CMS, label: TECHNOLOGY_CATEGORY_LABELS.CMS},
+  {value: TECHNOLOGY_CATEGORY.AI_AGENT, label: TECHNOLOGY_CATEGORY_LABELS.AI_AGENT},
+  {value: TECHNOLOGY_CATEGORY.LIBRARY, label: TECHNOLOGY_CATEGORY_LABELS.LIBRARY},
+  {value: TECHNOLOGY_CATEGORY.ORM, label: TECHNOLOGY_CATEGORY_LABELS.ORM},
+  {value: TECHNOLOGY_CATEGORY.BAAS, label: TECHNOLOGY_CATEGORY_LABELS.BAAS}
+]
 
 // Filtre partagé depuis commons
 const filterResult = computed(() => {
@@ -78,34 +99,13 @@ onMounted(async () => {
 
       <div class="flex gap-2 overflow-x-auto pb-1 sm:pb-0">
         <button
-            @click="handleFilterChange('ALL')"
-            :class="['btn', selectedFilter === 'ALL' ? 'btn--primary' : 'btn--secondary']"
+            v-for="filter in categoryFilters"
+            :key="filter.value"
+            type="button"
+            @click="handleFilterChange(filter.value)"
+            :class="['btn', selectedFilter === filter.value ? 'btn--primary' : 'btn--secondary']"
         >
-          Tout
-        </button>
-        <button
-            @click="handleFilterChange('FRONTEND')"
-            :class="['btn', selectedFilter === 'FRONTEND' ? 'btn--primary' : 'btn--secondary']"
-        >
-          Web
-        </button>
-        <button
-            @click="handleFilterChange('BACKEND')"
-            :class="['btn', selectedFilter === 'BACKEND' ? 'btn--primary' : 'btn--secondary']"
-        >
-          Backend
-        </button>
-        <button
-            @click="handleFilterChange('DATABASE')"
-            :class="['btn', selectedFilter === 'DATABASE' ? 'btn--primary' : 'btn--secondary']"
-        >
-          Base de données
-        </button>
-        <button
-            @click="handleFilterChange('MOBILE')"
-            :class="['btn', selectedFilter === 'MOBILE' ? 'btn--primary' : 'btn--secondary']"
-        >
-          Mobile
+          {{ filter.label }}
         </button>
       </div>
     </div>

@@ -1,0 +1,6 @@
+-- Catégories encyclopédie (hors tirage générateur)
+ALTER TYPE "Category" ADD VALUE IF NOT EXISTS 'CMS';
+ALTER TYPE "Category" ADD VALUE IF NOT EXISTS 'AI_AGENT';
+ALTER TYPE "Category" ADD VALUE IF NOT EXISTS 'LIBRARY';
+ALTER TYPE "Category" ADD VALUE IF NOT EXISTS 'ORM';
+ALTER TYPE "Category" ADD VALUE IF NOT EXISTS 'BAAS';

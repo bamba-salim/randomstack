@@ -14,8 +14,7 @@ Le code sécu / perf / dette / bugs polish est **fermé**. Docs infra : `docs/cl
 
 ### Produit / pages
 
-- [ ] Liste **API** (page / section dédiée)
-- [ ] Liste **librairies** + **compatibilités** (matrice / relations entre techs)
+- [ ] **Compatibilités** entre techs (matrice / relations)
 - [ ] **CLI** `npx create-random-stack` (bootstrap projet dans le terminal)
 - [ ] **Multi-langue** : FR / EN / ES / PT / DE
 
@@ -31,8 +30,6 @@ Le code sécu / perf / dette / bugs polish est **fermé**. Docs infra : `docs/cl
 - [ ] Articles : vidéo / liens vidéo
 - [ ] Suggestions de technologies (contribués par la communauté)
 - [ ] Projets communauté / marque liés aux techs
-- [ ] Réflexion produit « ORM / BaaS » (Supabase, Firebase…) — pas une dette sécu
-
 ### Qualité
 
 - [ ] Audit / checkup **API & routes** post-refonte (manuel)
@@ -42,6 +39,7 @@ Le code sécu / perf / dette / bugs polish est **fermé**. Docs infra : `docs/cl
 ### Fait (produit)
 
 1. <span style="color:#e03e3e">[x]</span> Page **About** (`/about` — nav + footer)
+2. <span style="color:#e03e3e">[x]</span> Catégories encyclopédie : **API**, **CMS**, **Agent IA**, **Librairies**, **ORM** (hors tirage) · **BaaS** tirable comme backend
 
 ---
 

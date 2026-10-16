@@ -13,6 +13,13 @@ enum Category {
   DATABASE
   MOBILE
   DESKTOP
+  /// Ci-dessous : encyclopédie uniquement (hors tirage `/draft` par défaut)
+  API
+  CMS
+  AI_AGENT
+  LIBRARY
+  ORM
+  BAAS
 }
 
 enum Role {

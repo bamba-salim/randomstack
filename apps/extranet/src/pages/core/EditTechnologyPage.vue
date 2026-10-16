@@ -5,7 +5,16 @@ import {useRoute, useRouter} from 'vue-router'
 import {Sidebar, ParagraphManager, BaseInput, BaseToggle} from '#components'
 
 import {saveTechnology, fetchTechnologies, fetchTechnologyFormData, uploadFile, fileUrl, ApiError} from '#services'
-import {TechnologyFilter, validateSaveTechnology, FILE_TYPE, TABLE} from '@randomstack/commons'
+import {
+  TechnologyFilter,
+  validateSaveTechnology,
+  FILE_TYPE,
+  TABLE,
+  TECHNOLOGY_CATEGORY,
+  TECHNOLOGY_CATEGORY_LABELS
+} from '@randomstack/commons'
+
+const categoryOptions = Object.values(TECHNOLOGY_CATEGORY)
 import {toast} from '../../lib/toast'
 
 import type {AdminTechnologyListed, EditTechnologyFormBean} from '@randomstack/commons'
@@ -206,7 +215,7 @@ onMounted(async () => {
         <label class="form-label">Catégories techniques associées (Multi-choix)</label>
         <div class="flex flex-wrap gap-2.5 mt-2">
           <label
-              v-for="cat in ['FRONTEND', 'BACKEND', 'DATABASE', 'MOBILE', 'DESKTOP']"
+              v-for="cat in categoryOptions"
               :key="cat"
               class="flex items-center gap-2 px-3 py-2 bg-[#f0f0f1] border border-[#c3c4c7] hover:bg-[#e0e0e0] rounded text-xs font-semibold text-[#1d2327] cursor-pointer select-none transition-colors duration-150"
           >
@@ -217,7 +226,7 @@ onMounted(async () => {
                 class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
                 @change="clearFieldError('categories')"
             />
-            <span>{{ cat }}</span>
+            <span>{{ TECHNOLOGY_CATEGORY_LABELS[cat] }}</span>
           </label>
         </div>
         <p v-if="fieldErrors.categories" class="form-field-error">{{ fieldErrors.categories }}</p>

@@ -59,9 +59,18 @@ const shareCodeGenerated = ref<string | null>(null)
 // ─── Groupement réactif pour le tiroir Blacklist ───────────────────────────
 // Regroupe les technologies par couche pour l'affichage dans BlacklistDrawer
 const groupedTechnologies = computed(() => ({
-  CLIENT: allTechnologies.value.filter(t => Array.isArray(t.categories) && t.categories.some(cat => ['FRONTEND', 'MOBILE', 'DESKTOP'].includes(cat))),
-  SERVER: allTechnologies.value.filter(t => Array.isArray(t.categories) && t.categories.includes('BACKEND')),
-  DATABASE: allTechnologies.value.filter(t => Array.isArray(t.categories) && t.categories.includes('DATABASE'))
+  // Encyclopédie-only (API, CMS, LIBRARY, ORM…) hors draft ; BaaS = couche serveur
+  CLIENT: allTechnologies.value.filter(t =>
+    Array.isArray(t.categories)
+    && t.categories.some(cat => ['FRONTEND', 'MOBILE', 'DESKTOP'].includes(cat))
+  ),
+  SERVER: allTechnologies.value.filter(t =>
+    Array.isArray(t.categories)
+    && t.categories.some(cat => ['BACKEND', 'BAAS'].includes(cat))
+  ),
+  DATABASE: allTechnologies.value.filter(t =>
+    Array.isArray(t.categories) && t.categories.includes('DATABASE')
+  )
 }))
 
 // Ajoute ou retire une technologie de la blacklist selon son état actuel

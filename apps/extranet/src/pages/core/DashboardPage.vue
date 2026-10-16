@@ -109,11 +109,17 @@ onMounted(() => {
 
       <select v-model="selectedCategory" @change="handleFilterChange" class="filter-select">
         <option value="">📦 Toutes les catégories</option>
-        <option value="FRONTEND">FRONTEND</option>
-        <option value="BACKEND">BACKEND</option>
-        <option value="DATABASE">DATABASE</option>
-        <option value="MOBILE">MOBILE</option>
-        <option value="DESKTOP">DESKTOP</option>
+        <option value="FRONTEND">Frontend</option>
+        <option value="BACKEND">Backend</option>
+        <option value="DATABASE">Base de données</option>
+        <option value="MOBILE">Mobile</option>
+        <option value="DESKTOP">Desktop</option>
+        <option value="API">API</option>
+        <option value="CMS">CMS</option>
+        <option value="AI_AGENT">Agent IA</option>
+        <option value="LIBRARY">Librairies</option>
+        <option value="ORM">ORM</option>
+        <option value="BAAS">BaaS</option>
       </select>
 
     </div>
