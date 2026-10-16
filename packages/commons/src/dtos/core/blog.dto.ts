@@ -12,6 +12,8 @@ export interface EditPostFormBean {
     summary: string
     content: PostContentBlock[]
     imageId?: string | null
+    /** Légende de l’illustration principale (optionnelle) */
+    imageCaption?: string | null
     status: PostStatus
     tags: string[]
     /** Sources / crédits (texte libre, comme les tags sans suggestions). */
@@ -88,6 +90,7 @@ export interface PublicPostDetail {
     summary: string
     content: PostContentBlock[]
     imageId: string | null
+    imageCaption?: string | null
     tags: string[]
     sources: string[]
     mainTag: string

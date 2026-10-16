@@ -12,51 +12,43 @@ export default class BlogAction {
     }
 
     /**
-     * Moteur de résolution de l'article "À la une" pour le flux global (Home / Blog)
-     * Règle des 48h : si l'article épinglé a plus de 48h, le dernier article publié devient featured.
+     * Choisit l’article « à la une » parmi une liste déjà chargée (1 requête amont).
+     * Règle 48h : épinglé périmé → fallback sur le plus récent.
      */
-    static async resolveFeaturedPost() {
-        // 1. Cherche l'article explicitement épinglé par l'administrateur
-        let featured = await BlogModel.fetchExplicitFeaturedPost()
+    private static pickFeatured(candidates: any[]): any | null {
+        if (!candidates.length) return null
 
-        // 2. Règle des 48h : vérification de l'âge de publication
-        if (featured) {
-            const publishDate = featured.publishAt || featured.createdAt
-            if (this.isOlderThanHours(publishDate, 48)) {
-                // Trop ancien : on annule la mise en avant explicite
-                featured = null
+        const pinned = candidates.find(p => p.isFeatured)
+        if (pinned) {
+            const publishDate = pinned.publishAt || pinned.createdAt
+            if (!this.isOlderThanHours(publishDate, 48)) {
+                return pinned
             }
         }
 
-        // 3. Fallback : s'il n'y a pas d'article à la une (ou s'il est périmé), on prend le plus récent
-        if (!featured) {
-            featured = await BlogModel.fetchLatestPost()
-        }
+        // Plus récent par date (indépendant de l’ordre isFeatured)
+        const byDate = [...candidates].sort((a, b) => {
+            const da = new Date(a.publishAt || a.createdAt).getTime()
+            const db = new Date(b.publishAt || b.createdAt).getTime()
+            return db - da
+        })
+        return byDate[0] ?? null
+    }
 
-        return featured
+    /**
+     * Moteur de résolution de l'article "À la une" pour le flux global (Home / Blog)
+     * Une seule requête Prisma (candidats featured + récents).
+     */
+    static async resolveFeaturedPost() {
+        const candidates = await BlogModel.fetchFeaturedCandidates()
+        return this.pickFeatured(candidates)
     }
 
     /**
      * Moteur de résolution de l'article "À la une" pour un tag spécifique (/tag/:tag)
-     * Applique la même règle des 48h et le même fallback sur le flux filtré par tag.
      */
     static async resolveFeaturedPostByTag(tag: string) {
-        // 1. Cherche l'article épinglé pour ce tag spécifique
-        let featured = await BlogModel.fetchExplicitFeaturedPostByTag(tag)
-
-        // 2. Règle des 48h
-        if (featured) {
-            const publishDate = featured.publishAt || featured.createdAt
-            if (this.isOlderThanHours(publishDate, 48)) {
-                featured = null
-            }
-        }
-
-        // 3. Fallback : article le plus récent avec ce tag
-        if (!featured) {
-            featured = await BlogModel.fetchLatestPostByTag(tag)
-        }
-
-        return featured
+        const candidates = await BlogModel.fetchFeaturedCandidatesByTag(tag)
+        return this.pickFeatured(candidates)
     }
 }

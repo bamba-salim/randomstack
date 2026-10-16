@@ -189,13 +189,14 @@ watch(() => route.params['slug'], (slug) => {
           {{ post.summary }}
         </p>
 
-        <figure v-if="post.imageId" class="w-full bg-[#f6f8fa] border border-[#c3c4c7] overflow-hidden mb-8">
+        <figure v-if="post.imageId" class="article-cover mb-8">
           <img
               :src="fileUrl(post.imageId)"
-              :alt="post.title"
+              :alt="post.imageCaption || post.title"
               class="w-full h-auto max-h-[480px] object-cover"
               fetchpriority="high"
           />
+          <figcaption v-if="post.imageCaption">{{ post.imageCaption }}</figcaption>
         </figure>
 
         <div class="post-content-body flex flex-col gap-6 w-full text-left">

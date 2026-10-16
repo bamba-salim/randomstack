@@ -39,6 +39,14 @@
   text-align: left;
 }
 
+.article-cover {
+  @apply w-full bg-[#f6f8fa] border border-[#c3c4c7] overflow-hidden;
+
+  figcaption {
+    @apply text-[10px] text-slate-500 italic mt-0 px-3 py-2 text-center border-t border-[#c3c4c7];
+  }
+}
+
 // Shell article + pubs latérales
 // Mobile : contenu seul · Tablette : contenu + rail droit · Desktop : 2 rails
 .article-page-shell {

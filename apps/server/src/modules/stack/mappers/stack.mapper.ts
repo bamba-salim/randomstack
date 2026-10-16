@@ -51,7 +51,9 @@ export default class StackMapper {
         return {
             success: true,
             shareCode: saved.shareCode,
-            expiresAt: saved.expiresAt
+            expiresAt: saved.expiresAt instanceof Date
+                ? saved.expiresAt.toISOString()
+                : String(saved.expiresAt)
         }
     }
 }

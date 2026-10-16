@@ -68,13 +68,12 @@ export default class BlogController {
                 return
             }
 
-            const session = (req as any).session
             const profile = await UserModel.findProfileById(post.authorId)
             const author = profile ? BlogMapper.buildAuthorListed(profile) : null
 
             let isFavorite = false
-            if (session?.userId) {
-                isFavorite = await FavoriteModel.isFavorite(session.userId, post.id)
+            if (req.session?.userId) {
+                isFavorite = await FavoriteModel.isFavorite(req.session.userId, post.id)
             }
 
             res.json(BlogMapper.buildPublicPostDetail(post, author, isFavorite))
@@ -91,9 +90,8 @@ export default class BlogController {
     static async fetchPostPreview(req: Request, res: Response): Promise<void> {
         try {
             const {shareCode} = req.params
-            const session = (req as any).session
-            const role = session?.userRole as string | undefined
-            const userId = session?.userId as string | undefined
+            const role = req.session?.userRole
+            const userId = req.session?.userId
 
             const staff = ['ADMIN', 'EDITOR', 'AUTHOR', 'MODERATOR']
             if (!userId || !role || !staff.includes(role)) {

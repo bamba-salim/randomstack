@@ -45,12 +45,14 @@ export default class TechnologyModel extends BaseModel {
     }
 
     static async updateTechnology(id: string, payload: EditTechnology) {
-        const {id: _, slug: __, ...technologyData} = payload.technology
+        const {id: _, slug: __, categories, ...technologyData} = payload.technology
 
         return await this.db.technology.update({
             where: {id},
             data: {
                 ...technologyData,
+                // Scalar list : `set` remplace toute la liste (évite les merges partiels)
+                categories: {set: categories},
                 detail: {
                     upsert: {
                         create: payload.detail,

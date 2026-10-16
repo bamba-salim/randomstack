@@ -18,7 +18,7 @@ export default class AdminUserController {
 
     static async fetchUsers(req: Request, res: Response): Promise<void> {
         try {
-            const actorRole = (req as any).session?.userRole as Role | undefined
+            const actorRole = req.session?.userRole as Role | undefined
             // EDITOR : uniquement les AUTHOR (pour voir leurs articles)
             const roleFilter = actorRole === 'EDITOR' ? ('AUTHOR' as Role) : undefined
             const users = await UserModel.fetchAllAdminUsers(roleFilter)
@@ -32,7 +32,7 @@ export default class AdminUserController {
     static async fetchUserById(req: Request, res: Response): Promise<void> {
         try {
             const {id} = req.params
-            const actorRole = (req as any).session?.userRole as Role | undefined
+            const actorRole = req.session?.userRole as Role | undefined
             const user = await UserModel.fetchAdminUserById(id)
             if (!user) {
                 res.status(404).json({error: 'Utilisateur introuvable.'})
@@ -54,7 +54,7 @@ export default class AdminUserController {
      */
     static async createUser(req: Request, res: Response): Promise<void> {
         try {
-            const actorRole = (req as any).session?.userRole as Role | undefined
+            const actorRole = req.session?.userRole as Role | undefined
             if (actorRole !== 'ADMIN') {
                 res.status(403).json({error: 'Seul un administrateur peut créer un utilisateur.'})
                 return
@@ -97,8 +97,7 @@ export default class AdminUserController {
         try {
             const {id} = req.params
             const {role} = req.body as UpdateUserRoleFormBean
-            const session = (req as any).session
-            const actorRole = session?.userRole as Role | undefined
+            const actorRole = req.session?.userRole as Role | undefined
             const moderatorManagedRoles: Role[] = ['USER', 'AUTHOR']
 
             if (!id) {

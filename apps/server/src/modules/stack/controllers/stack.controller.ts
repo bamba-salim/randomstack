@@ -1,4 +1,5 @@
 import type {Request, Response} from 'express'
+import crypto from 'crypto'
 import {sendSafeError} from '#utils'
 import TechnologyModel from '../models/technology.model'
 import StackModel from '../models/stack.model.js'
@@ -7,9 +8,19 @@ import StackMapper from '../mappers/stack.mapper.js'
 import TechnologyMapper from '../mappers/technology.mapper.js'
 import type {Category} from '@randomstack/commons'
 
+const HISTORY_MAX = 20
+const SHARE_CODE_ATTEMPTS = 8
+
 export default class StackController {
+    /** Code court cryptographique (6 chars A-Z0-9). */
     private static generateShortCode(): string {
-        return Math.random().toString(36).substring(2, 8).toUpperCase()
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        const bytes = crypto.randomBytes(6)
+        let code = ''
+        for (let i = 0; i < 6; i++) {
+            code += alphabet[bytes[i]! % alphabet.length]
+        }
+        return code
     }
 
     /**
@@ -42,13 +53,13 @@ export default class StackController {
                 newDraw.timestamp
             )
 
-            const session = (req as any).session || {}
-            if (!session.history) {
-                session.history = []
+            if (!req.session.history) {
+                req.session.history = []
             }
-            session.history.unshift(resolvedStack)
+            req.session.history.unshift(resolvedStack)
+            req.session.history = req.session.history.slice(0, HISTORY_MAX)
 
-            res.json(StackMapper.buildDrawResponse(resolvedStack, session.history))
+            res.json(StackMapper.buildDrawResponse(resolvedStack, req.session.history))
         } catch (error) {
             sendSafeError(res, error, {
                 label: '[StackController] Erreur draw',
@@ -62,8 +73,7 @@ export default class StackController {
      * Cible : GET /fetch-draw-history
      */
     static async getHistory(req: Request, res: Response): Promise<void> {
-        const session = (req as any).session || {}
-        res.json(StackMapper.buildDrawHistoryResponse(session.history || []))
+        res.json(StackMapper.buildDrawHistoryResponse(req.session.history || []))
     }
 
     /** GET pool tirage / blacklist → ExcludeTechnologyLite[] */
@@ -92,19 +102,43 @@ export default class StackController {
                 return
             }
 
-            const shareCode = StackController.generateShortCode()
             const expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            let saved = null
 
-            const saved = await StackModel.create({
-                shareCode,
-                projectType: projectType as Category,
-                frontendId,
-                backendId,
-                databaseId,
-                ormId: ormId || null,
-                expiresAt: expirationDate,
-                createdAt: new Date()
-            })
+            for (let attempt = 0; attempt < SHARE_CODE_ATTEMPTS; attempt++) {
+                const shareCode = StackController.generateShortCode()
+                const existing = await StackModel.findByCode(shareCode)
+                if (existing) continue
+
+                try {
+                    saved = await StackModel.create({
+                        shareCode,
+                        projectType: projectType as Category,
+                        frontendId,
+                        backendId,
+                        databaseId,
+                        ormId: ormId || null,
+                        expiresAt: expirationDate,
+                        createdAt: new Date()
+                    })
+                    break
+                } catch (error: unknown) {
+                    // Collision unique concurrente → retry
+                    if (
+                        error
+                        && typeof error === 'object'
+                        && (error as {code?: string}).code === 'P2002'
+                    ) {
+                        continue
+                    }
+                    throw error
+                }
+            }
+
+            if (!saved) {
+                res.status(500).json({error: 'Impossible de générer un code de partage unique.'})
+                return
+            }
 
             res.json(StackMapper.buildShareCreatedListed(saved))
         } catch (error: unknown) {
@@ -121,8 +155,13 @@ export default class StackController {
      */
     static async fetchShare(req: Request, res: Response): Promise<void> {
         try {
-            const {code} = req.params
-            const shared = await StackModel.findByCode(code.toUpperCase())
+            const raw = String(req.params['code'] || '').trim()
+            if (!raw) {
+                res.status(400).json({error: 'Code de partage manquant.'})
+                return
+            }
+
+            const shared = await StackModel.findByCode(raw.toUpperCase())
 
             if (!shared) {
                 res.status(404).json({error: "Ce lien de partage n'existe pas."})
@@ -135,7 +174,16 @@ export default class StackController {
             }
 
             const allTechs = await TechnologyModel.fetchTechnologies()
-            res.json(StackMapper.buildSharedStackListed(shared, allTechs as any))
+            const listed = StackMapper.buildSharedStackListed(shared, allTechs)
+
+            if (!listed.clientLayer || !listed.serverLayer || !listed.databaseLayer) {
+                res.status(410).json({
+                    error: 'Ce partage référence des technologies indisponibles.'
+                })
+                return
+            }
+
+            res.json(listed)
         } catch (error) {
             sendSafeError(res, error, {
                 label: '[StackController] Échec fetchShare',

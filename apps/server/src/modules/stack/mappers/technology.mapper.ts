@@ -164,6 +164,19 @@ export default class TechnologyMapper {
         }
 
         const rawCategories = rawBody.categories
+        let categories: Category[]
+        if (Array.isArray(rawCategories)) {
+            categories = rawCategories
+                .map((c: unknown) => String(c).trim())
+                .filter(Boolean) as Category[]
+        } else if (typeof rawCategories === 'string' && rawCategories.trim() !== '') {
+            categories = rawCategories.split(',').map((c: string) => c.trim()).filter(Boolean) as Category[]
+        } else {
+            categories = []
+        }
+        if (categories.length === 0) {
+            categories = ['FRONTEND']
+        }
 
         return {
             technology: {
@@ -173,11 +186,7 @@ export default class TechnologyMapper {
                 language: String(rawBody.language || '').trim(),
                 logo: rawBody.logo || null,
                 usage: String(rawBody.usage || '').trim(),
-                categories: Array.isArray(rawCategories)
-                    ? rawCategories
-                    : (typeof rawCategories === 'string' && rawCategories.trim() !== ''
-                        ? rawCategories.split(',').map((c: string) => c.trim()).filter(Boolean)
-                        : ['FRONTEND']),
+                categories,
                 isActive: rawBody.isActive === 'true' || rawBody.isActive === true
             },
             detail: {

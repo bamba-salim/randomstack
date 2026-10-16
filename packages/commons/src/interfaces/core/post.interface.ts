@@ -19,6 +19,8 @@ export interface Post {
     summary: string
     content: PostContentBlock[]
     imageId: string | null
+    /** Légende de l’illustration principale */
+    imageCaption?: string | null
     status: PostStatus
     tags: string[]
     sources: string[]

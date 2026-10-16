@@ -158,8 +158,10 @@ model Post {
   comments         Comment[]
   favorites        PostFavorite[]
 
-  imageId String?
-  image   File?   @relation(fields: [imageId], references: [id], onDelete: SetNull)
+  imageId      String?
+  image        File?   @relation(fields: [imageId], references: [id], onDelete: SetNull)
+  /// Légende de l’illustration principale (cover)
+  imageCaption String?
 
   @@index([slug])
   @@index([shareCode])

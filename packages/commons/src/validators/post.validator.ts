@@ -73,6 +73,13 @@ export function validateSavePost(raw: unknown): ValidationResult<EditPostFormBea
         ? null
         : asString(body['imageId'])
 
+    const rawCaption = body['imageCaption'] == null || body['imageCaption'] === ''
+        ? null
+        : sanitizePlainText(asString(body['imageCaption']))
+    const imageCaption = rawCaption && rawCaption.length > 300
+        ? rawCaption.slice(0, 300)
+        : rawCaption
+
     const authorId = body['authorId'] == null || body['authorId'] === ''
         ? null
         : asString(body['authorId'])
@@ -87,6 +94,7 @@ export function validateSavePost(raw: unknown): ValidationResult<EditPostFormBea
         summary: cleanSummary,
         content: sanitizePostContent(normalizeContent(body['content'])),
         imageId,
+        imageCaption,
         status,
         tags: normalizeStringList(body['tags']),
         sources: normalizeStringList(body['sources']),

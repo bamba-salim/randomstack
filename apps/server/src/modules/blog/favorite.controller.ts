@@ -5,7 +5,7 @@ import BlogMapper from './blog.mapper'
 export default class FavoriteController {
 
     private static sessionUserId(req: Request): string | undefined {
-        return (req as any).session?.userId as string | undefined
+        return req.session?.userId
     }
 
     /** GET /fetch-favorites — authentifié */

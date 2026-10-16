@@ -23,8 +23,21 @@ export default class BlogModel extends BaseModel {
     }
 
     /**
-     * Cherche l'article explicitement marqué comme "À la une" par la rédaction
+     * Candidats « à la une » (1 requête).
+     * Épinglés d’abord, puis les plus récents — BlogAction applique la règle 48h.
      */
+    static async fetchFeaturedCandidates(limit = 40) {
+        return await this.db.post.findMany({
+            where: {status: 'PUBLISHED'},
+            orderBy: [
+                {isFeatured: 'desc'},
+                {publishAt: 'desc'}
+            ],
+            take: limit
+        })
+    }
+
+    /** @deprecated — préférer fetchFeaturedCandidates */
     static async fetchExplicitFeaturedPost() {
         return await this.db.post.findFirst({
             where: { status: 'PUBLISHED', isFeatured: true },
@@ -32,9 +45,7 @@ export default class BlogModel extends BaseModel {
         })
     }
 
-    /**
-     * Fallback : récupère le tout dernier article publié
-     */
+    /** @deprecated — préférer fetchFeaturedCandidates */
     static async fetchLatestPost() {
         return await this.db.post.findFirst({
             where: { status: 'PUBLISHED' },
@@ -83,9 +94,22 @@ export default class BlogModel extends BaseModel {
         })
     }
 
-    /**
-     * Cherche l'article à la une pour un tag donné
-     */
+    /** Candidats « à la une » filtrés par tag (1 requête). */
+    static async fetchFeaturedCandidatesByTag(tag: string, limit = 40) {
+        return await this.db.post.findMany({
+            where: {
+                status: 'PUBLISHED',
+                tags: {has: tag}
+            },
+            orderBy: [
+                {isFeatured: 'desc'},
+                {publishAt: 'desc'}
+            ],
+            take: limit
+        })
+    }
+
+    /** @deprecated — préférer fetchFeaturedCandidatesByTag */
     static async fetchExplicitFeaturedPostByTag(tag: string) {
         return await this.db.post.findFirst({
             where: {
@@ -97,9 +121,7 @@ export default class BlogModel extends BaseModel {
         })
     }
 
-    /**
-     * Fallback : dernier article publié pour un tag donné
-     */
+    /** @deprecated — préférer fetchFeaturedCandidatesByTag */
     static async fetchLatestPostByTag(tag: string) {
         return await this.db.post.findFirst({
             where: {

@@ -6,10 +6,9 @@ import CommentMapper from './comment.mapper'
 export default class CommentController {
 
     private static sessionUser(req: Request) {
-        const session = (req as any).session
         return {
-            userId: session?.userId as string | undefined,
-            userRole: session?.userRole as string | undefined
+            userId: req.session?.userId,
+            userRole: req.session?.userRole
         }
     }
 

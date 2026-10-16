@@ -30,7 +30,7 @@ export default class StackModel extends BaseModel {
 
     static async findByCode(shareCode: string) {
         return await this.db.savedStack.findUnique({
-            where: { shareCode }
+            where: {shareCode: shareCode.trim().toUpperCase()}
         })
     }
 

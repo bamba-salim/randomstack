@@ -12,10 +12,9 @@ type SessionInfo = {userId?: string; userRole?: string}
 export default class AdminBlogController {
 
     private static session(req: Request): SessionInfo {
-        const session = req.session as any
         return {
-            userId: session?.userId,
-            userRole: session?.userRole
+            userId: req.session.userId,
+            userRole: req.session.userRole
         }
     }
 

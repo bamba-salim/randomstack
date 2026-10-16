@@ -158,22 +158,30 @@ const handleDraw = async () => {
  */
 const handleShare = async () => {
   if (!currentStack.value || loading.value) return
+
+  const frontendId = currentStack.value.clientLayer?.id
+  const backendId = currentStack.value.serverLayer?.id
+  const databaseId = currentStack.value.databaseLayer?.id
+  if (!frontendId || !backendId || !databaseId) {
+    toast.error('Tirage incomplet — impossible de partager.')
+    return
+  }
+
   loading.value = true
-
   try {
-    const payload = {
+    const data = await saveShare({
       projectType: selectedProjectType.value,
-      frontendId: currentStack.value.clientLayer?.id || '',
-      backendId: currentStack.value.serverLayer?.id || '',
-      databaseId: currentStack.value.databaseLayer?.id || '',
+      frontendId,
+      backendId,
+      databaseId,
       ormId: null
-    }
-
-    const data = await saveShare(payload)
-    if (data.success) {
+    })
+    if (data.success && data.shareCode) {
       shareCodeGenerated.value = data.shareCode
       showShareModal.value = true
       toast.success('Lien de partage généré.')
+    } else {
+      toast.error('Impossible de générer le lien de partage.')
     }
   } catch {
     toast.error('Impossible de générer le lien de partage.')
@@ -191,7 +199,7 @@ const handleShare = async () => {
  *  3. Sinon → charge l'historique de session et restaure le dernier stack affiché
  */
 onMounted(async () => {
-  //try {
+  try {
     // Étape 1 — Chargement de toutes les technologies (nécessaire pour la blacklist)
     allTechnologies.value = await fetchDrawTechnologies()
 
@@ -201,7 +209,9 @@ onMounted(async () => {
       loading.value = true
       try {
         const sharedData = await fetchShare(shareCode)
-        // Restaure le stack partagé dans les rouleaux
+        if (!sharedData.clientLayer || !sharedData.serverLayer || !sharedData.databaseLayer) {
+          throw new Error('incomplete-share')
+        }
         selectedProjectType.value = sharedData.projectType
         currentStack.value = {
           clientLayer: sharedData.clientLayer,
@@ -209,15 +219,15 @@ onMounted(async () => {
           databaseLayer: sharedData.databaseLayer,
           timestamp: sharedData.timestamp
         }
-        clientReel.value = [sharedData.clientLayer!]
-        serverReel.value = [sharedData.serverLayer!]
-        databaseReel.value = [sharedData.databaseLayer!]
-        loading.value = false
-        return  // On s'arrête ici, pas besoin de charger l'historique
+        clientReel.value = [sharedData.clientLayer]
+        serverReel.value = [sharedData.serverLayer]
+        databaseReel.value = [sharedData.databaseLayer]
+        return
       } catch {
-        // Lien expiré ou invalide → retour à la page de tirage normale
         toast.info('Ce lien de partage a expiré ou n’existe pas. Chargement de l’historique.')
         router.replace('/draft')
+      } finally {
+        loading.value = false
       }
     }
 
@@ -225,17 +235,17 @@ onMounted(async () => {
     const fetchedHistory = await fetchHistory()
     history.value = fetchedHistory
     if (fetchedHistory.length > 0) {
-      const last = fetchedHistory[0]  // Le plus récent est en tête de liste
-      if (last) {
+      const last = fetchedHistory[0]
+      if (last?.clientLayer && last?.serverLayer && last?.databaseLayer) {
         currentStack.value = last
-        clientReel.value = [last.clientLayer!]
-        serverReel.value = [last.serverLayer!]
-        databaseReel.value = [last.databaseLayer!]
+        clientReel.value = [last.clientLayer]
+        serverReel.value = [last.serverLayer]
+        databaseReel.value = [last.databaseLayer]
       }
     }
-  //} catch {
-   // console.warn("Historique de session indisponible.")
- // }
+  } catch {
+    toast.error('Impossible de charger le générateur.')
+  }
 })
 </script>
 

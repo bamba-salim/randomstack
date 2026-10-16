@@ -22,9 +22,8 @@ function regenerateSession(req: Request): Promise<void> {
 
 async function openSession(req: Request, user: {id: string; role: string; passwordHash?: string}, plainPassword?: string) {
     await regenerateSession(req)
-    const session = req.session as any
-    session.userId = user.id
-    session.userRole = user.role
+    req.session.userId = user.id
+    req.session.userRole = user.role
 
     // Upgrade PBKDF2 si ancien hash (1000 itérations)
     if (plainPassword && user.passwordHash && PasswordUtils.needsRehash(user.passwordHash)) {
@@ -111,8 +110,13 @@ export default class AuthController {
 
     static async me(req: Request, res: Response): Promise<void> {
         try {
-            const session = req.session as any
-            const user = await UserModel.findById(session.userId)
+            const userId = req.session.userId
+            if (!userId) {
+                res.status(401).json({error: 'Authentification requise.'})
+                return
+            }
+
+            const user = await UserModel.findById(userId)
 
             if (!user) {
                 res.status(404).json({error: 'Utilisateur introuvable.'})
@@ -120,7 +124,7 @@ export default class AuthController {
             }
 
             // Aligne le rôle session sur la DB
-            session.userRole = user.role
+            req.session.userRole = user.role
 
             res.json(AuthMapper.buildSessionUserResponse(user))
         } catch {
@@ -166,8 +170,7 @@ export default class AuthController {
      */
     static async updateProfile(req: Request, res: Response): Promise<void> {
         try {
-            const session = req.session as any
-            const userId = session?.userId as string | undefined
+            const userId = req.session.userId
             if (!userId) {
                 res.status(401).json({error: 'Authentification requise.'})
                 return

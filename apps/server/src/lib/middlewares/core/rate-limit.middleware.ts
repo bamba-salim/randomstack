@@ -4,8 +4,7 @@ type Bucket = {count: number; resetAt: number}
 
 /** Clé user session si dispo, sinon IP (évite de coller tout un NAT sur un compte). */
 function sessionOrIp(req: Request): string {
-    const userId = (req.session as {userId?: string} | undefined)?.userId
-    return userId || req.ip || 'unknown'
+    return req.session?.userId || req.ip || 'unknown'
 }
 
 /**

@@ -434,6 +434,15 @@ onMounted(async () => {
               @change="handleCoverUpload"
               class="file-input w-full"
           />
+          <input
+              v-if="formBean.imageId"
+              v-model="formBean.imageCaption"
+              type="text"
+              class="form-input-inline w-full mt-3 !mb-0"
+              :disabled="isReadOnly"
+              maxlength="300"
+              placeholder="Légende de la cover (optionnelle)"
+          />
         </div>
       </div>
 

@@ -88,7 +88,20 @@ export default class SeedAction {
             categories.push('DATABASE')
         }
 
+        if (
+            lower.includes('backend')
+            || lower.includes('back-end')
+            || lower.includes('serveur')
+            || lower.includes('api')
+            || lower.includes('runtime')
+        ) {
+            categories.push('BACKEND')
+        }
+
         if (categories.length === 0) {
+            console.warn(
+                `[Seed] Catégorie non reconnue pour utilisation="${utilisation}" → fallback BACKEND`
+            )
             categories.push('BACKEND')
         }
 
