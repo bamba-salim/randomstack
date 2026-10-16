@@ -2,157 +2,86 @@
 
 > ℹ️ **Source de vérité = le code.**
 >
-> Branche : `master` · HEAD : `86a6580` (optimise css)
+> Branche : `master` · dernière passe : **16 octobre 2026**
 >
-> Routes plates : `/` · `/ws` · `/auth` · `/auth/admin`
->
-> Dernière passe code : **15 octobre 2026**
->
-> Légende : <span style="color:#e03e3e">[x]</span> = fait · `[ ]` = à faire
+> Légende : <span style="color:#e03e3e">[x]</span> = fait · `[ ]` = à faire · `N` = idée produit (plus tard)
 
 ---
 
-## Ordre de fix recommandé
+## À faire maintenant
 
-1. ~~**Sécurité immédiate** — auth sur `POST /upload-file` + fixer cover `'POST'` → `TABLE.POST`~~
-2. **Sécu API** — helmet + `trust proxy` + `express.json({ limit })` + garde `CORS_ALLOW_ALL` en prod
-3. ~~**Validators / contenu** — `validateSaveTechnology` + sanitize HTML serveur~~
-4. ~~**Ops** — session store PG~~ + Bucket Railway / DNS (infra)
-5. ~~**Produit** — enrichir filtre client admin posts (auteur + résumé)~~
+### Go-live prod (ensemble)
 
----
+1. [ ] `NODE_ENV=production` (Railway)
+2. [ ] Domaines Cloudflare `www` / `admin` / `api` + SSL Full (strict)
+3. [ ] `CORS_ALLOW_ALL=false` + `CLIENT_ORIGIN` / `EXTRANET_ORIGIN`
+4. [ ] `SESSION_SECRET` ≥ 32 caractères
+5. [ ] Vérifier Bucket `S3_*` en prod
 
-## CRITICAL
+> Déjà dans le code : `trust proxy` (auto en prod) + garde CORS (refuse de démarrer si allow-all en prod).
 
-- <span style="color:#e03e3e">[x]</span> **`POST /upload-file` authentifié** — `AuthMiddleware.isAuthenticated` + rate-limit — `web-service.ts`
-- <span style="color:#e03e3e">[x]</span> **Secret de session** — env + refus prod si `< 32` caractères ; `secure` conditionnel — `session.middleware.ts`
-- <span style="color:#e03e3e">[x]</span> **Seed admin** — plus de password dans stdout (email loggé à la création seulement ; OK résiduel) — `seed.action.ts`
-- <span style="color:#e03e3e">[x]</span> **Alias `#utils` / `#scheduler`** — `apps/server/package.json` pointe bien sous `src/`
-- <span style="color:#e03e3e">[x]</span> **`file.dto.ts` versionné** — `packages/commons/src/dtos/core/file.dto.ts`
-- <span style="color:#e03e3e">[x]</span> **URLs images** — helper `fileUrl()` + `VITE_API_URL` (client + extranet)
+### Dette technique restante (ex-To Do / Notion)
 
----
+6. [ ] **Historique session borné** — `session.history.unshift` puis `.slice(0, 20)` — `stack.controller.ts`
+7. [ ] **`generateShortCode` crypto** — `crypto.randomBytes` à la place de `Math.random()`
+8. [ ] **Collision `shareCode`** — retry / check unicité avant insert (en plus du unique DB si présent)
+9. [ ] **Seed `determineCategories` warn** — `console.warn` si fallback `BACKEND`
+10. [ ] **Types session** — `session.d.ts` (`userId`, `userRole`, `history`) — finir le `as any`
+11. [ ] **Featured post 1 requête** — fusionner `fetchExplicitFeaturedPost` + `fetchLatestPost` dans `blog.action.ts`
 
-## IMPORTANT
+### Bugs / polish (à confirmer encore vivants)
 
-- <span style="color:#e03e3e">[x]</span> **`GET /files/:id` → 404** si inconnu (+ validation UUID) — `file.controller.ts`
-- <span style="color:#e03e3e">[x]</span> **`EditPostPage` `isEditMode`** — `Boolean(postId)` OK
-- <span style="color:#e03e3e">[x]</span> **Upload cover `TABLE.POST`** — `EditPostPage.vue` utilise `FILE_TYPE.IMAGE` + `TABLE.POST`
-- <span style="color:#e03e3e">[x]</span> **Double cron** — `index.ts` ne boot plus les crons ; `worker.ts` + `#scheduler` seuls
-- <span style="color:#e03e3e">[x]</span> **Encyclopédie = toutes les techs** (y compris inactives) — voulu ; `isActive` réservé au **generator** (`fetchActiveTechnologies` / draw)
-- <span style="color:#e03e3e">[x]</span> **PBKDF2** — **120_000** itérations + rehash legacy 1000 — `password.utils.ts`
-- <span style="color:#e03e3e">[x]</span> **Recherche admin posts** — filtre client sur titre + résumé + auteur + tags (`AdminPostListed` enrichi ; toujours 1× fetch, pas de query à la frappe)
-- <span style="color:#e03e3e">[x]</span> **Convention DTO** — garder `*Listed` (élément de liste) + `*Lite` (embed) ; **pas** de rename `Listed` → `Item` (cosmétique, zero gain)
-- <span style="color:#e03e3e">[x]</span> **Validation login / register / profile / admin-login** — `ValidateMiddleware` + commons validators
-- <span style="color:#e03e3e">[x]</span> **Validators post / comment / user** — en place
-- <span style="color:#e03e3e">[x]</span> **Validator `save-technology`** — `validateSaveTechnology` + `ValidateMiddleware` + erreurs champ extranet
+12. [ ] Bug catégories techno à la create/update
+13. [ ] Bug share stack technique
+14. [ ] Légende cover post (si encore manquante côté UI)
 
 ---
 
-## MINOR
+## Spec To Do / Notion — déchiffrage
 
-- <span style="color:#e03e3e">[x]</span> **Routes « orphelines » (check 15/10)** :
-  - `DELETE /ws/delete-post` → **utilisé** (EditPostPage corbeille)
-  - `GET /fetch-similar-posts/:slug` → **utilisé** (ArticleDetailView)
-  - `GET /ws/fetch-tags` → **utilisé** (EditPostPage) ; `GET /fetch-tags` **public** → **orphelins** (aucun front)
-  - `GET /ws/fetch-posts-contents` → **orphelin** (ADMIN only, aucun front)
-- <span style="color:#e03e3e">[x]</span> **`PublicPostDetail` / date** — `ArticleDetailView` utilise `publishAt` (plus de `createdAt` requis)
-- <span style="color:#e03e3e">[x]</span> **Login** — message unique (plus d’énumération email) — `AUTH_FAIL` / `REGISTER_FAIL`
-- <span style="color:#e03e3e">[x]</span> **`MODERATOR`** — login admin OK **et** `/ws` autorisé en lecture (posts/users) ; écriture articles refusée (voulu)
-- [ ] **CORS `allow-all`** — toujours possible via env ; **pas de garde prod** — `index.ts`
-- <span style="color:#e03e3e">[x]</span> **Alias paths (check 15/10)** :
-  - `#modules` / `#interfaces` → **morts** (fichiers absents) → retirés du tsconfig ; types = commons, pas de mega-barrel
-  - `#blog` était déclaré mais inutilisé → branché (api, web-service, jobs, auth.controller)
-  - extranet `#scripts` → **mort** (pas de dossier) → retiré package/tsconfig/vite
-- <span style="color:#e03e3e">[x]</span> **`DrawAction` dupliqué / `#action-support`** — disparu
-- [ ] **Spec Notion V0** vs stack réelle (Vue + Prisma) — doc
+Légende To Do : `L` / `Æ` ≈ fait ou quasi · `N` = backlog produit · `È` = sous-tâche.
 
----
+### Déjà couvert par le code actuel
 
-## Résolu récemment (ne plus rouvrir)
+| Item To Do | Verdict |
+|------------|---------|
+| Cookie `secure` en prod | OK |
+| `saveUninitialized: false` | OK |
+| Session PG + secret env (≥ 32 prod) | OK |
+| PBKDF2 (To Do disait 600k ; on a **120k** + rehash legacy — acceptable, bump optionnel) | OK / optionnel |
+| Validation body (zod/joi) | OK via commons validators + `ValidateMiddleware` |
+| `/me` sans `passwordHash` | OK (mapper) |
+| Seed : plus de password en stdout | OK |
+| Auth login/register + profile + public profile | OK |
+| Articles CRUD + photo + blocs | OK |
+| Pages d’erreur 404/403/500 | OK |
+| Encyclopédie + slugs + détail techno (desc, versions, histoire, liens…) | OK (plus besoin table `techno_details` séparée) |
+| Extranet login + rôles + admin/editor/author/mod | OK |
+| Slots locked + blacklist/exclure | OK |
+| Generator + ORM layer + share | OK (bugs share à retester) |
+| CORS `*` hardcodé | OK (plus dans la whitelist fixe ; allow-all = env only + garde prod) |
+| Doublons models/controllers core | OK (structure modules) |
+| Ordre articles récent → ancien | OK (indexes + queries) |
+| Boolean « actif au tirage » | OK (`isActive`) |
 
-- <span style="color:#e03e3e">[x]</span> Magic bytes upload (`ImageSniff`)
-- <span style="color:#e03e3e">[x]</span> Sanitize HTML posts (commons + validateSavePost)
-- <span style="color:#e03e3e">[x]</span> `express.json` limité à 1 Mo
-- <span style="color:#e03e3e">[x]</span> Session store PG (`connect-pg-simple`) + `saveUninitialized: false`
-- <span style="color:#e03e3e">[x]</span> CSRF — évalué, non requis (SameSite=lax + cookie host-only + CORS JSON)
-- <span style="color:#e03e3e">[x]</span> UUID params delete/purge (`validatePostId`)
-- <span style="color:#e03e3e">[x]</span> Rate-limit comments / votes / save-post / draw
-- <span style="color:#e03e3e">[x]</span> Cache GET publics (`CacheMiddleware` + docs Cloudflare Cache Rules)
-- <span style="color:#e03e3e">[x]</span> `loading="lazy"` images (LCP en `fetchpriority="high"`)
-- <span style="color:#e03e3e">[x]</span> Routes Vue lazy (`import()`) client + extranet
-- <span style="color:#e03e3e">[x]</span> `npm audit` CI + Dependabot
-- <span style="color:#e03e3e">[x]</span> Erreurs API sûres en prod (`ErrorMiddleware` / `sendSafeError`)
-- <span style="color:#e03e3e">[x]</span> Tokens SCSS client étendus
-- <span style="color:#e03e3e">[x]</span> `helmet` sur l’API (CSP / frameguard / referrer / HSTS)
-- <span style="color:#e03e3e">[x]</span> `validateSaveTechnology` + middleware `/ws/save-technology`
-- <span style="color:#e03e3e">[x]</span> Recherche admin posts enrichie (auteur + résumé + tags)
-- <span style="color:#e03e3e">[x]</span> `POST /upload-file` authentifié + cover `TABLE.POST`
-- <span style="color:#e03e3e">[x]</span> Validators auth / post / comment / user + UX field errors / toasts
-- <span style="color:#e03e3e">[x]</span> Password confirm register + create user
-- <span style="color:#e03e3e">[x]</span> Cursor pointer boutons actifs
-- <span style="color:#e03e3e">[x]</span> Consolidation SCSS extranet (form shell) + tokens boutons client
-- <span style="color:#e03e3e">[x]</span> Session cookie unique `rs.sid`, rate-limit auth/register/upload
-- <span style="color:#e03e3e">[x]</span> Upload MIME allowlist + blocage SVG + sharp
-- <span style="color:#e03e3e">[x]</span> `/auth/me` sans `passwordHash`
-- <span style="color:#e03e3e">[x]</span> Indexes Prisma utiles : `slug`, `shareCode`, `authorId`, `[status, publishAt]`, `deletedAt`
-- <span style="color:#e03e3e">[x]</span> S3 `ObjectStorage` + `GET /files/:id` → 302 signed (code prêt)
+### Backlog produit (`N` — pas urgent)
+
+- Profil enrichi : technos connues, préférences, projets, suggestions, mes articles, mes tirages
+- Articles : vidéo / liens vidéo
+- Suggestions de technologies
+- « ORM / BaaS » (Supabase, Firebase) — réflexion produit, pas une dette sécu
+- Projets communauté / marque liés aux techs
+
+### Ignorer / obsolète
+
+- Spec Notion V0 « document d’écart » formel — **cette To Do la remplace** ; pas besoin d’un autre doc Notion
+- `BlogAction` double fetch featured — encore ouvert (item #11)
+- Tests routes post-refonte — à faire manuellement / plus tard CI e2e
 
 ---
 
-## Backlog sécu / perf
+## Fait sécu / perf (raccourci)
 
-### P0 — immédiat
+`trust proxy` · garde CORS prod · helmet · json limit · session PG · sanitize · magic bytes · rate-limits · UUID delete/purge · erreurs API sûres · CSRF N/A · cache GET · lazy routes/images · pages erreur · Dependabot · tokens SCSS · upload auth · etc.
 
-- <span style="color:#e03e3e">[x]</span> Auth upload + fix `TABLE.POST` cover
-
-### P1 — sécu API
-
-- <span style="color:#e03e3e">[x]</span> `helmet` (CSP, X-Frame-Options, Referrer-Policy, HSTS prod, CORP cross-origin pour `/files`)
-- [ ] `trust proxy` (rate-limit IP derrière Cloudflare/Railway)
-- <span style="color:#e03e3e">[x]</span> `express.json({ limit })` — défaut `1mb` (override `JSON_BODY_LIMIT`)
-- [ ] Refuse démarrage si `CORS_ALLOW_ALL=true` en production
-- <span style="color:#e03e3e">[x]</span> `validateSaveTechnology`
-- <span style="color:#e03e3e">[x]</span> Sanitize HTML **serveur** à la save post (`sanitizePostContent` dans `validateSavePost`)
-
-### P2 — ops / durcissement
-
-- <span style="color:#e03e3e">[x]</span> Magic bytes upload (`file-type` + sharp metadata avant write)
-- <span style="color:#e03e3e">[x]</span> Session store PG (`connect-pg-simple` + table `session`) + `saveUninitialized: false`
-- <span style="color:#e03e3e">[x]</span> CSRF cross-subdomain — **pas nécessaire** (décision 15/10) : cookie `rs.sid` host-only (pas de `Domain=`), `SameSite=lax`, mutations JSON/`FormData` via `fetch` + CORS allowlist + `credentials`. Un token CSRF n’ajoute rien face à un XSS sur www/admin ; le CSRF classique cross-site est déjà bloqué. Revoir seulement si cookie scopé `.randomstack.io` ou endpoints `application/x-www-form-urlencoded`.
-- <span style="color:#e03e3e">[x]</span> Rate-limit comments / votes / save-post / draw — `RateLimitMiddleware` (comment 50, vote 60, savePost 40, draw 60 / 15 min)
-- <span style="color:#e03e3e">[x]</span> Validation UUID params delete/purge — `validatePostId` + `ValidateMiddleware.params` sur `/ws/delete-post/:id` et `/ws/purge-post/:id`
-- [ ] Infra : Bucket Railway + vars `S3_*` + DNS Cloudflare `api` — voir `docs/cloudflare-railway-files.md`
-
-### P3 — perf / hygiene
-
-- <span style="color:#e03e3e">[x]</span> Cache HTTP GET publics + CDN Cloudflare — `CacheMiddleware` (`s-maxage`) sur GET publics ; `no-store` si session ; docs Cache Rules
-- <span style="color:#e03e3e">[x]</span> `loading="lazy"` images — listes / blocs / tables ; LCP (hero article, featured, tech detail, profil) en `fetchpriority="high"`
-- <span style="color:#e03e3e">[x]</span> Routes Vue lazy (`import()`) — client + extranet
-- <span style="color:#e03e3e">[x]</span> `npm audit` / Dependabot CI — `.github/workflows/npm-audit.yml` + `.github/dependabot.yml`
-- <span style="color:#e03e3e">[x]</span> Revue messages d’erreur API — `ErrorMiddleware` + `sendSafeError` / `publicErrorMessage` (pas de stack/Prisma en prod)
-- <span style="color:#e03e3e">[x]</span> SCSS client — tokens étendus (danger, surfaces, radius, slot) + fin des doublons `$primary` / hex auth-buttons
-
----
-
-## Écarts vs checklist précédente
-
-| Ancien statut | Verdict code |
-|---------------|--------------|
-| Upload public | **Auth requise** |
-| localhost URLs `[ ]` | **Déjà fixé** via `fileUrl()` |
-| getFile 500 / isEditMode / cron / PBKDF2 / login enum / validation login | **Tous OK** |
-| Cover `TABLE.POST` | **Corrigé** (`TABLE.POST`) |
-| Encyclopédie `isActive` | **By design** — catalogue complet ; filtre actif = generator seulement |
-| MODERATOR bloqué sur `/ws` | **Obsolète** — lecture OK maintenant |
-
----
-
-## Note auth path
-
-Code + extranet : `POST /auth/admin/login` (plus `admin-login`).
-
-## Fichiers liés
-
-- `docs/env-and-cloudflare.md`
-- `docs/cloudflare-railway-files.md`
+Docs : `docs/cloudflare-railway-files.md` · `docs/env-and-cloudflare.md`

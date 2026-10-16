@@ -32,6 +32,8 @@ services:
       - "${PORT}:${PORT}"
     environment:
       RUNNING_IN_DOCKER: "true"
+      NODE_ENV: ${NODE_ENV:-development}
+      TRUST_PROXY: ${TRUST_PROXY:-}
       DATABASE_URL: ${DATABASE_URL}
       PORT: ${PORT}
       SESSION_SECRET: ${SESSION_SECRET}

@@ -17,6 +17,20 @@ const app = express()
 const isProd = process.env['NODE_ENV'] === 'production'
 
 /**
+ * Proxies (Cloudflare → Railway) : Express lit `X-Forwarded-For` pour `req.ip`
+ * (rate-limit, logs). Override : TRUST_PROXY=false|0|true|N
+ */
+function resolveTrustProxy(): boolean | number {
+    const raw = process.env['TRUST_PROXY']?.trim().toLowerCase()
+    if (raw === 'false' || raw === '0') return false
+    if (raw === 'true') return true
+    if (raw && /^\d+$/.test(raw)) return Number(raw)
+    return isProd ? 1 : false
+}
+
+app.set('trust proxy', resolveTrustProxy())
+
+/**
  * Headers de sécurité HTTP.
  * - CORP cross-origin : les SPA (www / admin) chargent `/files/:id` depuis l’API.
  * - CSP stricte côté API (réponses JSON / pas de HTML applicatif).
@@ -75,6 +89,18 @@ function resolveCorsOrigins(): {allowAll: boolean; origins: string[]} {
 
 const {allowAll: CORS_ALLOW_ALL, origins: ALLOWED_ORIGINS} = resolveCorsOrigins()
 
+/**
+ * Prod : CORS ouvert interdit — force CLIENT_ORIGIN / EXTRANET_ORIGIN.
+ * Dev : CORS_ALLOW_ALL=true OK (Bruno / localhost).
+ */
+if (isProd && CORS_ALLOW_ALL) {
+    console.error(
+        '[CORS] NODE_ENV=production avec CORS_ALLOW_ALL (ou origine *). '
+        + 'Refuse de démarrer. Mets CORS_ALLOW_ALL=false et CLIENT_ORIGIN / EXTRANET_ORIGIN.'
+    )
+    process.exit(1)
+}
+
 app.use(cors({
     origin: (origin, callback) => {
         // Pas d'Origin (Bruno, curl, same-origin) → OK
@@ -120,6 +146,7 @@ Database.checkConnection().then(async (connected) => {
         app.listen(PORT, () => {
             const storageMode = ObjectStorage.isEnabled() ? 'Railway S3 bucket' : 'local disk (public/uploads)'
             console.log(`[Server] Prêt sur le port ${PORT} — fichiers: ${storageMode}`)
+            console.log(`[Server] NODE_ENV=${process.env['NODE_ENV'] || 'undefined'} · trust proxy=${app.get('trust proxy')}`)
             console.log(`[Server] CORS: ${CORS_ALLOW_ALL ? 'allow-all (*)' : ALLOWED_ORIGINS.join(', ')}`)
         })
     } else {
