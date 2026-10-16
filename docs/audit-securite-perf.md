@@ -80,6 +80,10 @@
 - <span style="color:#e03e3e">[x]</span> Rate-limit comments / votes / save-post / draw
 - <span style="color:#e03e3e">[x]</span> Cache GET publics (`CacheMiddleware` + docs Cloudflare Cache Rules)
 - <span style="color:#e03e3e">[x]</span> `loading="lazy"` images (LCP en `fetchpriority="high"`)
+- <span style="color:#e03e3e">[x]</span> Routes Vue lazy (`import()`) client + extranet
+- <span style="color:#e03e3e">[x]</span> `npm audit` CI + Dependabot
+- <span style="color:#e03e3e">[x]</span> Erreurs API sûres en prod (`ErrorMiddleware` / `sendSafeError`)
+- <span style="color:#e03e3e">[x]</span> Tokens SCSS client étendus
 - <span style="color:#e03e3e">[x]</span> `helmet` sur l’API (CSP / frameguard / referrer / HSTS)
 - <span style="color:#e03e3e">[x]</span> `validateSaveTechnology` + middleware `/ws/save-technology`
 - <span style="color:#e03e3e">[x]</span> Recherche admin posts enrichie (auteur + résumé + tags)
@@ -124,10 +128,10 @@
 
 - <span style="color:#e03e3e">[x]</span> Cache HTTP GET publics + CDN Cloudflare — `CacheMiddleware` (`s-maxage`) sur GET publics ; `no-store` si session ; docs Cache Rules
 - <span style="color:#e03e3e">[x]</span> `loading="lazy"` images — listes / blocs / tables ; LCP (hero article, featured, tech detail, profil) en `fetchpriority="high"`
-- [ ] Routes Vue lazy (`import()`) — aujourd’hui eager client + extranet
-- [ ] `npm audit` / Dependabot CI
-- [ ] Revue messages d’erreur API (pas de stack/Prisma en prod)
-- [ ] SCSS client — étendre tokens CSS (non urgent)
+- <span style="color:#e03e3e">[x]</span> Routes Vue lazy (`import()`) — client + extranet
+- <span style="color:#e03e3e">[x]</span> `npm audit` / Dependabot CI — `.github/workflows/npm-audit.yml` + `.github/dependabot.yml`
+- <span style="color:#e03e3e">[x]</span> Revue messages d’erreur API — `ErrorMiddleware` + `sendSafeError` / `publicErrorMessage` (pas de stack/Prisma en prod)
+- <span style="color:#e03e3e">[x]</span> SCSS client — tokens étendus (danger, surfaces, radius, slot) + fin des doublons `$primary` / hex auth-buttons
 
 ---
 

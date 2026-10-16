@@ -2,21 +2,13 @@ import {createRouter, createWebHistory} from 'vue-router'
 
 import {getMe} from '#services'
 
-import AdminLayout from './layout/AdminLayout.vue'
-
-import Login from './core/LoginPage.vue'
-import Dashboard from './core/DashboardPage.vue'
-import TechnologyForm from './core/EditTechnologyPage.vue'
-import PostForm from './core/EditPostPage.vue'
-import ManagePost from './core/ManagePost.vue'
-import ManageUser from './core/ManageUser.vue'
-import EditUserPage from './core/EditUserPage.vue'
-
 const homeForRole = (role?: string) =>
     role === 'ADMIN' || role === 'EDITOR' ? '/dashboard' : '/manage-post'
 
 const hasRole = (userRole: string | undefined, allowed: string[]) =>
     Boolean(userRole && allowed.includes(userRole))
+
+const errorPage = () => import('./core/ErrorPage.vue')
 
 const router = createRouter({
     history: createWebHistory(),
@@ -24,42 +16,60 @@ const router = createRouter({
         {
             path: '/login',
             name: 'login',
-            component: Login,
+            component: () => import('./core/LoginPage.vue'),
             meta: {guestOnly: true}
         },
         {
+            path: '/404',
+            name: 'not-found',
+            component: errorPage,
+            meta: {errorCode: 404}
+        },
+        {
+            path: '/403',
+            name: 'forbidden',
+            component: errorPage,
+            meta: {errorCode: 403}
+        },
+        {
+            path: '/500',
+            name: 'server-error',
+            component: errorPage,
+            meta: {errorCode: 500}
+        },
+        {
             path: '/',
-            component: AdminLayout,
+            component: () => import('./layout/AdminLayout.vue'),
             meta: {requiresAuth: true},
             children: [
                 {
                     path: 'dashboard',
                     name: 'dashboard',
-                    component: Dashboard,
+                    component: () => import('./core/DashboardPage.vue'),
                     meta: {requiresRoles: ['ADMIN', 'EDITOR']}
                 },
                 {
                     path: 'edit-technology/:id?',
                     name: 'technology-form',
-                    component: TechnologyForm,
+                    component: () => import('./core/EditTechnologyPage.vue'),
                     meta: {requiresRoles: ['ADMIN', 'EDITOR']}
                 },
                 {
                     path: 'manage-post',
                     name: 'manage-post',
-                    component: ManagePost,
+                    component: () => import('./core/ManagePost.vue'),
                     meta: {requiresRoles: ['ADMIN', 'EDITOR', 'AUTHOR', 'MODERATOR']}
                 },
                 {
                     path: 'edit-post/:id?',
                     name: 'post-form',
-                    component: PostForm,
+                    component: () => import('./core/EditPostPage.vue'),
                     meta: {requiresRoles: ['ADMIN', 'EDITOR', 'AUTHOR', 'MODERATOR']}
                 },
                 {
                     path: 'manage-user',
                     name: 'manage-user',
-                    component: ManageUser,
+                    component: () => import('./core/ManageUser.vue'),
                     meta: {requiresRoles: ['ADMIN', 'MODERATOR', 'EDITOR']}
                 },
                 {
@@ -69,14 +79,14 @@ const router = createRouter({
                 {
                     path: 'edit-user/:id?',
                     name: 'user-form',
-                    component: EditUserPage,
+                    component: () => import('./core/EditUserPage.vue'),
                     meta: {requiresRoles: ['ADMIN', 'MODERATOR', 'EDITOR']}
                 }
             ]
         },
         {
             path: '/:pathMatch(.*)*',
-            redirect: '/manage-post'
+            redirect: '/404'
         }
     ]
 })
@@ -105,13 +115,13 @@ router.beforeEach(async (to, _from, next) => {
     }
 
     if (requiredRoles && !hasRole(user?.role, requiredRoles)) {
-        next(homeForRole(user?.role))
+        next({name: 'forbidden'})
         return
     }
 
     // Création utilisateur : ADMIN uniquement (`/edit-user` sans id)
     if (to.name === 'user-form' && !to.params['id'] && user?.role !== 'ADMIN') {
-        next('/manage-user')
+        next({name: 'forbidden'})
         return
     }
 

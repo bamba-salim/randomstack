@@ -1,0 +1,32 @@
+// --- PAGES D'ERREUR (404 / 403 / 500) ---
+.error-page {
+  @apply flex flex-col items-center text-center w-full max-w-xl mx-auto;
+
+  &__code {
+    @apply m-0 mb-2 font-black tracking-tight leading-none;
+    font-size: clamp(4.5rem, 18vw, 8rem);
+    color: var(--color-border-standard);
+    font-family: var(--font-sans);
+    user-select: none;
+  }
+
+  &__title {
+    @apply m-0 mb-3 text-3xl sm:text-4xl font-extrabold tracking-tight;
+    color: var(--color-text-title);
+    font-family: var(--font-serif, 'Georgia', serif);
+  }
+
+  &__message {
+    @apply m-0 mb-2 text-base sm:text-lg;
+    color: var(--color-text-body);
+  }
+
+  &__hint {
+    @apply m-0 mb-8 text-sm;
+    color: var(--color-text-muted);
+  }
+
+  &__actions {
+    @apply flex flex-wrap items-center justify-center gap-3;
+  }
+}

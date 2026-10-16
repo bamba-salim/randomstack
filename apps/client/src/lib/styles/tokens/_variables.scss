@@ -11,13 +11,34 @@
   --color-editorial-blue-hover: #135e96;
   --color-border-standard: #c3c4c7;
   --color-border-darker: #8c8f94;
+  --color-border-light: #dcdcde;
   --color-surface-soft: #f6f8fa;
+  --color-surface-muted: #f0f0f1;
+  --color-surface-white: #ffffff;
   --color-text-title: #1d2327;
   --color-text-body: #3c434a;
+  --color-text-input: #2c3338;
+  --color-text-muted: #64748b;
+  --color-text-on-dark: #f1f5f9;
+
+  /* --- Feedback --- */
+  --color-danger: #d63638;
+  --color-danger-bg: #fcf0f1;
+  --color-danger-border: color-mix(in srgb, var(--color-danger) 40%, transparent);
+  --color-success-soft: #e8f1f8;
 
   /* --- Typographies --- */
   --font-serif: 'Georgia', serif;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* --- Rayons / ombres --- */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --shadow-header: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+  /* --- Stack generator --- */
+  --slot-height: 140px;
 
   /* --- Responsive Layout Tokens --- */
   --container-max-width: 1440px;
@@ -32,5 +53,8 @@
   }
 }
 
-// Variables Sass internes pour calculs spécifiques
-$slot-height: 140px;
+// Alias Sass (calculs / gradients) — pointe vers les tokens CSS
+$primary: var(--color-primary);
+$neon-cyan: var(--color-neon-cyan);
+$neon-pink: var(--color-neon-pink);
+$slot-height: var(--slot-height);

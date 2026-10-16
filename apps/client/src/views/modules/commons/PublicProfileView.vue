@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import {ref, computed, watch} from 'vue'
-import {useRoute} from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 import {fetchPublicProfile, fileUrl} from '#services'
 import {AdSlot} from '#components'
 import type {PublicProfileListed} from '@randomstack/commons'
 import PostCard from '../blog/components/PostCard.vue'
 
 const route = useRoute()
+const router = useRouter()
 const profile = ref<PublicProfileListed | null>(null)
 const loading = ref(true)
-const error = ref<string | null>(null)
 
 const initials = computed(() =>
   (profile.value?.displayName || '?').substring(0, 2).toUpperCase()
@@ -17,12 +17,11 @@ const initials = computed(() =>
 
 const load = async (id: string) => {
   loading.value = true
-  error.value = null
   profile.value = null
   try {
     profile.value = await fetchPublicProfile(id)
   } catch {
-    error.value = 'Profil introuvable.'
+    await router.replace({name: 'not-found'})
   } finally {
     loading.value = false
   }
@@ -40,7 +39,6 @@ watch(
 <template>
   <main class="container-catalog py-8">
     <div v-if="loading" class="loading-state">Chargement du profil…</div>
-    <div v-else-if="error" class="error-state">{{ error }}</div>
 
     <div v-else-if="profile" class="article-page-shell">
       <aside class="article-rail article-rail--left" aria-label="Publicité">

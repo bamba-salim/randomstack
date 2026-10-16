@@ -5,7 +5,7 @@ import helmet from 'helmet'
 import path from 'path'
 
 import {Database} from '#db'
-import {SessionMiddleware} from '#middlewares'
+import {ErrorMiddleware, SessionMiddleware} from '#middlewares'
 import {SeedAction} from '#stack'
 import {ObjectStorage} from '#file'
 
@@ -105,6 +105,10 @@ app.use('/public', express.static(path.resolve(process.cwd(), 'public'), {
 }))
 app.use('/', WebService.routes)
 app.use('/auth', Auth.routes)
+
+// 404 JSON + filet anti-fuite (stack / Prisma / JSON parse)
+app.use(ErrorMiddleware.notFound)
+app.use(ErrorMiddleware.handle)
 
 const PORT = process.env['PORT'] || 4000
 

@@ -1,24 +1,23 @@
 <script setup lang="ts">
 import {ref, onMounted, watch} from 'vue'
-import {useRoute} from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 import {fetchTechnologyBySlug, fileUrl} from '#services'
 import {Breadcrumbs, AdSlot} from '#components'
 import type {PublicTechnologyDetail} from '@randomstack/commons'
 
 const route = useRoute()
+const router = useRouter()
 
 const tech = ref<PublicTechnologyDetail | null>(null)
 const loading = ref(true)
-const error = ref<string | null>(null)
 
 const loadTech = async (slug: string) => {
   loading.value = true
-  error.value = null
   try {
     tech.value = await fetchTechnologyBySlug(slug)
   } catch {
     tech.value = null
-    error.value = "Impossible de charger les détails de cette technologie."
+    await router.replace({name: 'not-found'})
   } finally {
     loading.value = false
   }
@@ -38,10 +37,6 @@ watch(() => route.params['slug'], (slug) => {
 
     <div v-if="loading" class="loading-state">
       Chargement de la fiche technique...
-    </div>
-
-    <div v-else-if="error" class="error-state">
-      {{ error }}
     </div>
 
     <div v-else-if="tech" class="tech-detail-page">

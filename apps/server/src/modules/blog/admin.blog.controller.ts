@@ -1,6 +1,7 @@
 import type {Request, Response} from 'express'
 import crypto from 'crypto'
 import {FileAction} from '#file'
+import {sendSafeError} from '#utils'
 import type {EditPostFormBean, PostStatus} from '@randomstack/commons'
 
 import BlogModel from './blog.model'
@@ -178,13 +179,19 @@ export default class AdminBlogController {
             }
 
             res.json(BlogMapper.buildSavePostResponse(result))
-        } catch (error: any) {
-            console.error('[AdminBlogController] Échec savePost :', error.message || error)
-            if (error?.code === 'P2002') {
-                res.status(409).json({error: 'Ce slug est déjà utilisé par un autre article.'})
+        } catch (error: unknown) {
+            if (error && typeof error === 'object' && (error as {code?: string}).code === 'P2002') {
+                sendSafeError(res, error, {
+                    label: '[AdminBlogController] Échec savePost',
+                    fallback: 'Ce slug est déjà utilisé par un autre article.',
+                    status: 409
+                })
                 return
             }
-            res.status(500).json({error: "Erreur lors de la sauvegarde de l'article."})
+            sendSafeError(res, error, {
+                label: '[AdminBlogController] Échec savePost',
+                fallback: "Erreur lors de la sauvegarde de l'article."
+            })
         }
     }
 

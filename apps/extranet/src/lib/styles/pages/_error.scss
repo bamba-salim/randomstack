@@ -1,0 +1,29 @@
+.admin-error-page {
+  @apply flex flex-col items-center justify-center text-center w-full min-h-[60vh] px-4;
+
+  &__code {
+    @apply m-0 mb-2 font-black tracking-tight leading-none text-slate-300;
+    font-size: clamp(4rem, 14vw, 7rem);
+    user-select: none;
+  }
+
+  &__title {
+    @apply m-0 mb-3 text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight;
+  }
+
+  &__message {
+    @apply m-0 mb-8 text-sm sm:text-base text-slate-500 max-w-md;
+  }
+
+  &__actions {
+    @apply flex flex-wrap items-center justify-center gap-3;
+
+    .add-btn {
+      @apply py-2.5 px-4 bg-[#2271b1] hover:bg-[#135e96] border border-[#2271b1] text-xs font-bold text-white rounded shadow-sm transition-colors duration-200 cursor-pointer text-center no-underline;
+    }
+
+    .cancel-btn {
+      @apply py-2.5 px-4 bg-white border border-[#c3c4c7] hover:bg-[#f6f8fa] text-xs font-bold text-slate-600 rounded cursor-pointer transition-colors duration-150 text-center no-underline;
+    }
+  }
+}

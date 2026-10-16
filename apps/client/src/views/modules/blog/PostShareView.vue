@@ -1,20 +1,18 @@
 <script setup lang="ts">
-import {ref, onMounted, watch} from 'vue'
+import {onMounted, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {resolvePostShareCode} from '#services'
 
 const route = useRoute()
 const router = useRouter()
-const error = ref<string | null>(null)
 
 const redirect = async (shareCode: string) => {
-  error.value = null
   try {
     const resolved = await resolvePostShareCode(shareCode)
     const tag = resolved.mainTag || 'post'
     await router.replace(`/${tag}/${resolved.slug}`)
   } catch {
-    error.value = 'Lien de partage invalide ou article introuvable.'
+    await router.replace({name: 'not-found'})
   }
 }
 
@@ -30,7 +28,6 @@ watch(() => route.params['shareCode'], (code) => {
 
 <template>
   <main class="container-catalog py-8">
-    <div v-if="error" class="error-state">{{ error }}</div>
-    <div v-else class="loading-state">Redirection vers l’article…</div>
+    <div class="loading-state">Redirection vers l’article…</div>
   </main>
 </template>

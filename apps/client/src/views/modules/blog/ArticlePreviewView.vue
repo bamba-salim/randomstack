@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import {ref, onMounted, watch} from 'vue'
-import {useRoute} from 'vue-router'
-import {fetchPostPreview, fileUrl} from '#services'
+import {useRoute, useRouter} from 'vue-router'
+import {fetchPostPreview, fileUrl, ApiError} from '#services'
 import {Breadcrumbs} from '#components'
 import type {PublicPostDetail} from '@randomstack/commons'
 import BlockRenderer from './components/BlockRenderer.vue'
 
 const route = useRoute()
+const router = useRouter()
 const post = ref<PublicPostDetail | null>(null)
 const loading = ref(true)
-const error = ref<string | null>(null)
 
 const formatDate = (dateString: string | Date) => {
   return new Date(dateString).toLocaleDateString('fr-FR', {
@@ -19,12 +19,12 @@ const formatDate = (dateString: string | Date) => {
 
 const load = async (shareCode: string) => {
   loading.value = true
-  error.value = null
   post.value = null
   try {
     post.value = await fetchPostPreview(shareCode)
-  } catch {
-    error.value = 'Prévisualisation impossible. Connecte-toi avec un compte staff, ou l’article est introuvable.'
+  } catch (err) {
+    const status = err instanceof ApiError ? err.status : undefined
+    await router.replace({name: status === 403 || status === 401 ? 'forbidden' : 'not-found'})
   } finally {
     loading.value = false
   }
@@ -43,7 +43,6 @@ watch(() => route.params['shareCode'], (code) => {
 <template>
   <main class="container-catalog py-8">
     <div v-if="loading" class="loading-state">Chargement de la prévisualisation…</div>
-    <div v-else-if="error" class="error-state">{{ error }}</div>
 
     <article v-else-if="post" class="article-column max-w-3xl mx-auto">
       <Breadcrumbs :items="[

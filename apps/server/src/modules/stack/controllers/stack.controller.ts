@@ -1,4 +1,5 @@
 import type {Request, Response} from 'express'
+import {sendSafeError} from '#utils'
 import TechnologyModel from '../models/technology.model'
 import StackModel from '../models/stack.model.js'
 import DrawAction from '../actions/draw.action'
@@ -49,8 +50,10 @@ export default class StackController {
 
             res.json(StackMapper.buildDrawResponse(resolvedStack, session.history))
         } catch (error) {
-            console.error('[StackController] Erreur draw :', error)
-            res.status(500).json({error: 'Une erreur est survenue lors du tirage.'})
+            sendSafeError(res, error, {
+                label: '[StackController] Erreur draw',
+                fallback: 'Une erreur est survenue lors du tirage.'
+            })
         }
     }
 
@@ -69,8 +72,10 @@ export default class StackController {
             const techs = await TechnologyModel.fetchActiveTechnologies()
             res.json(TechnologyMapper.buildExcludeTechnologyLiteList(techs))
         } catch (error) {
-            console.error('[StackController] Erreur fetchDrawActiveTechnologies :', error)
-            res.status(500).json({error: 'Erreur lors du chargement des technologies.'})
+            sendSafeError(res, error, {
+                label: '[StackController] Erreur fetchDrawActiveTechnologies',
+                fallback: 'Erreur lors du chargement des technologies.'
+            })
         }
     }
 
@@ -102,9 +107,11 @@ export default class StackController {
             })
 
             res.json(StackMapper.buildShareCreatedListed(saved))
-        } catch (error: any) {
-            console.error('[StackController] Échec saveShare :', error.message || error)
-            res.status(500).json({error: 'Erreur lors de la création du lien de partage.'})
+        } catch (error: unknown) {
+            sendSafeError(res, error, {
+                label: '[StackController] Échec saveShare',
+                fallback: 'Erreur lors de la création du lien de partage.'
+            })
         }
     }
 
@@ -130,8 +137,10 @@ export default class StackController {
             const allTechs = await TechnologyModel.fetchTechnologies()
             res.json(StackMapper.buildSharedStackListed(shared, allTechs as any))
         } catch (error) {
-            console.error('[StackController] Échec fetchShare :', error)
-            res.status(500).json({error: 'Erreur lors de la récupération du partage.'})
+            sendSafeError(res, error, {
+                label: '[StackController] Échec fetchShare',
+                fallback: 'Erreur lors de la récupération du partage.'
+            })
         }
     }
 }

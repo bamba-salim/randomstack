@@ -2,24 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 
 import {getMe} from '#services'
 
-import AppLayout from './layout/@AppLayout.vue'
-
-import HomeView from './modules/commons/HomeView.vue'
-import LoginView from './modules/commons/LoginView.vue'
-import RegisterView from './modules/commons/RegisterView.vue'
-import ProfileView from './modules/commons/ProfileView.vue'
-import PublicProfileView from './modules/commons/PublicProfileView.vue'
-
-import GeneratorView from './modules/stack/GeneratorView.vue'
-
-import EncyclopediaView from './modules/stack/EncyclopediaView.vue'
-import TechnologyDetailView from './modules/stack/TechnologyDetailView.vue'
-
-import ArticleDetailView from './modules/blog/ArticleDetailView.vue'
-import ArticlePreviewView from './modules/blog/ArticlePreviewView.vue'
-import PostShareView from './modules/blog/PostShareView.vue'
-import TagPostsView from './modules/blog/TagPostsView.vue'
-
+const errorPage = () => import('./modules/commons/ErrorView.vue')
 
 const router = createRouter({
     history: createWebHistory(),
@@ -27,78 +10,102 @@ const router = createRouter({
         {
             path: '/draft/:shareCode?',
             name: 'Generator',
-            component: GeneratorView
+            component: () => import('./modules/stack/GeneratorView.vue')
         },
         {
             path: '/',
-            component: AppLayout,
+            component: () => import('./layout/@AppLayout.vue'),
             children: [
                 {
                     path: '',
                     name: 'home',
-                    component: HomeView
+                    component: () => import('./modules/commons/HomeView.vue')
                 },
                 {
                     path: 'login',
                     name: 'login',
-                    component: LoginView,
+                    component: () => import('./modules/commons/LoginView.vue'),
                     meta: {guestOnly: true}
                 },
                 {
                     path: 'register',
                     name: 'register',
-                    component: RegisterView,
+                    component: () => import('./modules/commons/RegisterView.vue'),
                     meta: {guestOnly: true}
                 },
                 {
                     path: 'profile',
                     name: 'profile',
-                    component: ProfileView,
+                    component: () => import('./modules/commons/ProfileView.vue'),
                     meta: {requiresAuth: true}
                 },
                 {
                     path: 'u/:id',
                     name: 'public-profile',
-                    component: PublicProfileView
+                    component: () => import('./modules/commons/PublicProfileView.vue')
                 },
                 {
                     path: 'encyclopedia',
                     name: 'encyclopedia',
-                    component: EncyclopediaView
+                    component: () => import('./modules/stack/EncyclopediaView.vue')
                 },
                 {
                     path: 'technology/:slug',
                     name: 'technology-detail',
-                    component: TechnologyDetailView
+                    component: () => import('./modules/stack/TechnologyDetailView.vue')
                 },
                 {
                     /** Permalien `/post/:shareCode` → redirige vers `/:tag/:slug` */
                     path: 'post/:shareCode',
                     name: 'post-share',
-                    component: PostShareView
+                    component: () => import('./modules/blog/PostShareView.vue')
                 },
                 {
                     /** Preview staff (brouillon / planifié / archivé) */
                     path: 'preview/:shareCode',
                     name: 'article-preview',
-                    component: ArticlePreviewView
+                    component: () => import('./modules/blog/ArticlePreviewView.vue')
+                },
+                {
+                    path: '404',
+                    name: 'not-found',
+                    component: errorPage,
+                    meta: {errorCode: 404}
+                },
+                {
+                    path: '403',
+                    name: 'forbidden',
+                    component: errorPage,
+                    meta: {errorCode: 403}
+                },
+                {
+                    path: '500',
+                    name: 'server-error',
+                    component: errorPage,
+                    meta: {errorCode: 500}
                 },
                 {
                     /** URL canonique de l’article */
                     path: ':tag/:slug',
                     name: 'article',
-                    component: ArticleDetailView
+                    component: () => import('./modules/blog/ArticleDetailView.vue')
                 },
                 {
                     path: ':tag',
                     name: 'tag',
-                    component: TagPostsView
+                    component: () => import('./modules/blog/TagPostsView.vue')
+                },
+                {
+                    path: ':pathMatch(.*)*',
+                    name: 'catch-all',
+                    component: errorPage,
+                    meta: {errorCode: 404}
                 }
             ]
         },
         {
             path: '/:pathMatch(.*)*',
-            redirect: '/'
+            redirect: '/404'
         }
     ]
 })

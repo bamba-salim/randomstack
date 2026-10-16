@@ -1,12 +1,8 @@
-$primary: #3b82f6;
-$neon-cyan: #06b6d4;
-$neon-pink: #ec4899;
-
 .app-header {
   @apply sticky top-0 left-0 right-0 h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-center z-40 shrink-0;
   padding-left: var(--container-padding, 1rem);
   padding-right: var(--container-padding, 1rem);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-header);
 
   .header-container {
     @apply flex items-center justify-between w-full;
@@ -18,7 +14,7 @@ $neon-pink: #ec4899;
 
     .logo-text {
       @apply text-base font-black tracking-widest text-slate-100 uppercase;
-      background: linear-gradient(to right, $neon-cyan, $primary, $neon-pink);
+      background: linear-gradient(to right, var(--color-neon-cyan), var(--color-primary), var(--color-neon-pink));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }

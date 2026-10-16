@@ -1,7 +1,3 @@
-$neon-cyan: #06b6d4;
-$neon-pink: #ec4899;
-$slot-height: 140px;
-
 // --- LE ROULEAU INDIVIDUEL (COMPOSANT) ---
 .reel-container {
   @apply flex flex-col min-w-0;
@@ -12,7 +8,7 @@ $slot-height: 140px;
 
   .lock-btn {
     @apply self-center mb-2 px-2.5 sm:px-3 py-1 bg-slate-900 border border-slate-800 text-[9px] sm:text-[10px] font-black tracking-wide rounded-md transition-all duration-200 cursor-pointer select-none;
-    color: $neon-cyan;
+    color: var(--color-neon-cyan);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
 
     &:hover {
@@ -31,7 +27,7 @@ $slot-height: 140px;
 }
 
 .reel-window {
-  height: $slot-height;
+  height: var(--slot-height);
   @apply bg-slate-900/60 border border-slate-800 rounded-xl relative overflow-hidden flex flex-col justify-center;
   box-shadow: inset 0 12px 16px rgba(0, 0, 0, 0.7), inset 0 -12px 16px rgba(0, 0, 0, 0.7);
 }
@@ -54,12 +50,12 @@ $slot-height: 140px;
 }
 
 .reel-item {
-  height: $slot-height;
+  height: var(--slot-height);
   @apply flex flex-col justify-center items-center gap-1.5 sm:gap-2.5 px-1 text-center shrink-0;
 
   .tech-logo-placeholder {
     @apply w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-slate-800 flex items-center justify-center font-black text-xs border border-slate-700 shadow-md shrink-0 overflow-hidden;
-    color: $neon-cyan;
+    color: var(--color-neon-cyan);
 
     img {
       @apply w-full h-full object-cover;

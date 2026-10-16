@@ -26,7 +26,6 @@ const post = ref<PublicPostDetail | null>(null)
 const relatedPosts = ref<PublicPostListed[]>([])
 const authorPosts = ref<PublicPostListed[]>([])
 const loading = ref(true)
-const error = ref<string | null>(null)
 const liveCommentsCount = ref<number | null>(null)
 const favoriteBusy = ref(false)
 const shareModalOpen = ref(false)
@@ -76,7 +75,6 @@ const handleToggleFavorite = async () => {
 
 const loadArticle = async (slug: string) => {
   loading.value = true
-  error.value = null
   relatedPosts.value = []
   authorPosts.value = []
   liveCommentsCount.value = null
@@ -101,7 +99,7 @@ const loadArticle = async (slug: string) => {
     }
   } catch {
     post.value = null
-    error.value = "Impossible de charger cet article. Il a peut-être été supprimé ou n'est pas encore publié."
+    await router.replace({name: 'not-found'})
   } finally {
     loading.value = false
   }
@@ -121,10 +119,6 @@ watch(() => route.params['slug'], (slug) => {
 
     <div v-if="loading" class="loading-state">
       Chargement de l'article...
-    </div>
-
-    <div v-else-if="error" class="error-state">
-      {{ error }}
     </div>
 
     <div v-else-if="post" class="article-page-shell">
