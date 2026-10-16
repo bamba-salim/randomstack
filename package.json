@@ -6,6 +6,6 @@
     "packages/*"
   ],
   "dependencies": {
-    "@prisma/orm-postgres": "^8.0.0-rc.8"
+    "@prisma/orm-postgres": "^8.0.0-rc.17"
   }
 }
