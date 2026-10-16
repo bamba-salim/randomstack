@@ -1,4 +1,23 @@
 // --- PAGE D'ACCUEIL / LOBBY ---
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+
+  &__banner {
+    width: 100%;
+
+    &--footer {
+      margin-top: 0.5rem;
+    }
+
+    .ad-slot__placeholder {
+      min-height: 100px;
+    }
+  }
+}
+
 .lobby-layout-grid {
   @apply flex flex-col md:flex-row gap-8 w-full items-start;
 

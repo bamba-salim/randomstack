@@ -115,4 +115,22 @@
       min-height: 320px;
     }
   }
+
+  &--about-rail-left,
+  &--about-rail-right {
+    &.ad-slot--rail {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+
+      .ad-slot__image {
+        min-height: 420px;
+        max-height: 640px;
+      }
+
+      .ad-slot__placeholder {
+        min-height: 420px;
+      }
+    }
+  }
 }

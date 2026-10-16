@@ -4,7 +4,11 @@
  * Images : URL absolue ou chemin public (ex. /ads/sponsor.png).
  */
 export type AdPlacement =
+    | 'home-header'
     | 'home-sidebar'
+    | 'home-after-featured'
+    | 'home-feed'
+    | 'home-footer'
     | 'encyclopedia-banner'
     | 'article-header'
     | 'article-footer'
@@ -16,6 +20,10 @@ export type AdPlacement =
     | 'profile-rail-left'
     | 'profile-rail-right'
     | 'profile-footer'
+    | 'about-header'
+    | 'about-footer'
+    | 'about-rail-left'
+    | 'about-rail-right'
 
 export interface HouseAd {
     href: string
@@ -25,7 +33,11 @@ export interface HouseAd {
 }
 
 export const HOUSE_ADS: Record<AdPlacement, HouseAd | null> = {
+    'home-header': null,
     'home-sidebar': null,
+    'home-after-featured': null,
+    'home-feed': null,
+    'home-footer': null,
     'encyclopedia-banner': null,
     'article-header': null,
     'article-footer': null,
@@ -36,7 +48,11 @@ export const HOUSE_ADS: Record<AdPlacement, HouseAd | null> = {
     'profile-header': null,
     'profile-rail-left': null,
     'profile-rail-right': null,
-    'profile-footer': null
+    'profile-footer': null,
+    'about-header': null,
+    'about-footer': null,
+    'about-rail-left': null,
+    'about-rail-right': null
 }
 
 export function getHouseAd(placement: AdPlacement): HouseAd | null {

@@ -3,7 +3,7 @@
     <div class="footer-container">
       <span class="copyright">© 2026 RANDOMSTACK. Tous droits réservés.</span>
       <div class="footer-links">
-        <!-- Liens optionnels du footer -->
+        <router-link to="/about" class="footer-link">À propos</router-link>
       </div>
     </div>
   </footer>

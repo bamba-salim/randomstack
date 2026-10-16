@@ -23,6 +23,7 @@
 
 @use './modules/home';
 @use './modules/commons/auth';
+@use './modules/commons/about';
 
 @use './modules/blog/components/article-cards';
 @use './modules/blog/components/article-content';

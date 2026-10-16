@@ -80,6 +80,9 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick))
         <router-link to="/encyclopedia" :class="['nav-item', { 'active': route.path === '/encyclopedia' }]">
           📖 Encyclopédie
         </router-link>
+        <router-link to="/about" :class="['nav-item', { 'active': route.path === '/about' }]">
+          À propos
+        </router-link>
 
         <div ref="menuRoot" class="user-menu">
           <router-link
@@ -142,6 +145,9 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick))
         </button>
         <button @click="navigateTo('/encyclopedia')" :class="['mobile-nav-item', { 'active': route.path === '/encyclopedia' }]">
           📖 Encyclopédie
+        </button>
+        <button @click="navigateTo('/about')" :class="['mobile-nav-item', { 'active': route.path === '/about' }]">
+          À propos
         </button>
 
         <template v-if="user">

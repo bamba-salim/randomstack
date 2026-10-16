@@ -45,6 +45,11 @@ const router = createRouter({
                     component: () => import('./modules/commons/PublicProfileView.vue')
                 },
                 {
+                    path: 'about',
+                    name: 'about',
+                    component: () => import('./modules/commons/AboutView.vue')
+                },
+                {
                     path: 'encyclopedia',
                     name: 'encyclopedia',
                     component: () => import('./modules/stack/EncyclopediaView.vue')
