@@ -4,6 +4,7 @@
       <span class="copyright">© 2026 RANDOMSTACK. Tous droits réservés.</span>
       <div class="footer-links">
         <router-link to="/about" class="footer-link">À propos</router-link>
+        <router-link to="/suggest-article" class="footer-link">Suggérer un article</router-link>
       </div>
     </div>
   </footer>

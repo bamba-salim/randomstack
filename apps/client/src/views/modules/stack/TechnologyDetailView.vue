@@ -127,12 +127,19 @@ watch(() => route.params['slug'], (slug) => {
                 class="arcade-shortcut-btn"
                 @click="openReportModal"
             >
-              <span class="btn-icon">⚑</span>
+              <span class="btn-icon text-yellow-400">⚑</span>
               <div class="btn-content">
                 <span class="main-label">Signaler</span>
                 <span class="sub-label">Info incorrecte</span>
               </div>
             </button>
+            <router-link to="/suggest-technology" class="arcade-shortcut-btn no-underline">
+              <span class="btn-icon">💡</span>
+              <div class="btn-content">
+                <span class="main-label">Suggérer</span>
+                <span class="sub-label">Une techno</span>
+              </div>
+            </router-link>
           </div>
 
           <AdSlot

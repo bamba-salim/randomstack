@@ -27,7 +27,6 @@ Le code sécu / perf / dette / bugs polish est **fermé**. Docs infra : `docs/cl
 
 - [ ] Profil enrichi : technos connues, préférences, projets, suggestions, mes articles, mes tirages
 - [ ] Articles : vidéo / liens vidéo
-- [ ] Entrées inbox restantes côté client : signalement article, suggestion article, demande auteur
 - [ ] Projets communauté / marque liés aux techs
 ### Qualité
 
@@ -43,6 +42,9 @@ Le code sécu / perf / dette / bugs polish est **fermé**. Docs infra : `docs/cl
 4. <span style="color:#e03e3e">[x]</span> **Tirage avec cette techno** (fiche → `/draft?with=slug`, couche verrouillée)
 5. <span style="color:#e03e3e">[x]</span> **Inbox** générique (rôles) + signalement techno (auth) sur fiche
 6. <span style="color:#e03e3e">[x]</span> **Suggestion de techno** (formulaire détaillé → inbox `TECH_SUGGESTION`)
+7. <span style="color:#e03e3e">[x]</span> **Suggestion d’article** (profil + footer → `/suggest-article` → inbox `ARTICLE_SUGGESTION`)
+8. <span style="color:#e03e3e">[x]</span> **Signalement article** (fiche article → inbox `POST_REPORT`)
+9. <span style="color:#e03e3e">[x]</span> **Demande auteur** (profil → « Demander à être auteur » → `/author-request` → inbox `AUTHOR_REQUEST`, rôle USER)
 
 ---
 

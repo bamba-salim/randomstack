@@ -7,11 +7,12 @@ import {
   fetchPostsByAuthor,
   toggleFavorite,
   getMe,
-  fileUrl
+  fileUrl,
+  createInboxMessage
 } from '#services'
 import {Breadcrumbs, AdSlot} from '#components'
 import {toast} from '../../../lib/toast'
-import type {AuthorListed, PublicPostDetail, PublicPostListed} from '@randomstack/commons'
+import {INBOX_KIND, type AuthorListed, type PublicPostDetail, type PublicPostListed} from '@randomstack/commons'
 
 import BlockRenderer from './components/BlockRenderer.vue'
 import AuthorCard from './components/AuthorCard.vue'
@@ -29,6 +30,9 @@ const loading = ref(true)
 const liveCommentsCount = ref<number | null>(null)
 const favoriteBusy = ref(false)
 const shareModalOpen = ref(false)
+const showReportModal = ref(false)
+const reportBody = ref('')
+const reportSending = ref(false)
 
 const commentsCountLabel = computed(() => {
   const n = liveCommentsCount.value ?? post.value?.commentsCount ?? 0
@@ -73,12 +77,47 @@ const handleToggleFavorite = async () => {
   }
 }
 
+const openReportModal = async () => {
+  const me = await getMe()
+  if (!me) {
+    await router.push({path: '/login', query: {redirect: route.fullPath}})
+    return
+  }
+  reportBody.value = ''
+  showReportModal.value = true
+}
+
+const submitReport = async () => {
+  if (!post.value || reportSending.value) return
+  const body = reportBody.value.trim()
+  if (body.length < 10) {
+    toast.error('Décris le problème (10 caractères min.).')
+    return
+  }
+  reportSending.value = true
+  try {
+    await createInboxMessage({
+      kind: INBOX_KIND.POST_REPORT,
+      body,
+      postId: post.value.id,
+      subject: `Signalement — ${post.value.title}`
+    })
+    toast.success('Merci — ton signalement a été envoyé.')
+    showReportModal.value = false
+  } catch (err: unknown) {
+    toast.error(err instanceof Error ? err.message : 'Envoi impossible.')
+  } finally {
+    reportSending.value = false
+  }
+}
+
 const loadArticle = async (slug: string) => {
   loading.value = true
   relatedPosts.value = []
   authorPosts.value = []
   liveCommentsCount.value = null
   shareModalOpen.value = false
+  showReportModal.value = false
 
   try {
     post.value = await fetchPostBySlug(slug)
@@ -172,6 +211,17 @@ watch(() => route.params['slug'], (slug) => {
                   <path d="M12 17.3l-6.18 3.25 1.18-6.88L2 8.97l6.91-1L12 1.5l3.09 6.47 6.91 1-5 4.7 1.18 6.88z"/>
                 </svg>
               </button>
+              <button
+                  type="button"
+                  class="article-icon-btn"
+                  title="Signaler une erreur"
+                  aria-label="Signaler une erreur sur cet article"
+                  @click="openReportModal"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v18M5 4h9l-1.5 3L14 10H5"/>
+                </svg>
+              </button>
             </div>
           </div>
           <div class="page-meta">
@@ -259,6 +309,43 @@ watch(() => route.params['slug'], (slug) => {
           :title="post.title"
           @close="shareModalOpen = false"
       />
+
+      <Teleport to="body">
+        <div
+            v-if="showReportModal"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            @click.self="showReportModal = false"
+        >
+          <div
+              class="w-full max-w-md bg-white border border-[#c3c4c7] shadow-lg p-5"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="post-report-title"
+          >
+            <h2 id="post-report-title" class="text-sm font-black uppercase tracking-wider text-[#1d2327] mb-2">
+              Signaler une erreur
+            </h2>
+            <p class="text-xs text-slate-500 mb-3">
+              Une info incorrecte sur <strong>{{ post.title }}</strong> ? Décris le problème — l’équipe le traitera.
+            </p>
+            <textarea
+                v-model="reportBody"
+                rows="5"
+                class="w-full border border-[#c3c4c7] p-2.5 text-sm"
+                placeholder="Ex. : lien mort, erreur factuelle, contenu obsolète…"
+                maxlength="4000"
+            />
+            <div class="flex justify-end gap-2 mt-4">
+              <button type="button" class="btn btn--secondary" :disabled="reportSending" @click="showReportModal = false">
+                Annuler
+              </button>
+              <button type="button" class="btn btn--primary" :disabled="reportSending" @click="submitReport">
+                {{ reportSending ? 'Envoi…' : 'Envoyer' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </Teleport>
 
     </div>
 

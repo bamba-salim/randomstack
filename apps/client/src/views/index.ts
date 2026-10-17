@@ -61,6 +61,19 @@ const router = createRouter({
                     meta: {requiresAuth: true}
                 },
                 {
+                    path: 'suggest-article',
+                    name: 'suggest-article',
+                    component: () => import('./modules/blog/SuggestArticleView.vue'),
+                    meta: {requiresAuth: true}
+                },
+                {
+                    path: 'author-request',
+                    name: 'author-request',
+                    component: () => import('./modules/commons/AuthorRequestView.vue'),
+                    meta: {requiresAuth: true}
+                },
+
+                {
                     path: 'technology/:slug',
                     name: 'technology-detail',
                     component: () => import('./modules/stack/TechnologyDetailView.vue')

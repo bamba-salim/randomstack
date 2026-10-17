@@ -8,6 +8,7 @@ import {
     type UpdateInboxStatusFormBean
 } from '@randomstack/commons'
 import {TechnologyModel} from '#stack'
+import {BlogModel} from '#blog'
 import InboxModel from './inbox.model'
 import InboxMapper from './inbox.mapper'
 
@@ -24,6 +25,7 @@ export default class InboxController {
 
             const data = req.body as CreateInboxMessageFormBean
             let techName: string | null = null
+            let postTitle: string | null = null
 
             if (data.technologyId) {
                 const tech = await TechnologyModel.fetchTechnologyById(data.technologyId)
@@ -34,14 +36,27 @@ export default class InboxController {
                 techName = tech.name
             }
 
+            if (data.postId) {
+                const post = await BlogModel.fetchPostById(data.postId)
+                if (!post) {
+                    res.status(400).json({error: 'Article introuvable.', field: 'postId'})
+                    return
+                }
+                postTitle = post.title
+            }
+
             if (data.kind === INBOX_KIND.TECH_REPORT && !data.technologyId) {
                 res.status(400).json({error: 'Technologie requise.', field: 'technologyId'})
+                return
+            }
+            if (data.kind === INBOX_KIND.POST_REPORT && !data.postId) {
+                res.status(400).json({error: 'Article requis.', field: 'postId'})
                 return
             }
 
             const subject =
                 data.subject?.trim()
-                || InboxMapper.defaultSubject(data.kind, techName, null)
+                || InboxMapper.defaultSubject(data.kind, techName, postTitle)
 
             const row = await InboxModel.create({
                 kind: data.kind,

@@ -11,7 +11,7 @@ import {
   toggleFavorite
 } from '#services'
 import type {SessionUserLite, PublicPostListed} from '@randomstack/commons'
-import {FILE_TYPE, TABLE} from '@randomstack/commons'
+import {FILE_TYPE, TABLE, USER_ROLE} from '@randomstack/commons'
 import {getAdminNavLinks} from '../../../lib/admin-nav'
 import {toast} from '../../../lib/toast'
 import PostCard from '../blog/components/PostCard.vue'
@@ -36,6 +36,7 @@ const removingFavoriteId = ref<string | null>(null)
 
 const initials = computed(() => (displayName.value || '?').substring(0, 2).toUpperCase())
 const adminLinks = computed(() => getAdminNavLinks(user.value?.role))
+const canRequestAuthor = computed(() => user.value?.role === USER_ROLE.USER)
 
 const hydrateForm = (sessionUser: SessionUserLite) => {
   displayName.value = sessionUser.displayName || ''
@@ -214,6 +215,28 @@ const handleLogout = async () => {
           >
             {{ link.label }}
           </a>
+        </div>
+      </section>
+
+      <section class="profile-card__admin">
+        <h2 class="profile-card__section-title">Contributions</h2>
+        <p class="profile-card__admin-lead">
+          Propose une techno, un article, ou demande le statut auteur.
+        </p>
+        <div class="profile-card__admin-links">
+          <router-link to="/suggest-technology" class="btn btn--primary">
+            Suggérer une techno
+          </router-link>
+          <router-link to="/suggest-article" class="btn btn--secondary">
+            Suggérer un article
+          </router-link>
+          <router-link
+              v-if="canRequestAuthor"
+              to="/author-request"
+              class="btn btn--secondary"
+          >
+            Demander à être auteur
+          </router-link>
         </div>
       </section>
 
