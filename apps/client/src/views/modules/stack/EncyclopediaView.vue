@@ -78,9 +78,16 @@ onMounted(async () => {
   <main class="container-catalog py-8 flex flex-col gap-6">
 
     <!-- En-tête de page universel -->
-    <header class="page-header">
-      <h1 class="page-title">L'Encyclopédie</h1>
-      <p class="page-subtitle">Découvrez le catalogue des technologies de RANDOMSTACK</p>
+    <header class="page-header page-header--flush">
+      <div class="page-header__row">
+        <div>
+          <h1 class="page-title">L'Encyclopédie</h1>
+          <p class="page-subtitle">Découvrez le catalogue des technologies de RANDOMSTACK</p>
+        </div>
+        <router-link to="/suggest-technology" class="btn btn--primary shrink-0">
+          Suggérer une techno
+        </router-link>
+      </div>
     </header>
 
     <AdSlot placement="encyclopedia-banner" variant="banner"/>

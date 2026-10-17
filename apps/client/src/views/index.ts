@@ -55,6 +55,12 @@ const router = createRouter({
                     component: () => import('./modules/stack/EncyclopediaView.vue')
                 },
                 {
+                    path: 'suggest-technology',
+                    name: 'suggest-technology',
+                    component: () => import('./modules/stack/SuggestTechnologyView.vue'),
+                    meta: {requiresAuth: true}
+                },
+                {
                     path: 'technology/:slug',
                     name: 'technology-detail',
                     component: () => import('./modules/stack/TechnologyDetailView.vue')
