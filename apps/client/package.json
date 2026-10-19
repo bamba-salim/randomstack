@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@randomstack/commons": "*",
-    "vue": "^3.4.15",
+    "vue": "^3.5.44",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
